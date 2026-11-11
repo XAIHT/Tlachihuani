@@ -1,5 +1,7 @@
 # Build the Windows release ZIP
 
+Current documentation: **[0.3.3 pre-release](releases/v0.3.3.md)**.
+
 Open a visible Command Prompt in the Tlachihuani repository root and run:
 
 ```bat
@@ -18,6 +20,12 @@ on their first use. Caches and scratch space stay inside `artifacts`; client
 machines need none of these development tools.
 
 ## Version and source
+
+For the documented pre-release, the numeric product version is **0.3.3** and the
+GitHub release should be marked **pre-release**. The existing builder must select
+`v0.3.3` or `0.3.3` under the rules below. A documentation edit or GitHub channel
+label does not select or stamp the binary version. Do not expect a suffixed
+`v0.3.3-rc.1` tag to be selected. This update creates no tag or package.
 
 Each invocation reads local Git tags again. The highest numeric stable tag in
 `vX.Y.Z` or `X.Y.Z` form supplies the version; creation dates and lexical sorting

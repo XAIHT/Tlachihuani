@@ -1,4 +1,29 @@
-# Release command and optional tray startup — 2026-11-04
+# Implementation status · 0.3.3 pre-release
+
+Current documentation: **[0.3.3 pre-release](releases/v0.3.3.md)**, updated
+11 November 2026. The latest source evidence is the
+[10 November Torrenter recovery record](verification/2026-11-10-torrenter-recovery.md):
+64 automated checks, 48 headed-browser checks across both controller editions,
+four real local-peer transfers and 432 independently matched existing files.
+
+The implementation includes stalled-slot scheduling, disk-complete verification,
+accurate completed/stopped/error reporting, state-aware recovery controls and the
+sortable per-account workspace. Windows ZIP setup, optional XT sign-in startup,
+Manual services and Control Panel removal are carried forward. Their earlier
+package tests below retain the versions actually tested. No new package or
+installed-service acceptance is implied by this documentation bump.
+
+The active checkout is `C:\Development\XAIHT\repo\Tlachihuani`. Its product
+metadata already declares 0.3.3. The [11 November documentation check](verification/2026-11-11-documentation.md)
+records the path correction and documentation-only validation separately from
+the historical runtime tests below.
+
+Remaining release qualification: fresh package validation, clean installation,
+both startup choices, real reboot, ordinary-user XT, lifecycle and file delivery,
+Control Panel removal, signing, rollback and long-running transfer checks. The
+separate **Panels → Tlachihuani** lifecycle panel remains a design target.
+
+## Release command and optional tray startup — 2026-11-04
 
 `Build-Release.cmd` now generates `dist/Tlachihuani-<version>-windows-x64.zip`
 and its SHA-256 from the latest numeric stable local Git tag and the current
@@ -14,7 +39,7 @@ success. Login never starts services; the operator uses Start Services in XT.
 Two visible release-command runs completed at 0.2.1, each passing four release
 version tests, eleven lifecycle checks, a byte-for-byte comparison of 1,100
 runtime files plus maintenance files in three MSI cabinets, and ZIP CRC,
-allowlist, extraction, size and hash checks. The current ZIP is 103,415,658 bytes;
+allowlist, extraction, size and hash checks. That tested ZIP was 103,415,658 bytes;
 SHA-256: `013f1ce6d3d60c92a331d63ff39684fe263cdbb0bdc340f23295fec9747240af`.
 Run evidence: `artifacts/release-builds/20261104-195653-49a20ec3/build.log`.
 
@@ -38,7 +63,7 @@ cross-account login and reboot acceptance on a clean Windows machine. The
 shipping package remains unsigned. Existing production services/downloads were
 not modified by the QA test.
 
-# Offline ZIP and Windows registration — 2026-11-04
+## Offline ZIP and Windows registration — 2026-11-04
 
 The 0.2.1 packaging update creates a self-contained Windows x64 ZIP with both wizards, an offline styled guide, quick-start instructions, a file manifest and SHA-256 checksums. Separate .NET 10 installation is no longer required. See [the packaging notes](releases/v0.2.1.md) and [setup guide](../packaging/setup/README.md).
 
@@ -46,7 +71,7 @@ Visible workstation verification passed all 11 lifecycle checks, ZIP extraction/
 
 These SCM acceptance tests use inert QA service binaries with separate identities and paths. They do not certify the production Jobs workload or upgrade the existing 0.1.0 workstation installation. The package is unsigned. Reboot, cross-account and long-running transfer acceptance remain separate gates.
 
-# Windows setup — 2026-11-03
+## Windows setup — 2026-11-03
 
 The versioned setup output under `artifacts/setup/<version>/windows-x64/` contains the graphical installer and matching uninstaller. Workstation UI automation has exercised both version labels, Review and Cancel. Visible isolated acceptance installed the QA package, started both SCM services, removed it, reinstalled it with the same protected Jobs identity and removed it again. The test uses inert service binaries and separate product and service IDs. Full production-payload acceptance requires a clean machine or Windows Sandbox. Build, maintenance and test commands are in the [Windows setup guide](../packaging/setup/README.md).
 
@@ -64,9 +89,13 @@ The following entries are the historical October 11 foundation record.
 
 ## Lifecycle foundation — 2026-10-11
 
+The following foundation inventory and limitations describe the 11 October
+baseline. Later Jobs and installer evidence appears above; do not read this
+historical list as the current 0.3.3 feature inventory.
+
 This page distinguishes working code from the broader design. No SCM service, registry startup entry, local Git repository or GitHub repository was created. Tlamatini remains a separate, read-only checkout at `C:\Development\XAIHT\Tlamatini`, https://github.com/XAIHT/Tlamatini.
 
-## Implemented
+### Implemented at that baseline
 
 | Component | Current behavior |
 |---|---|
@@ -84,13 +113,13 @@ Protocol clarification from live testing: after reading a complete framed reply,
 
 Start/Stop/Restart operate entirely through SCM and do not wait for pipe health. Their 30-second deadline returns failure/timeout rather than guessing success or killing a process. Mutations serialize across processes through a Windows mutex restricted to the configured operator, administrators and SYSTEM. Synchronous results use `request_id`; persistent `operation_id` receipts and automatic retries are not part of this foundation. Do not retry Restart blindly after a controller disconnect.
 
-## Verification
+### Foundation verification
 
 See [the dated verification record](verification/2026-10-11-foundation.md) for exact checks, results, initial defects and limitations. Tests execute visibly, including the temporary real service-host process. That process shuts itself down after 12 seconds and is never registered with SCM. The tray's native status window was inspected on the real desktop; shell notification-area positioning remains Windows-controlled.
 
 NuGet is the sole package source. `Microsoft.Extensions.Hosting.WindowsServices` is pinned to `10.0.12`, SDK to `10.0.401` (latest patch roll-forward), and transitive dependencies are locked. NuGet audit is enabled. No Snyk scan, hook, skill or package is used. Microsoft references: [Worker services on Windows](https://learn.microsoft.com/en-us/dotnet/core/extensions/windows-service), [named-pipe ACLs](https://learn.microsoft.com/en-us/windows/win32/ipc/named-pipe-security-and-access-rights), [package metadata](https://www.nuget.org/packages/Microsoft.Extensions.Hosting.WindowsServices/10.0.12).
 
-## Not implemented or not accepted yet
+### Limitations recorded on 11 October
 
 - Actual installed-service acceptance, cross-account/remote-pipe tests, reboot/sign-out tests and Explorer restart verification. Current token is unelevated; native installation was not performed.
 - Force termination, UAC/host consent, elevated helper, durable receipts and restart request deduplication. `force_stop` is explicitly false.

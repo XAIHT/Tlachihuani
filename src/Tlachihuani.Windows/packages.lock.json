@@ -8,7 +8,7 @@
       "tlachihuani.core": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[0.3.2, )"
+          "Tlachihuani.Contracts": "[0.3.3, )"
         }
       }
     },

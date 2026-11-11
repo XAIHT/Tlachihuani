@@ -1,5 +1,9 @@
 # Operating Torrenter
 
+Documentation for **[0.3.3 pre-release](releases/v0.3.3.md)**. See the
+[dated recovery verification](verification/2026-11-10-torrenter-recovery.md) for
+source results and installed-audit limits.
+
 Torrenter downloads selected files in the independent Windows service `Tlachihuani.Jobs`. The XT tray, browser and original `Tlachihuani` service have separate lifetimes. Closing a window releases its UI session. Windows owns the download host under `NT SERVICE\Tlachihuani.Jobs`.
 
 ## Open the workspace
@@ -28,7 +32,7 @@ For a new graphical installation, follow the [installer and uninstaller guide](.
 Use a verified visible foreground PowerShell console in the source checkout. Windows x64 requires the .NET 10 ASP.NET Core and Desktop shared runtimes. The pinned .NET SDK supplies both on the development machine.
 
 ```powershell
-Set-Location -LiteralPath 'C:\Development\XAIHT\Tlachihuani'
+Set-Location -LiteralPath 'C:\Development\XAIHT\repo\Tlachihuani'
 .\scripts\Build.ps1 -Mode Check
 .\scripts\Build.ps1 -Mode Publish
 ```
@@ -55,7 +59,7 @@ To enable XT on future logins, run `.\packaging\windows\Set-TrayStartup.ps1` as 
 
 ## REST contract for the browser and wrapped agent
 
-Use the API prefix `/api/v1`. For automation, select **Issue API credential** in XT or enroll a trusted gateway through the native pipe. Scopes are `read`, `submit`, `control`, `remove` and `erase`. Send credentials as `Authorization: Bearer <token>`. Job IDs and receipts belong to the issuing account. Direct tokens expire after one hour, paired browser tokens after 30 minutes and gateway-issued tokens after five minutes.
+Use the API prefix `/api/v1`. Ordinary workspace access uses the signed-in Tlamatini account, its session and CSRF protection; it asks for no pairing code. For automation, select **Issue API credential** in XT or enroll a trusted gateway through the native pipe. Scopes are `read`, `submit`, `control`, `remove` and `erase`. Send credentials as `Authorization: Bearer <token>`. Job IDs and receipts belong to the issuing account. Direct tokens expire after one hour and gateway-issued tokens after five minutes.
 
 | Intent | Request | Result |
 |---|---|---|
@@ -112,9 +116,9 @@ records are not evidence of downloading; the peer suite supplies that evidence.
 The 10 November run passed 64 automated checks and 48 headed-browser checks across
 both editions. Four real local-peer payloads completed despite two silent swarms.
 An independent read-only installed audit matched all 432 delivered files from 21
-completed downloads. Evidence is under
-`artifacts/verification/torrenter-state-20261110/`; the installed service and its
-three unfinished downloads were left unchanged.
+completed downloads. The [dated verification record](verification/2026-11-10-torrenter-recovery.md)
+identifies the original evidence location; those results predate the checkout
+relocation. The installed service and its three unfinished downloads were left unchanged.
 
 ### Windows Downloads publication (1 November 2026)
 

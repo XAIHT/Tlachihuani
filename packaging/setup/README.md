@@ -1,10 +1,12 @@
 # Windows setup
 
+Documentation for **[0.3.3 pre-release](../../docs/releases/v0.3.3.md)**.
+
 The two x64 Windows wizards use Tlamatini's dark setup palette, Segoe UI and the original XT icon. Their title and version label use the compiled assembly version sourced from the project's `Directory.Build.props`. Installer.exe contains a compressed Windows Installer package. Uninstaller.exe targets the corresponding registered product. Neither needs the source tree at runtime.
 
 ## Install and operate
 
-Use Windows 11 x64. Extract `Tlachihuani-0.2.1-windows-x64.zip` with **Extract All** and read `START-HERE.html`. This package carries private .NET 10 and CPython/libtorrent runtimes; clients do not need to install a runtime or SDK. Sign in as the intended operator. Open **Installer.exe**, choose **Review**, confirm the operator, destination and version, and select **Install**. Approve UAC. If a different administrator supplies credentials, the operator shown in the original review remains the delegated operator.
+Use Windows 11 x64. Extract the matching `Tlachihuani-0.3.3-windows-x64.zip` pre-release with **Extract All** and read `START-HERE.html`. This package carries private .NET 10 and CPython/libtorrent runtimes; clients do not need to install a runtime or SDK. Sign in as the intended operator. Open **Installer.exe**, choose **Review**, confirm version **0.3.3**, the operator and destination, and select **Install**. Approve UAC. If a different administrator supplies credentials, the operator shown in the original review remains the delegated operator.
 
 Before Review, choose **Show XT at Windows sign-in (all users of this PC)** or leave it unchecked. Review displays that choice. After **Installation complete**, the original unelevated wizard opens the gray tray icon once; both services remain stopped. **Start menu and Desktop shortcuts** always reopen XT. If the entire wizard was launched as administrator, use either shortcut from your normal Desktop session. Choose **Start Services** in XT when needed.
 
@@ -16,9 +18,9 @@ Stop both services from XT. Exit the tray in every active Windows session. Start
 
 Windows Installer removes registered services, its own shortcuts and packaged files. Downloads, application-generated exports, job state and account manifests are retained. Reinstall as the original operator. Windows Installed apps also provides removal if the standalone uninstaller is lost. A different-version installation or a script-managed deployment must be maintained using the tools for that installation. An in-place upgrade is not offered by these wizards.
 
-### Moving from 0.1.0 / 0.2.0 to 0.2.1
+### Moving from an earlier wizard installation to 0.3.3 pre-release
 
-Stop Services, exit XT, remove the old wizard installation through Windows or its original uninstaller and run the 0.2.1 installer as the same operator. Its build output is `artifacts/setup/0.2.1/windows-x64/`. The previously published 0.2.0 tag is unchanged.
+Stop Services, exit XT, remove the old wizard installation through Windows or its original uninstaller and run the 0.3.3 installer as the same operator. Preserve the retained identities, journal and downloads. The release builder writes the distributable to `dist/Tlachihuani-0.3.3-windows-x64.zip` when its selected numeric tag is 0.3.3. Existing historical packages and tags remain unchanged.
 
 For a legacy PowerShell installation, use its [unregister scripts](../windows/README.md) first. Disable its per-user XT startup entry. Preserve the legacy program directory and both ProgramData directories under separate backup names before a fresh wizard install. A journal in a renamed legacy folder is a backup, not an imported queue. Leave it intact.
 
@@ -31,6 +33,11 @@ If Review reports an existing service, unexpected image, different operator, or 
 ## Reproduce a build
 
 For the complete release, run **`Build-Release.cmd`** from a visible Command Prompt at the repository root (or `.\Build-Release.cmd` in PowerShell). It reads the latest numeric local release tag, stamps product versions, rebuilds into fresh staging, checks the payload and writes the ZIP plus SHA-256 into **`dist/`**. It performs no Git writes or publication. See [the full command guide](../../docs/release-building.md).
+
+The 0.3.3 pre-release designation is the publication channel. The existing builder
+selects numeric tags and ignores suffixes such as `-rc.1`; the offline guide's
+`{{VERSION}}` is replaced from the actual package version. The documentation
+update did not regenerate installers or certify their acceptance.
 
 For lower-level component development:
 

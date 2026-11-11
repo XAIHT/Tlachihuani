@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/releases/v0.2.1.md"><img src="assets/branding/badge-version.svg" alt="Latest released version: v0.2.1 — release notes" /></a>
+  <a href="docs/releases/v0.3.3.md"><img src="assets/branding/badge-version.svg" alt="Tlachihuani v0.3.3 pre-release — release notes" /></a>
   <a href="#installation"><img src="assets/branding/badge-windows.svg" alt="Windows 11 x64 installation" /></a>
   <a href="packaging/setup/README.md"><img src="assets/branding/badge-package.svg" alt="Offline ZIP installation package" /></a>
   <a href="#build-from-source"><img src="assets/branding/badge-dotnet.svg" alt="Build with .NET 10" /></a>
@@ -21,13 +21,13 @@
 </p>
 
 <p align="center">
-  <b>Latest released version: <a href="docs/releases/v0.2.1.md">v0.2.1</a></b><br />
-  <b>Offline installer &amp; uninstaller · Bundled runtimes · Control Panel removal</b><br />
-  Illustrated setup guide · SHA-256 checksums · Optional XT at sign-in · Desktop shortcut
+  <b>Current pre-release: <a href="docs/releases/v0.3.3.md">v0.3.3</a></b><br />
+  <b>Resilient torrent queues · Sortable workspace · Verified file delivery</b><br />
+  Offline installer &amp; uninstaller · Optional XT at sign-in · Desktop shortcut · Control Panel removal
 </p>
 
 <p align="center">
-  <a href="docs/releases/v0.2.1.md">What's new in 0.2.1</a> ·
+  <a href="docs/releases/v0.3.3.md">What's new in 0.3.3</a> ·
   <a href="#installation">Install &amp; uninstall</a> ·
   <a href="packaging/setup/README.md">Package guide</a> ·
   <a href="#first-download">First download</a> ·
@@ -47,6 +47,28 @@ If XT is missing after setup, open **Tlachihuani XT** from Start or press **Win+
 3. **Start the transfer.** Choose the files you want and select **Download selected files**. You can close the browser or Tlamatini while the Jobs service continues downloading.
 4. **Find your files.** Select the completed transfer and open **Verified output** for its saved directory and each file’s SHA-256. The usual destination is **Downloads → Torrenter**. If Windows refuses delivery there, check Verified output for the application’s `content_generated` fallback.
 
+## What's new in 0.3.3 pre-release
+
+- **A queue that keeps moving.** An unfinished transfer with no payload progress
+  for 180 seconds yields its slot when another eligible download is blocked.
+  Partial files remain; retry waits at least 60 seconds. Paused and stopped jobs
+  keep the user's intent.
+- **Clear recovery actions.** Start resumes an incomplete stopped job, Resume
+  continues a paused one, and Recheck validates retained pieces after a failure.
+  Completed files remain completed when their peer session stops. Historical
+  errors are distinguished from current failures and delivery errors.
+- **A workspace you can organize.** Sort all twelve data columns, combine filters
+  and search, choose columns and row density, and save a separate view per account.
+  Mixed selections apply controls only to eligible downloads.
+- **Verified delivery.** Jobs waits for disk writes to finish before hashing.
+  Verified output shows the actual saved path and SHA-256. Session reads recover
+  from truncated responses without replaying download commands.
+
+The [release notes](docs/releases/v0.3.3.md) distinguish tested source behavior
+from package acceptance. The dated checks include 64 automated checks, 48 visible
+browser checks and four real local-peer transfers. Updating Jobs and the matching
+Tlamatini clients activates their respective changes.
+
 ## Tray controls
 
 | What you want to do | Where to go | What happens |
@@ -65,7 +87,7 @@ Use **Windows 11 x64**. The download includes private .NET and Python runtimes; 
 
 ### Install with the Windows wizard
 
-1. Get **Tlachihuani-0.2.1-windows-x64.zip** from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. The release command produces the ZIP in `dist\`.
+1. Get the matching **Tlachihuani-0.3.3-windows-x64.zip** pre-release from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **0.3.3** in the installer before proceeding. The release command produces the ZIP in `dist\`.
 2. Sign in as the Windows user who will operate XT. Open **Installer.exe** and choose whether **XT should appear at Windows sign-in**. This choice applies to all Windows users on the PC. Select **Review**, check the version, operator, destination and startup choice, then choose **Install** and approve Windows' administrator prompt.
 3. After **Installation complete**, XT appears gray in your normal Windows session. Check the hidden-icons arrow beside the clock. **Start menu and Desktop shortcuts** always let you reopen it. If the entire wizard was launched as administrator, open XT from either shortcut yourself.
 4. Choose **Start Services** only when needed. Both services remain **Stopped / Manual** after installation and reboot. Login opens XT only when you selected that option; it never starts services or downloads. With the option unchecked, open XT manually after signing in.
@@ -92,13 +114,18 @@ Or run `.\Build-Release.cmd` in a visible PowerShell console. Each run reads the
 
 The current checkout, including local edits, supplies the code; the tag supplies its version. Keep your local tags current. Prerelease tags are ignored, and a highest release tag outside the checkout's history stops the build. Fresh staging prevents old published files from leaking into a new ZIP. Build logs and source provenance stay under `artifacts/release-builds/`. See the [release command guide](docs/release-building.md) for prerequisites and acceptance checks.
 
+For **0.3.3 pre-release**, the existing builder needs a numeric `v0.3.3` or
+`0.3.3` tag selected by those rules; GitHub's **pre-release** publication flag is
+separate. A suffixed tag such as `v0.3.3-rc.1` is not selected by this builder.
+This documentation update does not generate a ZIP, change tags or publish a release.
+
 <details>
 <summary><b>Show PowerShell commands and runtime requirements</b></summary>
 
 Use the SDK pinned in [global.json](global.json). Open a visible foreground PowerShell console and keep it open for the results. From the source checkout on this machine, run:
 
 ```powershell
-Set-Location -LiteralPath 'C:\Development\XAIHT\Tlachihuani'
+Set-Location -LiteralPath 'C:\Development\XAIHT\repo\Tlachihuani'
 .\scripts\Build.ps1 -Mode Check
 .\scripts\Build.ps1 -Mode Publish
 .\scripts\Build-Setup.ps1
@@ -114,6 +141,7 @@ These lower-level commands are for component development. **Check** exercises th
 
 | For operators | For developers |
 | :--- | :--- |
+| [0.3.3 pre-release notes](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
 | [Torrenter workspace and REST API](docs/torrenter.md) | [Architecture and process responsibilities](docs/architecture.md) |
 | [Service lifecycle](docs/lifecycle.md) | [Controller commands and JSON replies](docs/control-protocol.md) |
 | [Panel and tray](docs/panel-and-tray.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |
@@ -126,7 +154,7 @@ The browser workspace and Tlamatini’s wrapped Torrenter agent use the same acc
 
 | Reference | Location |
 |---|---|
-| This independent project | `C:\Development\XAIHT\Tlachihuani` |
+| This independent project | `C:\Development\XAIHT\repo\Tlachihuani` |
 | Tlachihuani on GitHub | [github.com/angelahack1/Tlachihuani](https://github.com/angelahack1/Tlachihuani) |
 | Tlachihuani Git origin | `https://github.com/angelahack1/Tlachihuani.git` |
 | Tlamatini source checkout | `C:\Development\XAIHT\Tlamatini` |

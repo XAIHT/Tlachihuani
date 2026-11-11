@@ -1,5 +1,11 @@
 # Verification plan
 
+Current documentation: **[0.3.3 pre-release](releases/v0.3.3.md)**. Consult
+[implementation status](implementation-status.md) and the
+[10 November source results](verification/2026-11-10-torrenter-recovery.md) before
+marking any gate complete. Historical source checks and MSI fixtures do not
+certify a newly built 0.3.3 installation.
+
 Actual foundation results are in [the 2026-10-11 record](verification/2026-10-11-foundation.md). The cases below remain acceptance requirements, not claims of completion.
 
 This is a future acceptance matrix. Every runtime case is **NOT_RUN** in the design scaffold. Documentation integrity and the source inventory are separate checks, recorded in [source-review.md](source-review.md).

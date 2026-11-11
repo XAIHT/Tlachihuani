@@ -3,13 +3,18 @@
 
 This is the onboarding document for Claude, Codex, and every coding agent working on Tlachihuani.
 
-For v0.2.1 ZIP packaging, migration and verification, read the [packaging notes](docs/releases/v0.2.1.md) and the [Windows setup guide](packaging/setup/README.md). Change the product version in `Directory.Build.props` and refresh internal project lock references together.
+Current documentation is **[0.3.3 pre-release](docs/releases/v0.3.3.md)**, as explicitly
+requested by Angela on 11 November 2026. Read the [Windows setup guide](packaging/setup/README.md)
+for packaging and migration, and the [10 November recovery record](docs/verification/2026-11-10-torrenter-recovery.md)
+for source verification. This checkout already declares `0.3.3` in `Directory.Build.props` and internal
+project lock references. Preserve those matching values. Future stamps must update
+both together; documentation changes do not rebuild existing binaries or create Git tags.
 
 `Build-Release.cmd` is the root release entry point. It chooses the highest stable local Git tag numerically, stamps product/internal project versions, rebuilds into fresh staging and verifies before copying the install ZIP to `dist`. It never commits, tags or pushes. See [release building](docs/release-building.md). Setup asks whether XT should appear at sign-in, always installs Start/Desktop shortcuts, and leaves both services stopped/Manual. Startup shortcuts must never start services. Preserve the distinction between the original unelevated wizard and its privileged MSI helper.
 
 ## Project identity and controller
 
-**Project root:** `C:\Development\XAIHT\Tlachihuani`.
+**Project root:** `C:\Development\XAIHT\repo\Tlachihuani`.
 Its GitHub repository is **https://github.com/angelahack1/Tlachihuani**; the verified Git origin is **https://github.com/angelahack1/Tlachihuani.git**.
 
 **Tlamatini reference checkout:** `C:\Development\XAIHT\Tlamatini`.
@@ -30,7 +35,15 @@ The 2026-10-11 review used Tlamatini HEAD `c18d50815cfe8b1681f805fd4e76c66fbaeab
 
 ## Torrenter and the Jobs host
 
-Read [the operating and REST contract](docs/torrenter.md). The independent `Tlachihuani.Jobs` SCM service owns the provider registry and child-process lifetime. A protected worker journal owns transfer state, permissions and durable receipts. XT manages providers on the Jobs v2 pipe. The web facade at `127.0.0.1:12064` exposes the transfer API to paired browsers and enrolled automation clients. SCM installation, delegated control and headed XT pairing were tested on 2026-10-31.
+Read [the operating and REST contract](docs/torrenter.md). The independent `Tlachihuani.Jobs` SCM service owns the provider registry and child-process lifetime. A protected worker journal owns transfer state, permissions and durable receipts. XT manages providers on the Jobs v2 pipe. The web facade at `127.0.0.1:12064` exposes the account-scoped transfer API. Browsers sign in through Tlamatini and use its session and CSRF protection; ordinary workspace access asks for no pairing code. Native Windows enrollment supplies scoped automation credentials.
+
+Keep the canonical workspace assets synchronized with both Tlamatini editions
+when their changes are authorized. Preserve recovery semantics: completion is
+separate from stopped peer activity; current errors are not historical errors;
+reported seeds are not connected peers. The scheduler yields a stalled slot only
+to blocked eligible work (180-second stall, minimum 60-second retry). Publication
+waits for the disk-complete pause alert. Source and installed acceptance are
+separate evidence; see the linked verification record.
 
 ## Original service design decisions
 
@@ -49,7 +62,7 @@ Read [the operating and REST contract](docs/torrenter.md). The independent `Tlac
 
 Follow [development-execution.md](docs/development-execution.md): verified visible foreground development console; explicitly headed browser automation; no invisible test or diagnostic; monitor live and retain exit codes. This is not a requirement for extra end-user service consoles.
 
-Work only within the new project unless the user broadens scope. Do not create a GitHub repository, invent its URL, initialize a remote, commit, publish, or push without instructions. Angela will create the repository personally. Preserve authorship and never rewrite history.
+Work within this project unless the user broadens scope. The existing GitHub repository is listed above. Do not create additional repositories or remotes, commit, publish, or push without instructions. Preserve authorship and never rewrite history.
 
 Angela explicitly rejected Snyk on 2026-10-11. Do not use its skills, hooks or tools. Its global Codex server/hooks/skills were disabled at her request. NuGet audit remains enabled for this solution.
 

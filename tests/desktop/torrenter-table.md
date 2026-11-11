@@ -1,12 +1,16 @@
 # Torrenter table regression checks
 
+Referenced by **[0.3.3 pre-release](../../docs/releases/v0.3.3.md)**. The
+[10 November record](../../docs/verification/2026-11-10-torrenter-recovery.md)
+reports 48 passing headed checks, 24 per edition.
+
 Run from a verified visible foreground development console. These checks do not
 install, restart or modify Windows services. They do not touch either edition's
 normal database, account settings or downloads.
 
 ```powershell
 node --test tests/unit/workspace_table.test.cjs
-python tests/desktop/torrenter_table.py --output C:\Development\XAIHT\Tlachihuani\artifacts\verification\table-review --english C:\Development\XAIHT\Tlamatini --spanish C:\Development\XAIHT\Tlamatini-Spanish
+python tests/desktop/torrenter_table.py --output C:\Development\XAIHT\repo\Tlachihuani\artifacts\verification\table-review --english C:\Development\XAIHT\Tlamatini --spanish C:\Development\XAIHT\Tlamatini-Spanish
 ```
 
 Use the prepared Python 3.12 development environment with Django, Playwright,
@@ -21,6 +25,12 @@ in process. It deliberately bypasses the installed Windows control pipe. The
 isolated journal contains 263 historical QA records for one account and 12 for
 another. These are fixture records, **not claimed downloads**. No torrent network
 session is started. Ports 19431 and 19432 must be available.
+
+Recovery checks send actual Start/Stop and Recheck requests through the source
+workspace and API adapter, preserve completed/stopped file/source controls, and
+verify that ineligible actions are disabled. One read-only session response is
+deliberately truncated to test bounded recovery. Torrent mutations are never
+intercepted for success or automatically replayed by that retry.
 
 The headed browser checks all twelve data headers in both directions against an
 independent Python ordering calculation, keyboard and secondary sorting, search

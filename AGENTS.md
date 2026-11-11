@@ -2,7 +2,12 @@
 
 Read [CLAUDE.md](CLAUDE.md) and [NEXT_SESSION.md](NEXT_SESSION.md) before implementation.
 
-- Work in `C:\Development\XAIHT\Tlachihuani`. The separate reference checkout is `C:\Development\XAIHT\Tlamatini`, upstream [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini).
+Current documentation: **[0.3.3 pre-release](docs/releases/v0.3.3.md)**, explicitly
+requested by Angela on 11 November 2026. Preserve this pre-release designation.
+Historical versions and dated verification results remain historical. This
+documentation bump does not authorize builds, tags, commits or publication.
+
+- The authoritative source checkout is `C:\Development\XAIHT\repo\Tlachihuani` (Angela's correction, 11 November 2026). Use this root for all new work; do not use the former checkout as the active codebase. The separate reference checkout is `C:\Development\XAIHT\Tlamatini`, upstream [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini).
 - A .NET 10 lifecycle foundation is implemented. Read [implementation status](docs/implementation-status.md) for evidence and remaining gates. Console-host verification does not certify an installed SCM service.
 - Tlamatini will control this Windows service through **Panels → Tlachihuani**. Changes to that checkout remain deferred until Angela explicitly authorizes them. Reading it is allowed.
 - GitHub repository: [angelahack1/Tlachihuani](https://github.com/angelahack1/Tlachihuani) (`https://github.com/angelahack1/Tlachihuani.git`). Do not create additional remotes or push without Angela's explicit instruction.

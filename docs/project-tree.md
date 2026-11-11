@@ -1,18 +1,25 @@
-# Project files
+# Project files · 0.3.3 pre-release
 
-Source inventory for [Tlachihuani v0.2.0](releases/v0.2.0.md). Generated installers, verification transcripts and build intermediates live under the ignored artifacts directory.
+Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
+
+Current source inventory for [Tlachihuani 0.3.3 pre-release](releases/v0.3.3.md),
+updated 11 November 2026. Includes tracked files and new documentation in this
+working tree; ignored installers, local evidence and build intermediates are excluded.
 
 ~~~text
 .editorconfig
 .gitignore
 AGENTS.md
 assets/branding/badge-dotnet.svg
+assets/branding/badge-package.svg
 assets/branding/badge-rest.svg
+assets/branding/badge-version.svg
 assets/branding/badge-windows.svg
-assets/branding/README.md
 assets/branding/readme-hero.svg
-assets/branding/XT.ico
+assets/branding/README.md
 assets/branding/xt-preview.png
+assets/branding/XT.ico
+Build-Release.cmd
 CLAUDE.md
 config/README.md
 Directory.Build.props
@@ -30,16 +37,22 @@ docs/reference/preparation-verification.md
 docs/reference/tlamatini-skills.json
 docs/reference/tlamatini-source-coverage.csv
 docs/reference/tlamatini-tracked-files.txt
+docs/release-building.md
 docs/releases/v0.2.0.md
+docs/releases/v0.2.1.md
+docs/releases/v0.3.3.md
 docs/security-and-installation.md
 docs/skill-inventory.md
 docs/source-review.md
 docs/tlamatini-integration.md
 docs/torrenter.md
-docs/verification/2026-10-11-foundation.md
 docs/verification-plan.md
+docs/verification/2026-10-11-foundation.md
+docs/verification/2026-11-10-torrenter-recovery.md
+docs/verification/2026-11-11-documentation.md
 global.json
 integrations/tlamatini/README.md
+LICENSE
 NEXT_SESSION.md
 NuGet.Config
 packaging/setup/build.py
@@ -48,21 +61,24 @@ packaging/setup/Guard.cs
 packaging/setup/Ownership.cs
 packaging/setup/README.md
 packaging/setup/ServiceIdentity.cs
+packaging/setup/START-HERE.html
 packaging/setup/Wizard.cs
-packaging/windows/Install.ps1
 packaging/windows/Install-Jobs.ps1
+packaging/windows/Install.ps1
 packaging/windows/JobsPayload.ps1
 packaging/windows/README.md
 packaging/windows/Set-TrayStartup.ps1
-packaging/windows/Unregister.ps1
 packaging/windows/Unregister-Jobs.ps1
+packaging/windows/Unregister.ps1
 packaging/windows/Update-Jobs.ps1
 README.md
 scripts/Assert-Visible.ps1
-scripts/Build.ps1
+scripts/Build-Release.ps1
 scripts/Build-Setup.ps1
+scripts/Build.ps1
 scripts/Prepare-JobsRuntime.ps1
 scripts/README.md
+scripts/release_version.py
 scripts/Test-Jobs.ps1
 scripts/Test-Setup.ps1
 src/README.md
@@ -96,6 +112,7 @@ src/Tlachihuani.Jobs/WorkspaceControllers.cs
 src/Tlachihuani.Jobs/wwwroot/index.html
 src/Tlachihuani.Jobs/wwwroot/layout.js
 src/Tlachihuani.Jobs/wwwroot/open-workspace.js
+src/Tlachihuani.Jobs/wwwroot/table.js
 src/Tlachihuani.Jobs/wwwroot/workspace.css
 src/Tlachihuani.Jobs/wwwroot/workspace.html
 src/Tlachihuani.Jobs/wwwroot/workspace.js
@@ -131,12 +148,19 @@ tests/contracts/README.md
 tests/desktop/foreground_console.ps1
 tests/desktop/README.md
 tests/desktop/SetupWizard.ps1
+tests/desktop/table_server.py
+tests/desktop/torrenter-table.md
+tests/desktop/torrenter_table.py
 tests/desktop/torrenter_workspace.py
 tests/integration/check_setup_payload.py
+tests/integration/check_setup_zip.py
 tests/integration/jobs_swarm.py
 tests/integration/README.md
+tests/integration/Test-SetupStartup.ps1
 tests/integration/test_delivery.py
 tests/integration/test_magnet_queue.py
+tests/integration/test_release_version.py
+tests/integration/test_transfer_recovery.py
 tests/README.md
 tests/Tlachihuani.Checks/DownloadAccessChecks.cs
 tests/Tlachihuani.Checks/packages.lock.json
@@ -144,6 +168,7 @@ tests/Tlachihuani.Checks/Program.cs
 tests/Tlachihuani.Checks/Tlachihuani.Checks.csproj
 tests/Tlachihuani.Checks/TrayLayoutChecks.cs
 tests/unit/README.md
+tests/unit/workspace_table.test.cjs
 Tlachihuani.slnx
 workers/torrent/api.py
 workers/torrent/delivery.py
