@@ -336,6 +336,8 @@ public sealed class Operations(StateStore store, TimeProvider clock)
         if (p.Revoked.IsCancellationRequested) throw new RcFault("unauthorized", "Session ended.", 401);
         var device = Access.Device(s, p.DeviceId);
         if (device.BindingId != p.BindingId) throw new RcFault("forbidden", "Account mismatch.", 403);
+        if (p.Scopes.Any(scope => !device.Scopes.Contains(scope, StringComparer.Ordinal)))
+            throw new RcFault("unauthorized", "Device permissions changed. Reconnect to continue.", 401);
     }
     private static string Canonical(JsonElement value) => value.ValueKind == JsonValueKind.Object
         ? "{" + string.Join(",", value.EnumerateObject().OrderBy(p => p.Name, StringComparer.Ordinal).Select(p => JsonSerializer.Serialize(p.Name) + ":" + Canonical(p.Value))) + "}"

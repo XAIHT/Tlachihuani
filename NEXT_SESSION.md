@@ -1,5 +1,22 @@
 # Tlachihuani handoff · 14 November 2026 · 0.3.3 pre-release
 
+## Development Start-permission fix · 14 November, 16:28 Mexico City
+
+The source correction is complete: XT can edit an approved browser’s permissions,
+with clear RC client guidance, stable device identity, separate Start/Stop authority
+and stale-review/session safeguards. Canonical and packaged development client assets
+were updated. Build, 285 core checks, 36 isolated headed-browser checks and 11 visible
+dialog assertions passed. Read [the focused report](docs/verification/2026-11-14-rc-start-permission.md).
+
+Angela explicitly requested development-only changes and will rebuild/reinstall
+herself. Do not patch the active installation. No new package was produced. Existing
+browser grants remain unchanged; after reinstall, enable Start in Connections →
+Change permissions and reconnect without a new invitation.
+
+Angela then requested all task background processes stopped. The owned test browsers
+and isolated hosts are stopped, helper loops are absent, and the walkthrough queue
+has finish.ready with no queued command. Do not restart the old queue automatically.
+
 ## Completed connection walkthrough and tutorials · 14 November 2026
 
 The installed onboarding procedure and English/Spanish narrated tutorials are complete.

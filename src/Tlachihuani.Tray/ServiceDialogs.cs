@@ -105,6 +105,35 @@ internal sealed class ServiceDialogs : StudioForm
         dialog.Open(owner);
     }
 
+    internal static string[]? RcDevicePermissions(Form owner, string device, string[] current)
+    {
+        using var dialog = new ServiceDialogs(owner, "Remote-Controller · Permissions",
+            "Remote-Controller   /   Approved browser", "Change browser permissions", new(620, 520));
+        var layout = Studio.Grid([-1], [62, -1, 78]);
+        layout.Controls.Add(ReadText(device, "Selected browser and account"), 0, 0);
+        var choices = new CheckedListBox { Dock = DockStyle.Fill, CheckOnClick = true,
+            BackColor = Studio.Pane, ForeColor = Studio.Text, Font = Studio.Regular,
+            BorderStyle = BorderStyle.FixedSingle, AccessibleName = "Browser permissions" };
+        var options = new[] { new RcPermission("monitor", "View status"), new RcPermission("chat", "Conversation"),
+            new RcPermission("workspace", "Full mobile Tlamatini workspace"), new RcPermission("launch", "Start Tlamatini"),
+            new RcPermission("stop", "Stop Tlamatini (all accounts in this edition)"), new RcPermission("schedules", "Manage schedules") };
+        foreach (var option in options) choices.Items.Add(option, current.Contains(option.Id, StringComparer.Ordinal));
+        // Preserve previously granted scopes that this six-choice editor does not expose.
+        var retained = current.Except(options.Select(x => x.Id), StringComparer.Ordinal).ToArray();
+        layout.Controls.Add(choices, 0, 1);
+        layout.Controls.Add(ReadText("Start and Stop are separate permissions. Saving ends this browser's current connection. Reconnect with its existing approval; no new invitation is needed.", "Permission change details"), 0, 2);
+        dialog.BodyArea.Controls.Add(layout);
+        var save = dialog.Choice("Save permissions", DialogResult.OK, ButtonTone.Primary);
+        var cancel = dialog.Choice("Cancel", DialogResult.Cancel);
+        dialog.AcceptButton = dialog.CancelButton = cancel; dialog.ActiveControl = cancel;
+        save.Enabled = choices.CheckedItems.Count + retained.Length > 0;
+        choices.ItemCheck += (_, e) => save.Enabled = choices.CheckedItems.Count + retained.Length
+            + (e.NewValue == CheckState.Checked ? 1 : 0) - (e.CurrentValue == CheckState.Checked ? 1 : 0) > 0;
+        return dialog.Open(owner) == DialogResult.OK
+            ? choices.CheckedItems.Cast<RcPermission>().Select(x => x.Id).Concat(retained).ToArray() : null;
+    }
+    private sealed record RcPermission(string Id, string Label) { public override string ToString() => Label; }
+
     internal static bool ReviewFiles(Form owner, JsonObject preview)
     {
         var files = preview["files"]!.AsArray();

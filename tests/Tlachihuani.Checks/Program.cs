@@ -7,6 +7,7 @@ using Tlachihuani.Contracts;
 using Tlachihuani.Core;
 using Tlachihuani.Windows;
 
+if (args is ["--rc-permissions-dialog", var permissionDirectory]) return RcPermissionDialogChecks.Run(permissionDirectory);
 if (args is ["--tray-layout", var directory, var mode]) return TrayLayoutChecks.Run(directory, mode);
 if (args is ["--rc-layout", var rcDirectory, var captureScript, var python]) return RcLayoutChecks.Run(rcDirectory, captureScript, python);
 if (args is ["--rc-broker-checks", var brokerDirectory]) return RcBrokerChecks.Run(brokerDirectory);

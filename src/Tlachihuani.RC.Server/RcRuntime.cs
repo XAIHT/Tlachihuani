@@ -56,12 +56,13 @@ internal sealed class RcRuntime : IDisposable
             "status" => Status(),
             "development-stop" when !Settings.Installed => StopDevelopment(),
             "accounts" => Accounts(sid),
-            "devices" => Store.Read(s => new { devices = s.Devices.Values.Where(d => s.Bindings[d.BindingId].WindowsSid == sid).Select(d => new { d.Id, d.BindingId, d.Name, d.Scopes, d.EnrolledAt, d.Revoked }).ToArray() }),
+            "devices" => Store.Read(s => new { devices = s.Devices.Values.Where(d => s.Bindings[d.BindingId].WindowsSid == sid).Select(d => new { d.Id, d.BindingId, d.Name, d.Scopes, d.EnrolledAt, d.Revoked, d.Revision, account_name = s.Bindings[d.BindingId].DisplayName, edition = s.Bindings[d.BindingId].Edition }).ToArray() }),
             "pending-enrollments" => Store.Read(s => new { enrollments = s.Enrollments.Values.Where(e => e.Status == "pending" && e.ExpiresAt > Clock.GetUtcNow() && s.Bindings[s.Invitations[e.InvitationId].BindingId].WindowsSid == sid).Select(e => new { e.Id, e.Name, e.Fingerprint, e.ExpiresAt, binding_id = s.Invitations[e.InvitationId].BindingId, scopes = s.Invitations[e.InvitationId].Scopes }).ToArray() }),
             "invite" => Access.CreateInvitation(Text("binding_id"), req["scopes"]?.Deserialize<string[]>(RcProtocol.Json) ?? [], sid),
             "approve" => Access.Approve(Text("enrollment_id"), Text("fingerprint"), sid),
             "decline" => Decline(Text("enrollment_id"), sid),
             "revoke" => Revoke(Text("device_id"), sid),
+            "set-device-scopes" => ChangeDeviceScopes(req, sid),
             "configuration" => Settings.Configuration,
             "configure" => Configure(req["configuration"]?.Deserialize<RcConfiguration>(RcProtocol.Json) ?? throw new RcFault("invalid_request", "Configuration is required.", 400)),
             // Account registration is available only through the trusted local operator channel.
@@ -201,6 +202,13 @@ internal sealed class RcRuntime : IDisposable
         return new { stopping = true };
     }
     private object Decline(string id, string sid) { Access.Decline(id, sid); return new { declined = true }; }
+    private object ChangeDeviceScopes(JsonObject req, string sid)
+    {
+        var device = Access.ChangeDeviceScopes((string?)req["device_id"] ?? "",
+            req["scopes"]?.Deserialize<string[]>(RcProtocol.Json) ?? [],
+            (long?)req["revision"] ?? throw new RcFault("invalid_request", "Current device revision is required.", 400), sid);
+        return new { device.Id, device.Scopes, device.Revision, reconnect_required = true };
+    }
     private object Revoke(string id, string sid) { Access.Revoke(id, sid); return new { revoked = true }; }
     private object Complete(JsonObject req, string sid, bool broker = false)
     {

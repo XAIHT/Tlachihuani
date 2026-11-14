@@ -13,7 +13,7 @@ internal sealed class RemoteControllerForm : StudioForm
     private readonly System.Windows.Forms.Timer timer = new() { Interval = 3000 };
     private readonly SemaphoreSlim gate = new(1);
     private readonly Label scmLine = TextLine("Checking Windows service…"), healthLine = TextLine("Waiting for a current observation…"), endpointLine = TextLine(""), impactLine = TextLine("");
-    private readonly StudioButton start, stop, restart, open, save, invite, approve, decline, revoke;
+    private readonly StudioButton start, stop, restart, open, save, invite, approve, decline, revoke, permissions;
     private readonly ComboBox accounts = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 460 };
     private readonly Label accountHint = TextLine("Choose the same account name you use to sign in to Tlamatini.");
     private readonly CheckedListBox scopes = new() { Height = 150, Width = 560, CheckOnClick = true, BorderStyle = BorderStyle.FixedSingle };
@@ -61,7 +61,9 @@ internal sealed class RemoteControllerForm : StudioForm
         var connections = Page(tabs, "Connections");
         connections.Controls.Add(TextLine("Trusted devices and their account-scoped permissions")); connections.Controls.Add(devices);
         revoke = Command("Revoke selected device…", () => _ = Mutate(Revoke), ButtonTone.Danger);
-        connections.Controls.Add(revoke);
+        permissions = Command("Change permissions…", () => _ = Mutate(ChangePermissions), ButtonTone.Primary);
+        connections.Controls.Add(Actions(permissions, revoke));
+        connections.Controls.Add(TextLine("To start Tlamatini from an approved browser, select it here and enable Start Tlamatini.\nAfter saving, reconnect that browser. No new invitation is needed."));
         connections.Controls.Add(TextLine("Revocation ends this device's sessions and pending requests.\nA new local approval is required before it can connect again."));
 
         var network = Page(tabs, "Network");
@@ -136,7 +138,7 @@ internal sealed class RemoteControllerForm : StudioForm
                 }
                 Fill(accounts, (await Call(new() { ["op"] = "accounts" }))["accounts"]!.AsArray(), AccountLabel);
                 Fill(pending, (await Call(new() { ["op"] = "pending-enrollments" }))["enrollments"]!.AsArray(), x => (string?)x["name"] ?? "Device");
-                Fill(devices, (await Call(new() { ["op"] = "devices" }))["devices"]!.AsArray(), x => $"{x["name"]} · {((bool?)x["revoked"] == true ? "Revoked" : string.Join(", ", x["scopes"]!.AsArray().Select(s => (string?)s)))}");
+                Fill(devices, (await Call(new() { ["op"] = "devices" }))["devices"]!.AsArray(), x => $"{x["name"]} · {x["account_name"]} · {x["edition"]} · {((bool?)x["revoked"] == true ? "Revoked" : string.Join(", ", x["scopes"]!.AsArray().Select(s => (string?)s)))}");
             }
         }
         catch (OperationCanceledException) when (closing.IsCancellationRequested) { }
@@ -189,6 +191,7 @@ internal sealed class RemoteControllerForm : StudioForm
                 : "Choose the account you use to sign in to Tlamatini. Ready and Connected accounts are available; the first message may take longer while Tlamatini prepares the conversation.";
         approve.Enabled = decline.Enabled = idle && ready && pending.SelectedItem is Item;
         revoke.Enabled = idle && ready && devices.SelectedItem is Item item && (bool?)item.Row["revoked"] != true;
+        permissions.Enabled = revoke.Enabled && devices.SelectedItem is Item device && device.Row["revision"] is not null;
     }
     private async Task Mutate(Func<Task> action)
     {
@@ -229,6 +232,18 @@ internal sealed class RemoteControllerForm : StudioForm
         Record("Device approved for its selected account and permissions.");
     }
     private async Task Decline() { if (pending.SelectedItem is Item item) { await Call(new() { ["op"] = "decline", ["enrollment_id"] = item.Id }); Record("Device request declined."); } }
+    private async Task ChangePermissions()
+    {
+        if (devices.SelectedItem is not Item item || item.Row["revision"] is null) return;
+        var current = item.Row["scopes"]!.AsArray().Select(x => (string)x!).ToArray();
+        var selected = ServiceDialogs.RcDevicePermissions(this,
+            $"{item.Row["name"]} · {item.Row["account_name"]} · {item.Row["edition"]}", current);
+        if (selected is null || current.Order().SequenceEqual(selected.Order())) return;
+        await Call(new() { ["op"] = "set-device-scopes", ["device_id"] = item.Id,
+            ["revision"] = (long)item.Row["revision"]!, ["scopes"] = JsonSerializer.SerializeToNode(selected, RcProtocol.Json) });
+        Record("Browser permissions saved. Reconnect the browser; its existing approval is retained.");
+        ServiceDialogs.Notice(this, "Permissions saved", "In that RC browser, open Connection & trust and click Connect.\nIts existing approval is retained. No invitation is needed.");
+    }
     private async Task Revoke()
     {
         if (devices.SelectedItem is not Item item || !ServiceDialogs.Confirm(this, "Revoke device access?", item.Label + "\nIts sessions and unexecuted requests will end. New local enrollment is required to reconnect.", "Revoke device")) return;

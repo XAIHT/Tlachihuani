@@ -214,3 +214,18 @@ Current installed connection evidence and English/Spanish tutorials are in
 The earlier [implementation verification record](verification/2026-11-13-remote-controller.md)
 retains its original scope.
 No package publication, signing, commit or push is implied by source checks.
+
+## Change an approved browser’s permissions
+
+In XT → Remote-Controller → Connections, select the browser and choose **Change
+permissions…**. The account and edition are shown alongside its name. Enable
+**Start Tlamatini** if that browser should start a stopped main application; **Stop
+Tlamatini** remains a separate choice. Save, then reconnect the browser using its
+existing approval. No new invitation is required. Reinstallation does not silently
+expand existing grants.
+
+Only the delegated local Windows operator can submit the typed set-device-scopes
+operation. It requires the current device revision, preserves the approved key and
+account, and ends that device’s previous sessions and tickets. Revoked devices and
+disabled accounts cannot regain access through a permission edit. See the
+[development regression record](verification/2026-11-14-rc-start-permission.md).

@@ -202,6 +202,44 @@ public sealed class Access(StateStore store, RcConfiguration config, TimeProvide
         }
     }
 
+    public DeviceGrant ChangeDeviceScopes(string deviceId, string[] scopes, long revision, string windowsSid)
+    {
+        scopes = RcProtocol.ValidateScopes(scopes);
+        lock (gate)
+        {
+            var changed = false;
+            var result = store.Write(s =>
+            {
+                var device = Device(s, deviceId);
+                if (Binding(s, device.BindingId).WindowsSid != windowsSid)
+                    throw new RcFault("forbidden", "Wrong local account.", 403);
+                if (revision != device.Revision)
+                    throw new RcFault("revision_conflict", "Device permissions changed. Refresh and review them again.");
+                if (device.Scopes.SequenceEqual(scopes, StringComparer.Ordinal)) return device;
+                changed = true;
+                var updated = device with { Scopes = scopes, Revision = checked(device.Revision + 1) };
+                s.Devices[deviceId] = updated;
+                foreach (var op in s.Operations.Values.Where(o => o.DeviceId == deviceId
+                    && !scopes.Contains(RcProtocol.Operations[o.Kind], StringComparer.Ordinal)
+                    && o.State is "accepted" or "running").ToArray())
+                {
+                    // Removing authority cancels queued work. Already dispatched work
+                    // remains uncertain until its owning adapter reports the outcome.
+                    var state = op.State == "accepted" ? "cancelled" : "outcome_unknown";
+                    s.Operations[op.Id] = op with { State = state, Error = "permissions_changed", PendingPermission = null };
+                    StateStore.Event(s, clock, "operation.permissions_changed", device.BindingId, op.Id, state);
+                }
+                StateStore.Event(s, clock, "device.permissions_changed", device.BindingId);
+                return updated;
+            });
+            // Keep the approved key and identity. A new signed connection receives
+            // the new permissions; existing sessions/tickets cannot retain old ones.
+            if (changed)
+                foreach (var key in sessions.Where(p => p.Value.Device == deviceId).Select(p => p.Key).ToArray()) RemoveSession(key);
+            return result;
+        }
+    }
+
     public void Revoke(string deviceId, string windowsSid)
     {
         store.Write(s =>
