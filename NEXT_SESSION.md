@@ -1,5 +1,17 @@
 # Tlachihuani handoff · 14 November 2026 · 0.3.3 pre-release
 
+## Development lifecycle-button fix · 14 November, 16:56 Mexico City
+
+Start now respects observed ready/loading state as well as permission. Both controls
+remain locked while a start/stop submission or receipt is pending; late receipt
+responses cannot reopen completed work. Canonical and packaged development client
+assets match the built output. Build, 49 headed regression checks, source whitespace
+and asset hashes passed. Read [the focused report](docs/verification/2026-11-14-rc-lifecycle-buttons.md).
+
+This update remains development-only; Angela will rebuild/reinstall Tlachihuani.
+The installed applications and user grants were not changed. Test runtimes and
+compiler servers were stopped afterward; no helper queue remains active.
+
 ## Development Start-permission fix · 14 November, 16:28 Mexico City
 
 The source correction is complete: XT can edit an approved browser’s permissions,

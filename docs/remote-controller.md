@@ -229,3 +229,13 @@ operation. It requires the current device revision, preserves the approved key a
 account, and ends that device’s previous sessions and tickets. Revoked devices and
 disabled accounts cannot regain access through a permission edit. See the
 [development regression record](verification/2026-11-14-rc-start-permission.md).
+
+## Application lifecycle buttons
+
+Start is disabled while the current application observation is ready or loading.
+Both Start and Stop remain disabled while a local lifecycle submission or its
+accepted/running receipt is pending. A failed operation releases that pending lock;
+permission and current application-state checks still apply. Offline means the
+account adapter is not currently observed, not proof that its process stopped.
+The trusted broker checks the installed process before acting. See the
+[development button regression](verification/2026-11-14-rc-lifecycle-buttons.md).
