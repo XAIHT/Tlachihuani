@@ -11,10 +11,12 @@ namespace Tlachihuani.Windows;
 public sealed class ScmBackend : IServiceBackend
 {
     private readonly bool jobs;
+    private readonly bool remoteController;
     public ScmBackend() { }
-    private ScmBackend(bool jobs) => this.jobs = jobs;
+    private ScmBackend(bool jobs, bool remoteController = false) { this.jobs = jobs; this.remoteController = remoteController; }
     public static ScmBackend ForJobs() => new(true);
-    private string ServiceName => jobs ? JobsEndpoint.ServiceName : Protocol.ServiceName;
+    public static ScmBackend ForRemoteController() => new(false, true);
+    private string ServiceName => remoteController ? RC.RcProtocol.ServiceName : jobs ? JobsEndpoint.ServiceName : Protocol.ServiceName;
 
     public NativeStatus Query()
     {
@@ -38,6 +40,11 @@ public sealed class ScmBackend : IServiceBackend
         if (!jobs) throw new InvalidOperationException("Expected the Jobs service.");
         ValidateImage(JobsInstallation.Image);
     }
+    public void ValidateRemoteControllerInstallation()
+    {
+        if (!remoteController) throw new InvalidOperationException("Expected Remote-Controller.");
+        ValidateImage(RcInstallation.Image);
+    }
     private void ValidateImage(string expected)
     {
         using var manager = OpenSCManager(null, null, 1);
@@ -54,6 +61,8 @@ public sealed class ScmBackend : IServiceBackend
             var binary = Marshal.PtrToStringUni(config.BinaryPath);
             if (jobs && !string.Equals(Marshal.PtrToStringUni(config.StartName), @"NT SERVICE\Tlachihuani.Jobs", StringComparison.OrdinalIgnoreCase))
                 throw new LifecycleException("identity_changed", "Unexpected Jobs service account.");
+            if (remoteController && !string.Equals(Marshal.PtrToStringUni(config.StartName), @"NT SERVICE\Tlachihuani.RemoteController", StringComparison.OrdinalIgnoreCase))
+                throw new LifecycleException("identity_changed", "Unexpected Remote-Controller service account.");
             if (config.Type != 0x10 || !string.Equals(binary, $"\"{expected}\"", StringComparison.OrdinalIgnoreCase))
                 throw new LifecycleException("identity_changed", "The registered service executable does not match this installation.");
         }

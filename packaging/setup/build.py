@@ -70,7 +70,7 @@ for key,value in {
     "ARPHELPLINK":"https://github.com/angelahack1/Tlachihuani#readme",
     "ARPURLINFOABOUT":"https://github.com/angelahack1/Tlachihuani",
     "ARPCONTACT":"Angela López Mendoza · XAIHT",
-    "ARPCOMMENTS":"Windows services, Torrenter Jobs and the XT tray companion",
+    "ARPCOMMENTS":"Windows services, independent Torrenter and Remote-Controller, and the XT tray companion",
     "ARPNOMODIFY":"1", "ARPNOREPAIR":"1",
 }.items(): child(pkg,"Property",Id=key,Value=value)
 child(pkg,"SetProperty",Id="ARPINSTALLLOCATION",Value="[appRoot]",Before="InstallValidate",Sequence="execute")
@@ -90,32 +90,34 @@ def component(folder,key):
     cid=ident("C",key)
     child(feature,"ComponentRef",Id=cid)
     return child(folder,"Component",Id=cid,Guid=str(uuid.uuid5(FAMILY,key)),Bitness="always64")
-for rel in ["Service/Tlachihuani.Service.exe","Control/Tlachihuani.Control.exe","Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","Jobs/runtime/python.exe","Jobs/worker/worker.py","Jobs/wwwroot/index.html"]:
+for rel in ["Service/Tlachihuani.Service.exe","Control/Tlachihuani.Control.exe","Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","Jobs/runtime/python.exe","Jobs/worker/worker.py","Jobs/wwwroot/index.html","RCServer/Tlachihuani.RC.Server.exe","RCServer/wwwroot/remote.html","RCServer/wwwroot/remote.js"]:
     if not (PUB/rel).is_file():raise RuntimeError("Missing published component: "+rel)
 if not isolated:
-    for part in ("Service","Control","Tray","Jobs"):
-        rc=json.loads((PUB/part/("Tlachihuani."+part+".runtimeconfig.json")).read_text())["runtimeOptions"]
+    for part in ("Service","Control","Tray","Jobs","RCServer"):
+        executable = "RC.Server" if part == "RCServer" else part
+        rc=json.loads((PUB/part/("Tlachihuani."+executable+".runtimeconfig.json")).read_text())["runtimeOptions"]
         if "framework" in rc or "frameworks" in rc or not rc.get("includedFrameworks"):
             raise RuntimeError("Publish self-contained win-x64 before packaging: "+part)
         for name in ("coreclr.dll","hostfxr.dll","hostpolicy.dll"):
             if not (PUB/part/name).is_file(): raise RuntimeError("Missing private runtime: "+part+"/"+name)
 guide=WORK/"START-HERE.html"
 guide.write_text((SRC/"START-HERE.html").read_text(encoding="utf-8").replace("{{VERSION}}",VERSION),encoding="utf-8")
-payload=[(p.relative_to(PUB).as_posix(),p) for part in ["Service","Control","Tray","Jobs"] for p in sorted((PUB/part).rglob("*")) if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc",".pdb")]
+payload=[(p.relative_to(PUB).as_posix(),p) for part in ["Service","Control","Tray","Jobs","RCServer"] for p in sorted((PUB/part).rglob("*")) if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc",".pdb")]
 if isolated:
     # These services cannot access the production pipe, manifests or downloads.
     # Keep the same directory layout, MSI actions, security and wizard code.
     fixture=compile_tool("Fixture.exe","Fixture.cs")
     payload=[(rel,fixture) for rel,_ in payload if rel in (
         "Service/Tlachihuani.Service.exe","Control/Tlachihuani.Control.exe",
-        "Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe")]
+        "Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","RCServer/Tlachihuani.RC.Server.exe")]
 for rel,p in payload+[("Setup/SetupIdentity.exe",guard),("Uninstaller.exe",remove),("Setup/START-HERE.html",guide)]:
     comp=component(directory(rel.rpartition("/")[0]),rel)
     fid=ident("F",rel)
     child(comp,"File",Id=fid,Name=rel.rpartition("/")[2],Source=str(p),KeyPath="yes")
-    if rel in ("Service/Tlachihuani.Service.exe","Jobs/Tlachihuani.Jobs.exe"):
-        name=NAME+(".Jobs" if rel.startswith("Jobs") else "")
-        svc=child(comp,"ServiceInstall",Name=name,DisplayName=name,Type="ownProcess",Start="demand",ErrorControl="normal",Account="NT SERVICE\\"+name)
+    if rel in ("Service/Tlachihuani.Service.exe","Jobs/Tlachihuani.Jobs.exe","RCServer/Tlachihuani.RC.Server.exe"):
+        name=NAME+(".RemoteController" if rel.startswith("RCServer") else ".Jobs" if rel.startswith("Jobs") else "")
+        display="Remote-Controller" if rel.startswith("RCServer") and not isolated else name
+        svc=child(comp,"ServiceInstall",Name=name,DisplayName=display,Type="ownProcess",Start="demand",ErrorControl="normal",Account="NT SERVICE\\"+name)
         child(comp,"ServiceControl",Name=name,Stop="uninstall",Remove="uninstall",Wait="yes")
 tray="[#" + ident("F","Tray/Tlachihuani.Tray.exe")+"]"
 standard_dirs={}

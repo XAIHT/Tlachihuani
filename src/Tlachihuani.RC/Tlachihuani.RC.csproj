@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Tlachihuani.Contracts/Tlachihuani.Contracts.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,4 +1,338 @@
-# Tlachihuani handoff · 11 November 2026 · 0.3.3 pre-release
+# Tlachihuani handoff · 14 November 2026 · 0.3.3 pre-release
+
+## Completed connection walkthrough and tutorials · 14 November 2026
+
+The installed onboarding procedure and English/Spanish narrated tutorials are complete.
+Read [the current report](docs/verification/2026-11-14-rc-connection-walkthrough.md).
+
+- Actual XT start, real main-account enablement, invitation, fresh browser enrollment,
+  full fingerprint comparison and native approval succeeded. Two real English model
+  replies succeeded, including a cold-account request without opening main chat first.
+- RC stop/start and reconnection preserved the main process and independent Torrenter
+  state. Both repeated installed XT shortcuts restore the existing window.
+- Direct XT menu, both Welcome setup links, account readiness labels, stable account
+  selection, scoped capabilities and client recovery guidance are installed locally.
+- Checks: 11 lifecycle, 267 RC core, 30 headed recovery (explicit adapter fixture),
+  15 installed consistency/state; both tutorial chapter players passed.
+- The latest RC/XT overlay verified 643 files; this is a local validation overlay,
+  not a new MSI release. Both main editions have the updated external templates.
+- Final observed state: RC running/ready; English main running; Spanish main stopped;
+  primary service and Torrenter Jobs stopped, preserving the initial baseline.
+- Deliver Spanish from artifacts/rc-video-tutorial/es and corrected English from
+  artifacts/rc-video-tutorial/en-verified. Both include MP4, subtitles and a chapter
+  player. They are narrated screenshots with labeled examples, not continuous video.
+- Same-PC connections only. No phone/LAN acceptance, commit, push, tag or publication.
+- Retained development consoles are idle. No job/update is queued. Do not replay
+  earlier commands. The approved QA browser remains available for inspection.
+
+Earlier dated records below are historical, including the strict Spanish 49/50
+answer result. Today's connection checks do not replace that result.
+
+## Completed local acceptance · 13 November, 23:28 Mexico City
+
+The requested uninstall-first controller rebuild/install and bilingual local
+acceptance are complete. Read [the final report](docs/verification/2026-11-13-installed-rc-acceptance.md).
+Final evidence: `artifacts/rc-final-acceptance/20261114-051121/summary.json`.
+
+- Controller package: `20261114-033543-1abcb41e`; all 1,475 installed runtime
+  files match, setup exits 0, protected identities preserved.
+- Main runtimes: English `english-20261114-0255` (7,870 files), Spanish
+  `spanish-20261114-0457` (7,873 files); protected database/configuration bytes preserved.
+- 50 English + 50 Spanish requests completed with all six modes exercised on/off.
+  English answer checks: 50/50; Spanish: 49/50. ES050 returned
+  `Cae lluvia de las nubes.` instead of only `lluvia`; preserve this failure.
+- 85/85 mobile checks per edition; independent remote restart and final stop
+  verified. Both main processes and HTTP listeners are stopped. All three
+  controller services are running, RC is ready, and installed mobile assets match
+  canonical source and repository mirror. Final verification exited 0.
+- English evidence was copied from `043459` with SHA-256 provenance because its
+  runtime was unchanged. Spanish was rebuilt and retested after fixing the
+  `Devuelve` one-shot input-validation defect. Its source checks passed 247/247.
+- Earlier failed runs remain intact. No commit, push, tag, firewall change or
+  publication occurred. LAN/physical-phone checks remain deferred.
+
+The normal test console remains open and idle. The installer finish marker is
+set; no additional installation or prompt batch is queued. Do not replay the
+old commands below. They are historical recovery notes.
+
+## Historical checkpoints — superseded by the completed result
+## Corrected Spanish run active · 13 November, 23:12 Mexico City
+
+**Current acceptance:** `artifacts/rc-final-acceptance/20261114-051121`.
+The corrected Spanish `spanish-20261114-0457` runtime installed successfully at
+23:10 local: 7,873 hashes verified, 13 files updated, database/configuration
+bytes preserved. Rollback: `artifacts/main-rc-installed-backup/214634dd2e334f7ba5d9f9447910a035/Tlamatini-Spanish`.
+Spanish onboarding passed 10/10; the new remote restart/50-prompt/mobile/stop
+sequence is running. English evidence is copied unchanged from run `043459` with
+SHA-256 provenance; its executable remains the same tested `0255` build.
+
+A first evidence-copy attempt (`051051`) stopped before onboarding because this
+PowerShell environment lacked `Get-FileHash`. The helper now uses .NET SHA-256,
+matching the installer. No prompt was dispatched in that failed handoff. The
+normal queue is active; do not run the rebuild or batch again. Monitor the path
+file afresh: old JavaScript monitor closures can retain the old acceptance path.
+The final verification script is ready, including provenance checks and strict
+five-second socket-refusal checks. Execute it only after the new run completes.
+
+## Spanish input repair building · 13 November, 23:04 Mexico City
+
+Original full run `artifacts/rc-final-acceptance/20261114-043459` is complete:
+English 50/50 answers, Spanish 47/50, both 85/85 mobile, both remote restart/final
+stop. `summary.json` verifies 100 actual requests, 97 answer checks and 170 mobile
+checks. The first final socket check timed out at two seconds (Windows 10035);
+its strict refusal assertion passed with a five-second deadline. No timeout was
+accepted as shutdown. Both main processes are stopped.
+
+Spanish ES016 exposed a real lexical validation defect: the one-shot prompt-shape
+gate did not recognize `Devuelve` or several other text-transformation verbs.
+`Tlamatini-Spanish/Tlamatini/agent/rag/interface.py` and its existing prompt-shape
+regressions now cover those imperative/infinitive forms, retaining the separate
+access validator. **247/247 Spanish source checks passed.** The other original
+failures, ES028 `3 plumas` and ES050 a full sentence instead of `lluvia`, remain
+strict answer-format failures. Every original result remains intact.
+
+The retained normal console is executing `repair-spanish-input.ps1`: it verified
+the original summary, is freezing `spanish-20261114-0457`, then installs that
+Spanish-only runtime with full hashes, protected data and rollback copies.
+English remains on its unchanged `english-20261114-0255` runtime. The controller
+is still the uninstall-first verified `20261114-033543-1abcb41e` package.
+After installation, `repeat-spanish-after-input-repair.ps1` automatically creates
+a new acceptance directory, copies English JSON/PNG/log evidence with SHA-256
+and origin metadata, and runs Spanish onboarding/restart/50/mobile/stop afresh.
+Do not dispatch another copy while this command is active. Monitor build log and
+`final-acceptance-path.txt` every 5–15 seconds. Final evidence verification checks
+the copied English provenance and requires that its installed runtime is unchanged.
+
+## Fresh acceptance running · 13 November, 22:35 Mexico City
+
+The installed package is `20261114-033543-1abcb41e` (267 core and 42 gateway
+checks passed; uninstall-first install verified all 1,475 files and identities).
+Both main editions use the verified `20261114-0255` frozen runtimes.
+The normal console queue was resumed at its verified idle foreground prompt
+using `resume-visible-console.py`; its PID, creation time, owner, path, console
+membership and empty prompt were checked before entering the staged command.
+No duplicate console was opened and no visibility guard was bypassed.
+
+**Active full acceptance:** `artifacts/rc-final-acceptance/20261114-043459`.
+It runs both editions independently: onboarding, immediate remote restart,
+50 real prompts, 85 mobile checks and final remote stop. The runner preserves
+strict model-answer failures and only continues a batch with all 50 requests
+completed with matching modes. Monitor every 5–15 seconds; never replay a batch.
+After `complete.json`, run `verify-final-installed-acceptance.ps1` visibly and
+update the final evidence. The old run and every failure remain preserved.
+
+## Renewal repair checkpoint · 14 November, 03:36 UTC
+
+Run `20261114-030824` completed all 50 English requests with matching modes;
+46 strict answer checks passed and four failed. All four failures remain intact.
+Its mobile run passed 78 checks before the host-directory picker hit an expired
+RC session. The workspace opened near the end of the original 15-minute session,
+but its first page-relative renewal would have happened after expiry.
+The canonical and packaged mobile transport now renew immediately, use the
+actual expiry, and share renewal before requests and on foreground recovery.
+Mutations are never replayed. The headed gateway regression uses actual
+one-minute sessions and verifies that revocation remains effective.
+
+English stopped normally through RC at 03:35 UTC; its process and HTTP listener
+closed. Spanish has not run in this acceptance. Both main editions are stopped.
+Package `20261114-033543-1abcb41e` passed 267 core and 42 gateway checks,
+including the real one-minute renewal/revocation regression. Uninstall-first
+installation completed at 03:41 UTC: all 1,475 files match, both setup exits 0,
+all protected identities preserved. The fresh full bilingual run is queued in
+the normal console; Windows refused its focus switch and Angela was asked to
+bring that existing console to the foreground. The 90-second guard then timed
+out and ended the queue before a new acceptance directory was created. Angela
+was asked to run `& 'C:\Development\XAIHT\repo\Tlachihuani\artifacts\rc-local-diagnosis\visible.ps1'`
+in that same console. `command.ready` remains staged; no new prompt was sent.
+The queue script now catches later foreground timeouts and keeps the request
+pending; it still verifies actual visibility before executing anything. Inspect
+queue/report state before issuing another command. The runner preserves strict
+answer failures while continuing only when all 50 requests and modes succeeded;
+transport, permission, mobile or lifecycle failures still stop the sequence.
+
+Older sections below are historical checkpoints, not current run instructions.
+
+## Fresh installed run · 14 November, 03:08 UTC
+
+**Active acceptance:** `artifacts/rc-final-acceptance/20261114-030824`.
+Both `20261114-0255` frozen runtimes are now installed: 7,870 English and 7,873
+Spanish files verified; 11 changed per edition; protected database/configuration
+bytes preserved. Rollback directory: `artifacts/main-rc-installed-backup/41b68f175a734d1fa3092afb014cdb4e`.
+Controller package remains the installed `20261114-023208-81091886`.
+
+The existing normal console is running `start-fresh-after-main-repair.ps1`, which
+invokes the complete `final-installed-acceptance.ps1`. It runs English onboarding,
+remote restart, 50 real prompts, 85 mobile checks and remote stop, then Spanish
+independently. Monitor this run's `stage.json`, per-edition reports and
+`complete.json` every 5–15 seconds. Do not restart an in-progress batch.
+English EN002 returned the correct value `45` plus an unrequested explanation;
+its strict answer-format check remains failed. The installed model log confirms
+the model authored the extra text; RC delivered it with matching modes. When the
+English batch finishes and the current command exits, queue
+`continue-completed-requests.ps1`. It verifies all 50 requests actually succeeded
+with all modes available, preserves answer failures without regrading/replay,
+and continues mobile/stop plus the independent Spanish sequence. Any transport,
+permission, missing-mode or incomplete-batch failure still stops that continuation.
+Final reporting must distinguish request completion from strict answer quality;
+never call an answer-format failure a pass.
+The corrected answer comparator passed **10 checks**, keeping literal markup
+and explicitly requested casing strict. A PowerShell array-wrapper mistake in
+the preflight was fixed before this run; no prompt was sent by that failed check.
+
+After `complete.json` exists, run `verify-final-installed-acceptance.ps1` in the
+visible console and update the final report/handoff with the actual outcome.
+All earlier run directories and their failures remain preserved. The response
+repair checkpoint below now describes completed building/installation work.
+
+## Active response repair · 14 November, 02:59 UTC
+
+The corrected Tlachihuani package **`20261114-023208-81091886` is installed** after
+uninstall; all 1,475 runtime files matched and installation identities survived.
+Fresh run `artifacts/rc-final-acceptance/20261114-023937` passed English onboarding
+and immediate remote restart, then completed all 50 real prompts. Its original
+report has 48 passes: one assertion wrongly required lowercase `no` instead of
+the valid answer `No`; the other found actual loss of literal HTML text during RC
+conversion. The model returned `<b>safe</b>`, but RC displayed `safe`. Preserve
+that failure. English subsequently stopped normally through RC. Spanish has not
+started in this run.
+
+Both main editions now preserve original answer text through an owned channel
+hook in `services/response_parser.py` and `remote_controller_runtime.py`, keeping
+system-report/denial text and the normal rich output. **242/242 source checks per
+edition passed**, including actual formatter-to-adapter regression coverage.
+The normal visible console is running `repair-literal-main.ps1`: freeze English
+then Spanish to `artifacts/main-rc-freeze/{english,spanish}-20261114-0255`, then
+install the verified frozen runtime overlays using `Install-MainRcValidation.py
+20261114-0255`. Protected database/configuration bytes and rollback copies remain
+required. Do not run main `build.py`'s destructive main function.
+
+After this command finishes successfully, queue **a fresh**
+`final-installed-acceptance.ps1` in the existing verified foreground normal
+console. It will copy both installation records into a new run and perform all
+50 English + 50 Spanish prompts, 85 mobile checks per edition, immediate restart
+and final stop. The answer comparator now accepts `No` only for the comprehension
+case; explicit casing cases remain strict (8 comparator checks passed).
+The unused answer-regrading continuation was removed after the actual literal
+response defect was found. Do not regrade the literal mismatch into a pass.
+The final evidence/state verifier is `verify-final-installed-acceptance.ps1`;
+only run it after the fresh run's `complete.json` exists.
+
+The elevated installation queue remains open in PID 43244; finish it using its
+`installer-finish.ready` marker after completion. Leave the ordinary console and
+headed browsers retained. Controller services remain running; both main apps
+are currently stopped. Firewall/LAN stays deferred. Older checkpoints follow.
+
+## Active installed acceptance · 14 November, 02:39 UTC
+
+Read [the installed acceptance record](docs/verification/2026-11-13-installed-rc-acceptance.md)
+first. Package **`20261114-023208-81091886`** fixes the stale heartbeat that caused
+an immediate Spanish remote restart to report success without launching. Broker
+regressions passed 31 checks (two symbolic-link fixtures unavailable); core 267
+and isolated gateway 40 passed. Corrected uninstall-first installation is running
+in the retained elevated console after Angela restarted its expired queue.
+Then run `final-installed-acceptance.ps1` visibly for a fresh bilingual batch.
+
+Earlier installed run `20261114-015347` passed English 50 real prompts, 85 mobile
+checks and remote start/final stop. Spanish onboarding passed; its restart found
+the now-repaired product defect before any Spanish batch prompt. Preserve all
+failure/reconciliation evidence. The older checkpoints below are historical and
+do not describe the current installation or count as corrected-build acceptance.
+
+## Latest mobile work · 13 November local / 14 November UTC
+
+Read [the mobile scope and live acceptance record](docs/remote-mobile-parity.md)
+before using the older evidence below. Full touch-adapted Tlamatini is authorized,
+excluding only Agentic Control Panel, Prompt Flow Panel and Admin Panel. Both
+Torrenter pages and all other menu actions remain in scope. The canonical mobile
+assets are in `C:\Development\XAIHT\Tlamatini-RC\public`; mirror them into this
+repository's RC server `wwwroot` before packaging.
+
+Both main editions now have rebuilt frozen runtimes installed with protected
+database/configuration bytes preserved. Current source checks: 267 RC core,
+235 per main edition; 40 isolated gateway checks passed on the corrected package.
+Direct installed boot/login/owned-console cleanup passed 6 checks per edition.
+Both installed main editions passed **85/85 real mobile interaction checks** in
+visible touch-emulated Chrome, through an isolated development gateway. Spanish
+and English both used the corrected packaged gateway. These checks do not certify
+installed RC service integration or inference.
+The latest verified package is **`20261114-012418-5334617f`**. It fixes bilingual
+CSRF cookie names and workspace cookie isolation in addition to the earlier
+multipart, renewal and layout fixes. Generated-file chat links now reveal the
+mobile Canvas tab; the new touch regression also verifies a missing file retains
+the existing document and returns a real gateway 404. `validated-mobile-build.txt`
+points to this package. See the 01:35 UTC checkpoint in the mobile evidence record.
+
+The immediately preceding build failed with WiX `ERROR_DISK_FULL`. A bounded
+cleanup recovered 8.06 GiB from obsolete generated staging, retaining verified
+ZIPs, logs, source, evidence and main-application backups. Do not reuse removed
+staging paths; `obsolete-staging-cleanup.json` lists them. The latest package has
+its complete verified installation payload. Older `005815` no longer has its
+extracted `zip-check` or `payload-check` copies.
+
+Two Windows elevation requests were canceled, most recently at 00:48 UTC on
+14 November. No elevated queue started; no `installed-final.json` exists. The old
+install request was removed when the Spanish defect was found. **No install
+request is currently staged.** The existing installation is still the earlier
+`20261113-223721-17936f9b` build. Only the normal diagnostic console remains;
+`console-elevation-audit.json` found no reusable elevated development queue.
+`final-idle.json` confirms both main editions exited and all three services stopped.
+
+When Angela can handle Windows consent, queue `prepare-final-install.ps1` in the
+existing visible diagnostic console. Observe `installer-ready.json`, stage
+`{"build_id":"20261114-012418-5334617f"}` in `install-request.json`, restore the
+installation console and verify `installed-final.json` reports the exact build.
+Then run the prepared **`final-installed-acceptance.ps1`** from the unelevated,
+verified foreground diagnostic console. It starts installed services/XT and runs
+normal onboarding, browser RC stop/start, 50 real prompts, mobile checks and RC
+stop for English, then Spanish independently. **0/100 batch prompts have completed.**
+Do not count fixture/source checks as those prompts. Account activation for Spanish
+already passed through its normal password-confirmed form. All changes remain
+uncommitted; no push, tag or publication occurred.
+
+Preserve the ongoing visible diagnostic console and all evidence. Do not run a
+second hidden workload. Final install requires Windows administrator consent;
+authorization to install is already present. Firewall/LAN work remains deferred.
+
+## Active implementation · 13 November 2026
+
+Angela authorized implementing the approved Remote-Controller design and at least
+100 distinct tests. Read [Remote-Controller](docs/remote-controller.md) and
+[the verification record](docs/verification/2026-11-13-remote-controller.md) first.
+Angela also explicitly authorized changes to **both main Tlamatini applications**.
+The source now has a separate RC service, core library, live client bundle, XT
+controls and installed-application launch broker. English and Spanish implement
+account activation and the existing chat engine with execution consent and owned
+cancellation. Keep Torrenter independent and preserve database backup/restore
+mechanics. Main editions remain at the latest released **1.93.5**; this work does
+not bump a version or authorize a destructive main-app build.
+
+Observed evidence: **212/212 core checks**, **210/210 main checks in each edition**
+(including 16 real SQLite migration/deletion/revocation cases), 24 broker checks
+passed with two unavailable symbolic-link fixtures, **54/54 HTTP checks**, and
+**119/119 headed-client checks** including lost heartbeat followed by a late result
+without replay. Source carriage, syntax and edition parity passed. The final r5
+package verified **1,466 runtime files byte-for-byte**. Native XT layout passed
+11/11 at 144 DPI. The earlier **14/14 real isolated SCM checks passed** and its
+temporary service was removed; that SCM run predates final source changes.
+No UAC retry is pending. Final main-account browser acceptance passed **129/129 checks** across both
+editions, including actual chat/history/Proceed/Deny/cancellation/recovery,
+revocation and ORM account deletion using an isolated model fixture. The driver
+verified real owned Chrome foreground state before interactions and screenshots. See the verification record for paths.
+
+Recent source behavior: **Load recent conversation** uses an account-scoped typed
+history request (40 rows/24,000 JSON bytes). `RemoteControllerRevocation` retains
+account-deletion intent through service outages and app restarts. Native/account
+polling is bounded to four concurrent slots; an active authorization watchdog
+cancels after 20 seconds without renewal. RC marks running application work
+`outcome_unknown` after 20 seconds without its heartbeat, or 45 seconds for the
+broker, without automatic replay; an owning adapter may reconcile its later result.
+
+Production post-quantum transport, independent client trust/distribution, voice and
+installed end-to-end acceptance remain open gates. Do not claim the whole approved
+design is production-complete from source checks. Changes remain uncommitted;
+there has been no push, tag or publication.
+
+The earlier handoff below is historical context.
 
 Work in `C:\Development\XAIHT\repo\Tlachihuani`. The separate Tlamatini reference checkout is `C:\Development\XAIHT\Tlamatini`. Read AGENTS.md, CLAUDE.md, [the Torrenter operating guide](docs/torrenter.md) and [implementation status](docs/implementation-status.md). The design baseline is Revision 05 of `TlachihuaniKickoffDesign.html` on Angela’s Desktop.
 

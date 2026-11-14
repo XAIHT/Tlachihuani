@@ -8,13 +8,19 @@ The two x64 Windows wizards use Tlamatini's dark setup palette, Segoe UI and the
 
 Use Windows 11 x64. Extract the matching `Tlachihuani-0.3.3-windows-x64.zip` pre-release with **Extract All** and read `START-HERE.html`. This package carries private .NET 10 and CPython/libtorrent runtimes; clients do not need to install a runtime or SDK. Sign in as the intended operator. Open **Installer.exe**, choose **Review**, confirm version **0.3.3**, the operator and destination, and select **Install**. Approve UAC. If a different administrator supplies credentials, the operator shown in the original review remains the delegated operator.
 
-Before Review, choose **Show XT at Windows sign-in (all users of this PC)** or leave it unchecked. Review displays that choice. After **Installation complete**, the original unelevated wizard opens the gray tray icon once; both services remain stopped. **Start menu and Desktop shortcuts** always reopen XT. If the entire wizard was launched as administrator, use either shortcut from your normal Desktop session. Choose **Start Services** in XT when needed.
+Before Review, choose **Show XT at Windows sign-in (all users of this PC)** or leave it unchecked. Review displays that choice. After **Installation complete**, the original unelevated wizard opens the gray tray icon once; all installed services remain stopped. **Start menu and Desktop shortcuts** always reopen XT. If the entire wizard was launched as administrator, use either shortcut from your normal Desktop session. Choose **Start Services** in XT when needed.
+
+The current packaging source adds `RCServer` and the independent **Remote-Controller**
+service, alongside the original service and Jobs. It is Manual/stopped and excluded
+from Start Services until explicitly selected in its Network settings. Stop Services
+includes it. See [its implementation boundary](../../docs/remote-controller.md);
+the source change does not certify an already distributed or installed package.
 
 The optional per-machine Startup shortcut displays only XT at sign-in. With the option unchecked, no login shortcut is installed. The services use Manual startup under separate virtual accounts and stay stopped after reboot. Signing out/in does not stop services already started by the operator. Windows enforces service permissions separately.
 
 ## Remove and reinstall
 
-Stop both services from XT. Exit the tray in every active Windows session. Start the version-matched **Uninstaller.exe**, choose **Review**, then **Uninstall**. Review can be cancelled before applying changes. During Apply, leave the wizard open. The Finish page reports Windows Installer's result and any required reboot.
+Stop all services from XT. Exit the tray in every active Windows session. Start the version-matched **Uninstaller.exe**, choose **Review**, then **Uninstall**. Review can be cancelled before applying changes. During Apply, leave the wizard open. The Finish page reports Windows Installer's result and any required reboot.
 
 Windows Installer removes registered services, its own shortcuts and packaged files. Downloads, application-generated exports, job state and account manifests are retained. Reinstall as the original operator. Windows Installed apps also provides removal if the standalone uninstaller is lost. A different-version installation or a script-managed deployment must be maintained using the tools for that installation. An in-place upgrade is not offered by these wizards.
 

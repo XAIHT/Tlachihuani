@@ -64,7 +64,8 @@ try:
         assert args == ("" if folder == "StartupFolder" else "--show")
         assert components[component][1] == ('TLTRAYSTARTUP = "1"' if folder == "StartupFolder" else "")
     services = list(rows("SELECT `Name`,`StartType`,`StartName` FROM `ServiceInstall`", 3))
-    assert len(services) == 2
+    assert len(services) == 3
+    assert any(name.endswith('.RemoteController') for name, _, _ in services)
     for name, start, account in services:
         assert start == "3" and account == "NT SERVICE\\" + name, (name, start, account)
     for name, event in rows("SELECT `Name`,`Event` FROM `ServiceControl`", 2):
@@ -99,7 +100,7 @@ try:
         finally: api.MsiCloseHandle(view)
         print("Checking cabinet", n + 1, "of", len(cabinets), flush=True)
         subprocess.run(["expand.exe", "-F:*", str(cab), str(extracted)], check=True, stdout=subprocess.DEVNULL)
-    expected = {p.relative_to(publish) for part in ("Service", "Jobs", "Control", "Tray") for p in (publish/part).rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc", ".pdb")}
+    expected = {p.relative_to(publish) for part in ("Service", "Jobs", "Control", "Tray", "RCServer") for p in (publish/part).rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc", ".pdb")}
     setup_sources = {Path("Setup/SetupIdentity.exe"): "SetupIdentity.exe", Path("Uninstaller.exe"): "Uninstaller.exe", Path("Setup/START-HERE.html"): "START-HERE.html"}
     actual, setup_actual = set(), set()
     for fid, cid, filename in rows("SELECT `File`,`Component_`,`FileName` FROM `File`", 3):

@@ -2,4 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="../Tlachihuani.Core/Tlachihuani.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Tlachihuani.RC/Tlachihuani.RC.csproj" />
+  </ItemGroup>
 </Project>

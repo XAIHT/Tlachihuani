@@ -10,7 +10,7 @@ for source verification. This checkout already declares `0.3.3` in `Directory.Bu
 project lock references. Preserve those matching values. Future stamps must update
 both together; documentation changes do not rebuild existing binaries or create Git tags.
 
-`Build-Release.cmd` is the root release entry point. It chooses the highest stable local Git tag numerically, stamps product/internal project versions, rebuilds into fresh staging and verifies before copying the install ZIP to `dist`. It never commits, tags or pushes. See [release building](docs/release-building.md). Setup asks whether XT should appear at sign-in, always installs Start/Desktop shortcuts, and leaves both services stopped/Manual. Startup shortcuts must never start services. Preserve the distinction between the original unelevated wizard and its privileged MSI helper.
+`Build-Release.cmd` is the root release entry point. It chooses the highest stable local Git tag numerically, stamps product/internal project versions, rebuilds into fresh staging and verifies before copying the install ZIP to `dist`. It never commits, tags or pushes. See [release building](docs/release-building.md). Setup asks whether XT should appear at sign-in, always installs Start/Desktop shortcuts, and leaves all services stopped/Manual. Startup shortcuts must never start services. Preserve the distinction between the original unelevated wizard and its privileged MSI helper.
 
 ## Project identity and controller
 
@@ -34,6 +34,11 @@ The 2026-10-11 review used Tlamatini HEAD `c18d50815cfe8b1681f805fd4e76c66fbaeab
 5. Before editing Tlamatini in a later authorized session, read its `AGENTS.md`, `CLAUDE.md`, `TestsVisiblesAndVisibleExecutionFromClaude2Codex.md`, and `docs/claude/INDEX.md` at the full checkout path above. Relevant skill paths and applicability are indexed in [skill-inventory.md](docs/skill-inventory.md).
 
 ## Torrenter and the Jobs host
+
+The separate [Remote-Controller plane](docs/remote-controller.md) was authorized on
+13 November 2026. Its source, XT controls and live Tlamatini-RC client are implemented;
+read the linked implementation boundary and dated verification before claiming
+remote or installed acceptance. It owns no Torrenter processes or downloads.
 
 Read [the operating and REST contract](docs/torrenter.md). The independent `Tlachihuani.Jobs` SCM service owns the provider registry and child-process lifetime. A protected worker journal owns transfer state, permissions and durable receipts. XT manages providers on the Jobs v2 pipe. The web facade at `127.0.0.1:12064` exposes the account-scoped transfer API. Browsers sign in through Tlamatini and use its session and CSRF protection; ordinary workspace access asks for no pairing code. Native Windows enrollment supplies scoped automation credentials.
 

@@ -9,6 +9,14 @@ foreach($name in 'TEMP','TMP','DOTNET_CLI_HOME','NUGET_PACKAGES','DOTNET_CLI_TEL
 }
 $lock=$null
 $transcribing=$false
+# Windows PowerShell can inherit a module path from another host that prevents
+# Get-FileHash autoloading. Hash the actual streams without relying on that host.
+function Get-ReleaseFileHash([string]$Path) {
+    $stream=[IO.File]::OpenRead($Path)
+    $sha=[Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-','') }
+    finally { $sha.Dispose(); $stream.Dispose() }
+}
 Push-Location -LiteralPath $root
 try {
     $cache=Join-Path $root 'artifacts\release-cache'
@@ -58,7 +66,7 @@ try {
         $target=Join-Path $dist ([IO.Path]::GetFileName($source))
         $stage=$target+'.new'
         Copy-Item -LiteralPath $source -Destination $stage -Force
-        if((Get-FileHash -LiteralPath $source).Hash -ne (Get-FileHash -LiteralPath $stage).Hash){throw 'Distribution copy hash mismatch.'}
+        if((Get-ReleaseFileHash $source) -ne (Get-ReleaseFileHash $stage)){throw 'Distribution copy hash mismatch.'}
         $copies+=@{Target=$target; Stage=$stage; Backup=$target+'.previous'; Existed=(Test-Path -LiteralPath $target); Done=$false}
     }
     try{

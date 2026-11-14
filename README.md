@@ -71,6 +71,17 @@ Tlamatini clients activates their respective changes.
 
 ## Tray controls
 
+The current source also includes **Tlachihuani-RC Server**, managed independently
+as **Remote-Controller** from the Services panel. It contains the live RC client,
+local device enrollment, sessions, receipts and schedules. Both main Tlamatini
+editions now have source integration for account activation, real chat, execution
+approvals and cancellation; XT supplies the installed-application launch broker.
+Network connections, voice and final installed acceptance remain gated; see the precise
+[implementation boundary](docs/remote-controller.md) and
+[13 November verification](docs/verification/2026-11-13-remote-controller.md).
+RC is Manual/stopped at installation, joins Start Services only by explicit opt-in,
+and is included in Stop Services. Torrenter remains its own Jobs plane.
+
 | What you want to do | Where to go | What happens |
 | :--- | :--- | :--- |
 | Bring Torrenter online | **XT → Start Services** | The icon turns color when the services and API are ready. |
@@ -83,7 +94,7 @@ Tlamatini clients activates their respective changes.
 
 ## Installation
 
-Use **Windows 11 x64**. The download includes private .NET and Python runtimes; no SDK or separate runtime installation is required. Windows runs two independent services. `Tlachihuani` reports lifecycle and health. `Tlachihuani.Jobs` hosts Torrenter. The XT tray runs in the signed-in Windows session.
+Use **Windows 11 x64**. The download includes private .NET and Python runtimes; no SDK or separate runtime installation is required. The current setup source defines three independent services: `Tlachihuani` reports lifecycle and health, `Tlachihuani.Jobs` hosts Torrenter, and `Tlachihuani.RemoteController` hosts the RC server. The XT tray runs in the signed-in Windows session. See the [RC verification record](docs/verification/2026-11-13-remote-controller.md) for the distinction between the built package and final installed acceptance.
 
 ### Install with the Windows wizard
 

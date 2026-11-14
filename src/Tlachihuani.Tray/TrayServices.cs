@@ -9,9 +9,29 @@ using Tlachihuani.Windows;
 namespace Tlachihuani.Tray;
 
 internal sealed record JobsState(string State, bool ApiReady = false);
+internal sealed record RemoteControllerState(string State, bool Ready = false, bool Included = false, string? Error = null);
 
 internal sealed class TrayServices(Controller primary)
 {
+    internal async Task<RemoteControllerState> ObserveRemoteControllerAsync(CancellationToken token)
+    {
+        var scm = ScmBackend.ForRemoteController();
+        var state = scm.Query().State;
+        if (state == "not_installed") return new(state);
+        bool included = false;
+        try
+        {
+            scm.ValidateRemoteControllerInstallation();
+            included = RcInstallation.Configuration().IncludeInStartServices;
+            if (state != "running") return new(state, Included: included);
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
+            deadline.CancelAfter(TimeSpan.FromSeconds(3));
+            var status = await RcEndpoint.CallInstalledAsync(new() { ["op"] = "status" }, deadline.Token);
+            return new(state, (bool?)status["listener"] == true && (string?)status["health"] == "ready", included, (string?)status["error"]);
+        }
+        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
+        { return new(state, Included: included, Error: "health_unavailable"); }
+    }
     private readonly ScmBackend jobs = ScmBackend.ForJobs();
     private static readonly HttpClient http = new(new HttpClientHandler { UseProxy = false, AllowAutoRedirect = false })
     {
@@ -56,6 +76,13 @@ internal sealed class TrayServices(Controller primary)
         {
             throw new TimeoutException("Jobs started, but Torrenter did not become ready on port 12064. Check the Services panel.");
         }
+        if (ScmBackend.ForRemoteController().Query().State != "not_installed" && RcInstallation.Configuration().IncludeInStartServices)
+        {
+            await RcLifecycle.ExecuteAsync("start", token);
+            using var rcReady = CancellationTokenSource.CreateLinkedTokenSource(token);
+            rcReady.CancelAfter(TimeSpan.FromSeconds(30));
+            while (!(await ObserveRemoteControllerAsync(rcReady.Token)).Ready) await Task.Delay(400, rcReady.Token);
+        }
     }
 
     private async Task ChangePrimaryAsync(string action, CancellationToken token)
@@ -69,6 +96,13 @@ internal sealed class TrayServices(Controller primary)
         // Jobs checkpoints active transfers, then closes the kill-on-close Windows Job Object
         // containing its worker and web facade. Always also try the other independent service.
         var errors = new List<string>();
+        try
+        {
+            if (ScmBackend.ForRemoteController().Query().State is not ("stopped" or "not_installed"))
+                await RcLifecycle.ExecuteAsync("stop", token);
+        }
+        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
+        { errors.Add($"Remote-Controller: {ex.Message}"); }
         foreach (var name in new[] { JobsEndpoint.ServiceName, Contracts.Protocol.ServiceName })
         {
             token.ThrowIfCancellationRequested();

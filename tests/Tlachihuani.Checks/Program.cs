@@ -8,6 +8,8 @@ using Tlachihuani.Core;
 using Tlachihuani.Windows;
 
 if (args is ["--tray-layout", var directory, var mode]) return TrayLayoutChecks.Run(directory, mode);
+if (args is ["--rc-layout", var rcDirectory, var captureScript, var python]) return RcLayoutChecks.Run(rcDirectory, captureScript, python);
+if (args is ["--rc-broker-checks", var brokerDirectory]) return RcBrokerChecks.Run(brokerDirectory);
 if (args is ["--downloads-access"]) return DownloadAccessChecks.Run();
 
 var passed = 0;
@@ -20,8 +22,11 @@ try
 {
     await Check("XT exit label follows service state and keeps the exit action", () =>
     {
-        int exits = 0;
-        using var menu = new Tlachihuani.Tray.TrayMenu(() => { }, _ => Task.CompletedTask, () => exits++);
+        int exits = 0, remoteOpens = 0, serviceActions = 0;
+        using var menu = new Tlachihuani.Tray.TrayMenu(() => { }, () => remoteOpens++, _ => { serviceActions++; return Task.CompletedTask; }, () => exits++);
+        var remote = menu.Items.Cast<System.Windows.Forms.ToolStripItem>().Single(item => item.Text == "Remote-Controller…");
+        remote.PerformClick();
+        Require(remoteOpens == 1 && serviceActions == 0, "Opening Remote-Controller must not start any service");
         var exit = menu.Items[menu.Items.Count - 1];
         const string warning = "Exit tray (service keeps running)";
         Require(exit.Text == warning, "Unobserved services must retain the warning");

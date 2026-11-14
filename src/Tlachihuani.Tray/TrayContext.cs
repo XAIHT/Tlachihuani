@@ -17,32 +17,38 @@ internal sealed class TrayContext : ApplicationContext
     private readonly StatusForm form;
     private readonly System.Windows.Forms.Timer timer = new() { Interval = 3000 };
     private readonly TrayMenu menu;
+    private readonly WindowActivation activation;
     private bool changing;
     private bool exitRequested;
     private string progress = "";
     private bool resourcesDisposed;
     private ControlReply? last;
     private JobsState? jobs;
+    private RemoteControllerState? remoteController;
 
-    internal TrayContext(bool show)
+    internal TrayContext(bool show, EventWaitHandle showSignal)
     {
         services = new(controller);
         using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("Tlachihuani.XT.ico")!;
         icon = new Icon(resource);
         grayIcon = TrayIcons.Grayscale(icon);
         form = new StatusForm(icon);
+        activation = new WindowActivation(form, showSignal);
         form.Requested += operation => _ = RunAsync(operation);
         form.ExitRequested += RequestExit;
-        menu = new TrayMenu(ShowPanel, RunAsync, RequestExit);
+        menu = new TrayMenu(ShowPanel, ShowRemoteController, RunAsync, RequestExit);
         tray = new NotifyIcon { Icon = grayIcon, Text = "Tlachihuani — Checking services", ContextMenuStrip = menu, Visible = true };
         // WinForms NotifyIcon handles Explorer's TaskbarCreated message and adds the icon again.
         tray.DoubleClick += (_, _) => ShowPanel();
         timer.Tick += (_, _) => _ = RunAsync("status"); timer.Start();
         if (show) ShowPanel();
         _ = RunAsync("status");
+        _ = Task.Run(() => new RcApplicationBroker().RunAsync(closing.Token));
     }
 
-    private void ShowPanel() { form.Show(); form.Activate(); }
+    private void ShowPanel() => WindowActivation.Show(form);
+
+    private void ShowRemoteController() => RemoteControllerLauncher.Open(form.Visible ? form : null);
 
     private void RequestExit()
     {
@@ -88,6 +94,7 @@ internal sealed class TrayContext : ApplicationContext
             }
             last = await Task.Run(() => controller.ExecuteAsync("status", token), token);
             jobs = await Task.Run(() => services.ObserveJobsAsync(token), token);
+            remoteController = await Task.Run(() => services.ObserveRemoteControllerAsync(token), token);
             if (operation == "start-services" && !Ready) error ??= "The services have not reached API readiness. Check the Services panel and retry.";
             if (operation == "stop-services" && !Stopped) error ??= "Service shutdown could not be confirmed. Check the Services panel and retry.";
         }
@@ -95,6 +102,7 @@ internal sealed class TrayContext : ApplicationContext
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             jobs = null;
+            remoteController = null;
             if (mutation) error ??= ex.Message;
         }
         finally
@@ -109,8 +117,10 @@ internal sealed class TrayContext : ApplicationContext
     }
 
     private bool Ready => last is { Service.ScmState: "running", Capabilities: not null }
-        && last.Error?.Code is not ("identity_changed" or "incompatible_protocol") && jobs?.ApiReady == true;
-    private bool Stopped => (last?.Service?.ScmState is "stopped" or "not_installed") && (jobs?.State is "stopped" or "not_installed");
+        && last.Error?.Code is not ("identity_changed" or "incompatible_protocol") && jobs?.ApiReady == true
+        && remoteController is not null && (remoteController.Ready || (!remoteController.Included && remoteController.State is "stopped" or "not_installed"));
+    private bool Stopped => (last?.Service?.ScmState is "stopped" or "not_installed") && (jobs?.State is "stopped" or "not_installed")
+        && (remoteController?.State is "stopped" or "not_installed");
 
     private void Render()
     {
@@ -118,10 +128,11 @@ internal sealed class TrayContext : ApplicationContext
         if (last is not null) form.Render(last, jobs, changing);
         menu.SetState(StatusForm.Pretty(last?.Service?.ScmState ?? "unavailable"));
         tray.Icon = !changing && Ready ? icon : grayIcon;
-        var text = changing ? progress : Ready ? "Services running · Torrenter API ready"
+        var text = changing ? progress : Ready ? remoteController?.Ready == true ? "Services ready · RC available" : "Services ready · RC off"
             : Stopped ? "Services stopped" : jobs is null || last is null ? "Service status unavailable"
             : last.Service?.ScmState != "running" ? "Main service " + StatusForm.Pretty(last.Service?.ScmState ?? "unavailable")
-            : jobs.State != "running" ? "Jobs " + StatusForm.Pretty(jobs.State) : "Torrenter API unavailable";
+            : jobs.State != "running" ? "Jobs " + StatusForm.Pretty(jobs.State) : !jobs.ApiReady ? "Torrenter API unavailable"
+            : "Remote-Controller " + StatusForm.Pretty(remoteController?.State ?? "unavailable");
         tray.Text = "Tlachihuani — " + text;
     }
 
@@ -136,7 +147,7 @@ internal sealed class TrayContext : ApplicationContext
         if (disposing && !resourcesDisposed)
         {
             resourcesDisposed = true;
-            closing.Cancel(); timer.Dispose(); tray.Dispose(); menu.Dispose(); form.Dispose(); grayIcon.Dispose(); icon.Dispose(); closing.Dispose();
+            closing.Cancel(); timer.Dispose(); activation.Dispose(); tray.Dispose(); menu.Dispose(); form.Dispose(); grayIcon.Dispose(); icon.Dispose(); closing.Dispose();
         }
         base.Dispose(disposing);
     }

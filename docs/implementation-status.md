@@ -1,5 +1,49 @@
 # Implementation status · 0.3.3 pre-release
 
+## Installed connection walkthrough · 14 November 2026
+
+The installed local-PC connection procedure now passes through real XT controls,
+account enablement, fingerprint approval, real model replies, retained browser
+approval and independent RC stop/start. Direct tray/setup links, restored shortcut
+windows, account readiness labels and client recovery fixes are installed as a
+local RC/XT validation overlay with updated external main templates. This is not
+a new MSI release. See [the complete report](verification/2026-11-14-rc-connection-walkthrough.md)
+for 11 lifecycle, 267 core, 30 headed recovery and 15 final installed checks, their
+fixture boundaries, failures and rollback records. English and Spanish narrated
+tutorials and tested chapter players are linked there. Same-PC access remains the
+supported boundary; physical-phone/LAN and remote transport are not certified.
+Earlier sections retain their dated verification scope and remaining gates.
+
+## Remote-Controller source implementation · 13 November 2026
+
+The independent `Tlachihuani.RemoteController` service, RC core, live client assets,
+native control pipe and XT controls are implemented in source. The packaging source
+now includes its own virtual account, Manual startup and protected data directories.
+Both main Tlamatini editions now implement account activation, their existing chat
+engine, execution approvals and owned cancellation; XT implements the interactive
+installed-application launch broker. The service permits only local-loopback
+connections. Post-quantum remote transport, independently trusted delivery, speech
+and final installed end-to-end acceptance remain open gates. Read
+[the full boundary and operating contract](remote-controller.md) and
+[the separate verification record](verification/2026-11-13-remote-controller.md).
+Earlier package and Torrenter results below retain their original dates and scopes.
+
+Recorded evidence: **212/212 RC core checks**, **210/210 main-application checks
+in each edition**, and **24 broker/path checks passed with two symbolic-link
+fixtures skipped** because Windows denied creation. Each main suite includes
+16 real SQLite migration, deletion and durable-revocation checks. Source carriage,
+syntax and edition parity passed. Real HTTP/native-pipe verification passed **54/54**;
+the headed RC client passed **119/119**, including uncertain outcomes, late completion
+and no command replay. The final r5 package verified **1,466 runtime files
+byte-for-byte**, and native XT layout passed **11/11** at 144 DPI. Main-account
+browser acceptance passed **129/129 checks** in both editions, with actual
+foreground HWND/document verification, account revocation and ORM deletion.
+The earlier real RC executable passed **14/14 isolated SCM checks** and its temporary
+service was removed; that run does not certify the latest installed package.
+Exact evidence paths and scope are in the linked verification record.
+
+## Previous implementation evidence
+
 Current documentation: **[0.3.3 pre-release](releases/v0.3.3.md)**, updated
 11 November 2026. The latest source evidence is the
 [10 November Torrenter recovery record](verification/2026-11-10-torrenter-recovery.md):

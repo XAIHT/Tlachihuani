@@ -7,9 +7,12 @@
     <Project Path="src/Tlachihuani.Service/Tlachihuani.Service.csproj" />
     <Project Path="src/Tlachihuani.Control/Tlachihuani.Control.csproj" />
     <Project Path="src/Tlachihuani.Jobs/Tlachihuani.Jobs.csproj" />
+    <Project Path="src/Tlachihuani.RC/Tlachihuani.RC.csproj" />
+    <Project Path="src/Tlachihuani.RC.Server/Tlachihuani.RC.Server.csproj" />
     <Project Path="src/Tlachihuani.Tray/Tlachihuani.Tray.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Tlachihuani.Checks/Tlachihuani.Checks.csproj" />
+    <Project Path="tests/Tlachihuani.RC.Checks/Tlachihuani.RC.Checks.csproj" />
   </Folder>
 </Solution>

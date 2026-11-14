@@ -16,8 +16,9 @@ internal sealed class TrayMenu : ContextMenuStrip
     private readonly ToolStripMenuItem? state, start, stop, restart;
     private readonly ToolStripMenuItem startServices, stopServices, exitItem;
 
-    internal TrayMenu(Action showPanel, Func<string, Task> run, Action exitTray)
+    internal TrayMenu(Action showPanel, Action showRemoteController, Func<string, Task> run, Action exitTray)
     {
+        Items.Add("Remote-Controller…", null, (_, _) => showRemoteController());
         Items.Add("Show panel", null, (_, _) => showPanel());
 
         // Link: used to show a disabled placeholder or open the validated loopback URL.

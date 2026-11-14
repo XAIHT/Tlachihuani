@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {answerMatches} from './rc_prompt_answer.mjs';
+assert.equal(answerMatches('negation comprehension','No','no'),true);
+assert.equal(answerMatches('negation comprehension','no','no'),true);
+assert.equal(answerMatches('negation comprehension','yes','no'),false);
+assert.equal(answerMatches('negation comprehension','not sure','no'),false);
+assert.equal(answerMatches('uppercase','Hello','HELLO'),false);
+assert.equal(answerMatches('uppercase','HELLO','HELLO'),true);
+assert.equal(answerMatches('boolean negation','True','true'),false);
+assert.equal(answerMatches('JSON object','{"b":2,"a":1}',{a:1,b:2}),true);
+assert.equal(answerMatches('literal HTML text','```html\n<b>safe</b>\n```','<b>safe</b>'),true);
+assert.equal(answerMatches('literal HTML text','safe','<b>safe</b>'),false);
+console.log('PASS: 10 answer comparator checks; explicit casing and literal markup remain strict.');

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../../src/Tlachihuani.Windows/Tlachihuani.Windows.csproj" /></ItemGroup>
+  <ItemGroup><Compile Include="../../src/Tlachihuani.RC.Server/MobileRoutes.cs" Link="MobileRoutes.cs" /></ItemGroup>
+</Project>

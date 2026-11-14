@@ -14,12 +14,15 @@ try {
     if ($Mode -eq 'Check') {
         & '.\tests\Tlachihuani.Checks\bin\Release\net10.0-windows\Tlachihuani.Checks.exe' --service-exe '.\src\Tlachihuani.Service\bin\Release\net10.0-windows\Tlachihuani.Service.exe'
         if ($LASTEXITCODE -ne 0) { throw "Checks failed: $LASTEXITCODE" }
+        & '.\tests\Tlachihuani.RC.Checks\bin\Release\net10.0-windows\Tlachihuani.RC.Checks.exe' --output '.\artifacts\rc-checks'
+        if ($LASTEXITCODE -ne 0) { throw "RC checks failed: $LASTEXITCODE" }
     }
     if ($Mode -eq 'Publish') {
-        foreach ($component in @('Service', 'Control', 'Tray', 'Jobs')) {
+        foreach ($component in @('Service', 'Control', 'Tray', 'Jobs', 'RC.Server')) {
             # Private runtimes travel with each executable. No client SDK/runtime
             # install or self-extraction into a user's TEMP directory is needed.
-            dotnet publish "src/Tlachihuani.$component/Tlachihuani.$component.csproj" --configuration Release --runtime win-x64 --self-contained true -p:RestoreLockedMode=true --output (Join-Path $PublishDirectory $component)
+            $folder = if ($component -eq 'RC.Server') { 'RCServer' } else { $component }
+            dotnet publish "src/Tlachihuani.$component/Tlachihuani.$component.csproj" --configuration Release --runtime win-x64 --self-contained true -p:RestoreLockedMode=true --output (Join-Path $PublishDirectory $folder)
             if ($LASTEXITCODE -ne 0) { throw "$component publish failed: $LASTEXITCODE" }
         }
     }

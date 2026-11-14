@@ -14,6 +14,8 @@ internal static class Ownership {
     internal static readonly string Common = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "XAIHT");
     internal static string Image(bool jobs) { return Path.Combine(Program, jobs ? "Jobs" : "Service", jobs ? "Tlachihuani.Jobs.exe" : "Tlachihuani.Service.exe"); }
     internal static string Name(bool jobs) { return Product.Name + (jobs ? ".Jobs" : ""); }
+    static string PlaneName(int plane) { return plane==2 ? Product.Name+".RemoteController" : Name(plane==1); }
+    static string PlaneImage(int plane) { return plane==2 ? Path.Combine(Program,"RCServer","Tlachihuani.RC.Server.exe") : Image(plane==1); }
     static void Plain(string path) {
         for (var d = new DirectoryInfo(path); d != null; d = d.Parent) {
             try { if ((File.GetAttributes(d.FullName) & FileAttributes.ReparsePoint) != 0) throw new InvalidOperationException("A redirected path cannot be used: " + d.FullName); }
@@ -30,11 +32,11 @@ internal static class Ownership {
             }catch(System.ComponentModel.Win32Exception){throw new InvalidOperationException("Could not verify the running XT tray. Close XT in other signed-in sessions and retry.");}
         }
         if (!remove && !managed && Directory.Exists(Program)) throw new InvalidOperationException("This program folder already exists. Use the existing installation's maintenance tools. Setup will not overwrite it.");
-        foreach (bool jobs in new[]{false,true}) {
-            string name=Name(jobs);
+        foreach (int plane in new[]{0,1,2}) {
+            string name=PlaneName(plane);
             using(var k=Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\"+name)) {
                 if(k!=null) {
-                    if(!managed || !String.Equals((string)k.GetValue("ImagePath"),"\""+Image(jobs)+"\"",StringComparison.OrdinalIgnoreCase) ||
+                    if(!managed || !String.Equals((string)k.GetValue("ImagePath"),"\""+PlaneImage(plane)+"\"",StringComparison.OrdinalIgnoreCase) ||
                        !String.Equals((string)k.GetValue("ObjectName"),@"NT SERVICE\"+name,StringComparison.OrdinalIgnoreCase))
                         throw new InvalidOperationException("The existing "+name+" registration belongs to a different installation. Use its original maintenance tools.");
                     using(var svc=new ServiceController(name)) if(!remove && svc.Status!=ServiceControllerStatus.Stopped)
@@ -43,8 +45,8 @@ internal static class Ownership {
             }
             string data=Path.Combine(Common,name);
             Plain(data);
-            if(!remove && Directory.Exists(data)) CheckExisting(data,jobs,operatorSid);
-            if(remove && managed && Directory.Exists(data)) CheckExisting(data,jobs,null);
+            if(!remove && Directory.Exists(data)) CheckExisting(data,plane!=0,operatorSid);
+            if(remove && managed && Directory.Exists(data)) CheckExisting(data,plane!=0,null);
         }
         // Self-contained published payloads are verified by the package builder.
         // MSI ServiceControl stops the services during removal; Restart Manager
@@ -55,6 +57,11 @@ internal static class Ownership {
         var acl=new DirectorySecurity();
         string rights=state ? "(A;OICI;0x1301bf;;;"+service+")" : "(A;OICI;GRGX;;;"+service+")(A;OICI;GRGX;;;"+op+")";
         acl.SetSecurityDescriptorSddlForm("O:BAG:BAD:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)"+rights);
+        return acl;
+    }
+    static DirectorySecurity RcSettingsPermissions(string service,string op) {
+        var acl=Permissions(service,op,true);
+        acl.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(op),FileSystemRights.ReadAndExecute,InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit,PropagationFlags.None,AccessControlType.Allow));
         return acl;
     }
     static void Trusted(string path,bool sharedParent=false) {
@@ -91,20 +98,21 @@ internal static class Ownership {
         Plain(Common);
         if(!Directory.Exists(Common)) Directory.CreateDirectory(Common,Permissions("S-1-5-32-545",op,false));
         Trusted(Common,true);
-        foreach(bool jobs in new[]{false,true}) {
-            string name=Name(jobs), data=Path.Combine(Common,name);
+        foreach(int plane in new[]{0,1,2}) {
+            string name=PlaneName(plane), data=Path.Combine(Common,name);
             ServiceIdentity.Configure(name,op);
             string svc=((SecurityIdentifier)new NTAccount(@"NT SERVICE\"+name).Translate(typeof(SecurityIdentifier))).Value;
             Plain(data);
-            if(Directory.Exists(data)) CheckExisting(data,jobs,op);
+            if(Directory.Exists(data)) CheckExisting(data,plane!=0,op);
             else {
                 string stage=Path.Combine(Common,".setup-"+Guid.NewGuid().ToString("N"));
                 Directory.CreateDirectory(stage,Permissions(svc,op,false));
                 var doc=new Dictionary<string,string>{{"installation_id",Guid.NewGuid().ToString()},{"operator_sid",op}};
-                if(!jobs)doc["service_path"]=Image(false);
+                if(plane==0)doc["service_path"]=Image(false);
                 File.WriteAllText(Path.Combine(stage,"installation.json"),new JavaScriptSerializer().Serialize(doc));
                 File.WriteAllText(Path.Combine(stage,"setup-owner.txt"),Product.Family);
-                if(jobs)Directory.CreateDirectory(Path.Combine(stage,"state"),Permissions(svc,op,true));
+                if(plane!=0)Directory.CreateDirectory(Path.Combine(stage,"state"),Permissions(svc,op,true));
+                if(plane==2)Directory.CreateDirectory(Path.Combine(stage,"settings"),RcSettingsPermissions(svc,op));
                 Directory.Move(stage,data);
             }
         }

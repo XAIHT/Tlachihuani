@@ -13,6 +13,7 @@ internal sealed partial class ServicesForm
 
     public ServicesForm(Icon icon) : base(icon, "Tlachihuani · Services", "Tlachihuani   /   Service control", "Services", new(778, 500), new(668, 466))
     {
+        HeaderCommands.Controls.Add(Command("Remote-Controller…", () => RemoteControllerLauncher.Open(this)));
         var layout = Studio.Grid([-1], [38, 8, -1]);
         var switcher = Studio.Actions(runtimeTab, accessTab);
         switcher.AccessibleName = "Service views"; layout.Controls.Add(switcher, 0, 0);

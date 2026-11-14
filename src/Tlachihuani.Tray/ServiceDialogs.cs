@@ -71,20 +71,36 @@ internal sealed class ServiceDialogs : StudioForm
     }
 
     internal static void ShowCredential(Form owner, string token)
+        => ShowSecret(owner, token, false);
+
+    internal static void ShowRcInvitation(Form owner, string token)
+        => ShowSecret(owner, token, true);
+
+    private static void ShowSecret(Form owner, string token, bool invitation)
     {
-        using var dialog = new ServiceDialogs(owner, "Torrenter · Copy credential", "Torrenter   /   Access", "API credential", new(566, 257));
+        using var dialog = new ServiceDialogs(owner,
+            invitation ? "Remote-Controller · Invitation" : "Torrenter · Copy credential",
+            invitation ? "Remote-Controller   /   Access" : "Torrenter   /   Access",
+            invitation ? "One-use invitation" : "API credential", new(566, 257));
         var form = Studio.Grid([-1], [24, 34, -1]);
         var field = new TextBox { Text = token, ReadOnly = true, UseSystemPasswordChar = true };
-        form.Controls.Add(Studio.Label("Access token", Studio.Small), 0, 0); form.Controls.Add(Studio.Field(field, "Issued access token"), 0, 1);
-        form.Controls.Add(Studio.Label("Copy this token before closing the window.", Studio.Small, Studio.Muted), 0, 2);
+        form.Controls.Add(Studio.Label(invitation ? "Enrollment invitation" : "Access token", Studio.Small), 0, 0);
+        form.Controls.Add(Studio.Field(field, invitation ? "One-use enrollment invitation" : "Issued access token"), 0, 1);
+        form.Controls.Add(Studio.Label(invitation
+            ? "Expires in five minutes. Paste into the RC client, then compare its fingerprint before approving."
+            : "Copy this token before closing the window.", Studio.Small, Studio.Muted), 0, 2);
         dialog.BodyArea.Controls.Add(form);
-        var copy = dialog.Command("Copy token", () =>
+        var copy = dialog.Command(invitation ? "Copy invitation" : "Copy token", () =>
         {
             try { Clipboard.SetText(token); dialog.FooterNote.Text = "Copied"; }
             catch (ExternalException) { dialog.FooterNote.Text = "Clipboard busy"; }
         }, ButtonTone.Primary);
-        var reveal = new StudioButton("Show token");
-        reveal.Click += (_, _) => { field.UseSystemPasswordChar = !field.UseSystemPasswordChar; reveal.Text = field.UseSystemPasswordChar ? "Show token" : "Hide token"; };
+        var reveal = new StudioButton(invitation ? "Show invitation" : "Show token");
+        reveal.Click += (_, _) =>
+        {
+            field.UseSystemPasswordChar = !field.UseSystemPasswordChar;
+            reveal.Text = (field.UseSystemPasswordChar ? "Show " : "Hide ") + (invitation ? "invitation" : "token");
+        };
         dialog.Commands.Controls.AddRange([copy, reveal]); dialog.AcceptButton = copy; dialog.CancelButton = dialog.Choice("Close", DialogResult.Cancel);
         dialog.Open(owner);
     }

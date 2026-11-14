@@ -73,7 +73,7 @@ internal sealed class StatusForm : StudioForm
         };
         version.Text = service?.Version ?? "—"; pid.Text = service?.Pid?.ToString() ?? "—";
         uptime.Text = service?.UptimeSeconds is double seconds ? TimeSpan.FromSeconds(seconds).ToString(@"d\.hh\:mm\:ss") : "—";
-        note.Text = result.Error?.Message ?? (service?.ScmState == "not_installed" ? "Install Tlachihuani to enable these controls." : "Use Services… to manage the Jobs host and Torrenter.");
+        note.Text = result.Error?.Message ?? (service?.ScmState == "not_installed" ? "Install Tlachihuani to enable these controls." : "Use Services… to manage Torrenter and Remote-Controller independently.");
         note.ForeColor = result.Error is null ? Studio.Muted : Studio.Danger;
         FooterNote.Text = busy ? "Working…" : $"Observed {result.ObservedAtUtc.ToLocalTime():HH:mm:ss}";
         start.Enabled = !busy && result.Capabilities?.Start == true && service?.ScmState == "stopped";

@@ -86,6 +86,7 @@ internal sealed class NativeSecurity : IDisposable
 public sealed class ProcessIdentity : IDisposable
 {
     private readonly SafeProcessHandle handle;
+    public int Id { get; }
     public string ImagePath { get; }
     public long CreationTime { get; }
     public bool HasExited
@@ -96,7 +97,7 @@ public sealed class ProcessIdentity : IDisposable
             return exitCode != 259;
         }
     }
-    private ProcessIdentity(SafeProcessHandle handle, string path, long creation) { this.handle = handle; ImagePath = path; CreationTime = creation; }
+    private ProcessIdentity(SafeProcessHandle handle, int id, string path, long creation) { this.handle = handle; Id = id; ImagePath = path; CreationTime = creation; }
     public static ProcessIdentity Open(int pid)
     {
         var handle = OpenProcess(0x1000, false, pid);
@@ -106,7 +107,7 @@ public sealed class ProcessIdentity : IDisposable
             var path = new StringBuilder(32768); var length = path.Capacity;
             if (!QueryFullProcessImageName(handle, 0, path, ref length) || !GetProcessTimes(handle, out var created, out _, out _, out _))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
-            return new(handle, path.ToString(), created);
+            return new(handle, pid, path.ToString(), created);
         }
         catch { handle.Dispose(); throw; }
     }
