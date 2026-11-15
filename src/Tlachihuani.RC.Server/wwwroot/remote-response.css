@@ -1,0 +1,679 @@
+/* Tlamatini-RC — Angela López Mendoza · XAIHT.
+ * Response typography and execution-report styles are carried from the main
+ * English/Spanish agent_page.css; only their response scope is changed.
+ */
+.rc-rich-response {
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+    color: #ececf1;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow-x: auto;
+    isolation: isolate;
+}
+.rc-rich-response *, .rc-rich-response *::before, .rc-rich-response *::after { box-sizing: border-box; }
+.rc-rich-response :where(div, p, pre, img, figure, blockquote, ul, ol) { max-width: 100%; min-width: 0; }
+.rc-rich-response h1, .rc-rich-response h2, .rc-rich-response h3,
+.rc-rich-response h4, .rc-rich-response h5, .rc-rich-response h6 {
+    margin: 0 0 .5rem; font-weight: 500; line-height: 1.2; letter-spacing: normal;
+}
+.rc-rich-response h1 { font-size: 2.5rem; }
+.rc-rich-response h2 { font-size: 2rem; }
+.rc-rich-response h3 { font-size: 1.75rem; }
+.rc-rich-response h4 { font-size: 1.5rem; }
+.rc-rich-response h5 { font-size: 1.25rem; }
+.rc-rich-response h6 { font-size: 1rem; }
+.rc-rich-response p { margin: 0 0 1rem; line-height: inherit; }
+.rc-rich-response small { display: inline; margin: 0; color: inherit; font-size: .875em; white-space: inherit; }
+.rc-rich-response strong, .rc-rich-response b { font-weight: bolder; }
+.rc-rich-response a[href] { color: #8ce5d5; text-decoration: underline; text-underline-offset: .15em; }
+.rc-rich-response code, .rc-rich-response kbd, .rc-rich-response pre, .rc-rich-response samp {
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+.rc-rich-response code { font-size: .875em; color: #e685b5; }
+.rc-rich-response pre { display: block; margin: 0 0 1rem; overflow: auto; font-size: .875em; white-space: pre; }
+.rc-rich-response pre code { font-size: inherit; color: inherit; word-break: normal; }
+.rc-rich-response img { height: auto; max-width: 100%; }
+.rc-rich-response .rc-response-table { width: 100%; max-width: 100%; overflow-x: auto; margin: .4rem 0; white-space: normal; }
+.rc-rich-response table { caption-side: bottom; border-collapse: collapse; }
+.rc-rich-response th { text-align: inherit; }
+.rc-rich-response .rc-file { display: block; margin: .65rem 0; white-space: normal; }
+.rc-rich-response .rc-file-download {
+    max-width: 100%; min-height: 44px; padding: 10px 14px; text-align: left;
+    font: inherit; font-weight: 650; overflow-wrap: anywhere; white-space: normal;
+    border: 1px solid var(--accent, #77e0cd); border-radius: 10px;
+    color: #092f30; background: var(--accent, #77e0cd);
+}
+.rc-rich-response .rc-file-status { display: block; font-size: .85em; line-height: 1.5; margin-top: .35rem; }
+.rc-rich-response .rc-file-status:empty { display: none; }
+.rc-rich-response .rc-file-status.error { color: #ffbaad; }
+.rc-rich-response .rc-image-unavailable { font-style: italic; }
+.rc-rich-response .rc-render-warning, .rc-rich-response .rc-response-truncated { margin: .75rem 0 0; color: #f2d394; font-size: .85em; }
+
+.rc-rich-response .ascii-diagram {
+    font-family: ui-monospace, "Cascadia Code", "Cascadia Mono", "JetBrains Mono",
+                 SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+    font-size: 0.88em;
+    line-height: 1.25;
+    white-space: pre;
+    overflow-x: auto;
+    margin: 0.6em 0;
+    padding: 10px 14px;
+    background-color: rgba(0, 0, 0, 0.30);
+    border-left: 3px solid #55BBAA;
+    border-radius: 6px;
+    color: #ececf1;
+    tab-size: 4;
+    -moz-tab-size: 4;
+}
+
+.rc-rich-response .automated-message-execreport {
+    display: block;
+    clear: both;
+    margin-top: 1.35rem;
+}
+
+.rc-rich-response .exec-report-frame {
+    display: block;
+    clear: both;
+    margin-top: 0;
+    padding: 0 0.9rem 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-top: 4px solid #38bdf8;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.62);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.rc-rich-response .exec-report-divider {
+    height: 0;
+    margin: 0 -0.9rem 0;
+    border-top: 2px dashed rgba(56, 189, 248, 0.55);
+}
+
+.rc-rich-response .exec-report-header {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.6rem;
+    padding: 0.6rem 0.7rem 0.55rem;
+    margin: 0 -0.9rem 0.55rem;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, rgba(15, 23, 42, 0.1) 100%);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 0 0 4px 4px;
+}
+
+.rc-rich-response .exec-report-header-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.rc-rich-response .exec-report-header-title {
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    color: #e2f3ff;
+}
+
+.rc-rich-response .exec-report-header-sub {
+    font-size: 0.75rem;
+    color: #9fb4cc;
+    font-style: italic;
+}
+
+.rc-rich-response .exec-report-block {
+    display: block;
+    margin-top: 0.2rem;
+    width: 100%;
+}
+
+.rc-rich-response .exec-report-table {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0.6rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    table-layout: fixed;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.rc-rich-response .exec-report-caption {
+    caption-side: top;
+    padding: 0.45rem 0.75rem;
+    font-weight: 700;
+    text-align: left;
+    letter-spacing: 0.02em;
+    color: #1b1b1b;
+    
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.rc-rich-response .exec-report-caption-executer {
+    background: linear-gradient(135deg, #FDE047 0%, #EAB308 100%);
+}
+
+.rc-rich-response .exec-report-caption-editor {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-editor .exec-report-cmd {
+    border-left: 3px solid #10b981;
+}
+
+.rc-rich-response .exec-report-caption-grepper {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-grepper .exec-report-cmd {
+    border-left: 3px solid #3b82f6;
+}
+
+.rc-rich-response .exec-report-caption-globber {
+    background: linear-gradient(135deg, #8b5cf6 0%, #5b21b6 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-globber .exec-report-cmd {
+    border-left: 3px solid #8b5cf6;
+}
+
+.rc-rich-response .exec-report-caption-pythonxer {
+    background: linear-gradient(135deg, #306998 0%, #FFD43B 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-unzip {
+    background: linear-gradient(135deg, #FFB74D 0%, #F57C00 100%);
+}
+
+.rc-rich-response .exec-report-caption-jdecompiler {
+    background: linear-gradient(135deg, #2C3E50 0%, #E74C3C 50%, #27AE60 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-decompresser {
+    background: linear-gradient(135deg, #1F2A56 0%, #B07A2B 33%, #D7263D 66%, #7CF6B5 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-dockerer {
+    background: linear-gradient(135deg, #2496ED 0%, #FFFFFF 100%);
+}
+
+.rc-rich-response .exec-report-caption-kuberneter {
+    background: linear-gradient(135deg, #000000 0%, #00008B 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-ssher {
+    background: linear-gradient(135deg, #1a237e 0%, #e53935 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-scper {
+    background: linear-gradient(135deg, #424242 0%, #e53935 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-pser {
+    background: linear-gradient(135deg, #E91E63 0%, #4CAF50 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-sqler {
+    background: linear-gradient(135deg, #f97316 0%, #10b981 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-mongoxer {
+    background: linear-gradient(135deg, #558B2F 0%, #33691E 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-jenkinser {
+    background: linear-gradient(135deg, #FFFFFF 0%, #1E88E5 100%);
+}
+
+.rc-rich-response .exec-report-caption-gitter {
+    background: linear-gradient(135deg, #FFFFFF 0%, #000000 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-filecreator {
+    background: linear-gradient(135deg, #00897B 0%, #FF7043 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-mover {
+    background: linear-gradient(135deg, #8D6E63 0%, #5D4037 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-deleter {
+    background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-apirer {
+    background: linear-gradient(135deg, #3B0764 0%, #86EFAC 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-unrealer {
+    background: linear-gradient(135deg, #0B1220 0%, #1F3A8A 33%, #10B981 66%, #22D3EE 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-blenderer {
+    background: linear-gradient(135deg, #15334F 0%, #2A6FB3 33%, #EA7600 66%, #F7B733 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-playwrighter {
+    background: linear-gradient(135deg, #3D1766 0%, #D90368 33%, #0FA3B1 66%, #6EE7B7 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-emailer {
+    background: linear-gradient(135deg, #5C6BC0 0%, #3949AB 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-telegrammer {
+    background: linear-gradient(135deg, #1a237e 0%, #10B981 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-whatsapper {
+    background: linear-gradient(135deg, #006400 0%, #008000 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-instantmessagingdoctor {
+    background: linear-gradient(135deg, #12343B 0%, #2A9D8F 34%, #E76F51 68%, #F4D35E 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-notifier {
+    background: linear-gradient(135deg, #F472B6 0%, #DB2777 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-kyberkeygen {
+    background: linear-gradient(135deg, #7B2FBE 0%, #00BFA5 50%, #FFD740 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-kybercipher {
+    background: linear-gradient(135deg, #D35400 0%, #1ABC9C 50%, #8E44AD 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-kyberdecipher {
+    background: linear-gradient(135deg, #4A90D9 0%, #D94F7A 50%, #82C91E 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-keyboarder {
+    background: linear-gradient(135deg, #F44336 0%, #FF9800 33%, #FFEB3B 66%, #4CAF50 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-mouser {
+    background: linear-gradient(135deg, #FF1744 0%, #651FFF 50%, #00E676 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-windower {
+    background: linear-gradient(135deg, #0F2C4D 0%, #1E6FB8 50%, #4FC3F7 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-kalier {
+    background: linear-gradient(135deg, #001F0C 0%, #00892A 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-pptxer {
+    background: linear-gradient(135deg, #1A0B2E 0%, #6D28D9 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-pptxer .exec-report-cmd {
+    border-left: 3px solid #6D28D9;
+}
+
+.rc-rich-response .exec-report-caption-terminater {
+    background: linear-gradient(135deg, #07130E 0%, #0B7A4B 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-terminater .exec-report-cmd { border-left: 3px solid #0B7A4B; }
+
+.rc-rich-response .exec-report-caption-pdfer {
+    background: linear-gradient(135deg, #2B0A0A 0%, #C1272D 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-latexer {
+    background: linear-gradient(135deg, #14213D 0%, #7F5539 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-stm32er {
+    background: linear-gradient(135deg, #0A0E17 0%, #1E63FF 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-videoanalyzer {
+    background: linear-gradient(135deg, #12043A 0%, #39FF14 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-videoanalyzer .exec-report-cmd {
+    border-left: 3px solid #7B2FF7;
+}
+
+.rc-rich-response .exec-report-caption-netspeedcalculator {
+    background: linear-gradient(135deg, #041E2B 0%, #F9C80E 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-netspeedcalculator .exec-report-cmd {
+    border-left: 3px solid #0E6BA8;
+}
+
+.rc-rich-response .exec-report-caption-esp32er {
+    background: linear-gradient(135deg, #1A1A1A 0%, #E7352C 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-esphomer {
+    background: linear-gradient(135deg, #06281C 0%, #0E8A4F 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-arduiner {
+    background: linear-gradient(135deg, #00363A 0%, #008184 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-acpx {
+    background: linear-gradient(135deg, #BF360C 0%, #E64A19 33%, #6A1B9A 66%, #212121 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-caption-skill {
+    background: linear-gradient(135deg, #4527A0 0%, #6A1B9A 33%, #00838F 66%, #00BFA5 100%);
+    color: #ffffff;
+}
+
+.rc-rich-response .exec-report-table thead th {
+    padding: 0.4rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #1b1b1b;
+    background: rgba(255, 255, 255, 0.55);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.rc-rich-response .exec-report-pythonxer thead th,
+.rc-rich-response .exec-report-kuberneter thead th,
+.rc-rich-response .exec-report-ssher thead th,
+.rc-rich-response .exec-report-scper thead th,
+.rc-rich-response .exec-report-pser thead th,
+.rc-rich-response .exec-report-sqler thead th,
+.rc-rich-response .exec-report-mongoxer thead th,
+.rc-rich-response .exec-report-gitter thead th,
+.rc-rich-response .exec-report-filecreator thead th,
+.rc-rich-response .exec-report-mover thead th,
+.rc-rich-response .exec-report-deleter thead th,
+.rc-rich-response .exec-report-apirer thead th,
+.rc-rich-response .exec-report-unrealer thead th,
+.rc-rich-response .exec-report-blenderer thead th,
+.rc-rich-response .exec-report-playwrighter thead th,
+.rc-rich-response .exec-report-emailer thead th,
+.rc-rich-response .exec-report-telegrammer thead th,
+.rc-rich-response .exec-report-whatsapper thead th,
+.rc-rich-response .exec-report-instantmessagingdoctor thead th,
+.rc-rich-response .exec-report-notifier thead th,
+.rc-rich-response .exec-report-kyberkeygen thead th,
+.rc-rich-response .exec-report-kybercipher thead th,
+.rc-rich-response .exec-report-kyberdecipher thead th,
+.rc-rich-response .exec-report-jdecompiler thead th,
+.rc-rich-response .exec-report-decompresser thead th,
+.rc-rich-response .exec-report-keyboarder thead th,
+.rc-rich-response .exec-report-mouser thead th,
+.rc-rich-response .exec-report-windower thead th,
+.rc-rich-response .exec-report-kalier thead th,
+.rc-rich-response .exec-report-stm32er thead th,
+.rc-rich-response .exec-report-esp32er thead th,
+.rc-rich-response .exec-report-esphomer thead th,
+.rc-rich-response .exec-report-arduiner thead th,
+.rc-rich-response .exec-report-videoanalyzer thead th,
+.rc-rich-response .exec-report-netspeedcalculator thead th,
+.rc-rich-response .exec-report-pdfer thead th,
+.rc-rich-response .exec-report-terminater thead th,
+.rc-rich-response .exec-report-latexer thead th,
+.rc-rich-response .exec-report-acpx thead th,
+.rc-rich-response .exec-report-skill thead th {
+    color: #f5f5f5;
+    background: rgba(0, 0, 0, 0.55);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.rc-rich-response .exec-report-table tbody td {
+    padding: 0.4rem 0.75rem;
+    vertical-align: top;
+    background-color: #2d2d2d;
+    color: #ececf1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    word-break: break-word;
+}
+
+.rc-rich-response .exec-report-col-cmd {
+    width: 85%;
+}
+
+.rc-rich-response .exec-report-col-status {
+    width: 15%;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.rc-rich-response .exec-report-success {
+    color: #7ddc7d;
+    background-color: #1f3a23 !important;
+}
+
+.rc-rich-response .exec-report-failure {
+    color: #ff9999;
+    background-color: #3a1f1f !important;
+}
+
+.rc-rich-response .exec-report-cmd {
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+    background-color: #1e1e1e;
+    color: #e6e6e6;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    max-height: 22rem;
+    overflow: auto;
+}
+
+.rc-rich-response .exec-report-executer .exec-report-cmd { border-left: 3px solid #EAB308; }
+
+.rc-rich-response .exec-report-pythonxer .exec-report-cmd { border-left: 3px solid #306998; }
+
+.rc-rich-response .exec-report-unzip .exec-report-cmd { border-left: 3px solid #F57C00; }
+
+.rc-rich-response .exec-report-jdecompiler .exec-report-cmd { border-left: 3px solid #E74C3C; }
+
+.rc-rich-response .exec-report-decompresser .exec-report-cmd { border-left: 3px solid #D7263D; }
+
+.rc-rich-response .exec-report-dockerer .exec-report-cmd { border-left: 3px solid #2496ED; }
+
+.rc-rich-response .exec-report-kuberneter .exec-report-cmd { border-left: 3px solid #00008B; }
+
+.rc-rich-response .exec-report-ssher .exec-report-cmd { border-left: 3px solid #e53935; }
+
+.rc-rich-response .exec-report-scper .exec-report-cmd { border-left: 3px solid #e53935; }
+
+.rc-rich-response .exec-report-pser .exec-report-cmd { border-left: 3px solid #E91E63; }
+
+.rc-rich-response .exec-report-sqler .exec-report-cmd { border-left: 3px solid #f97316; }
+
+.rc-rich-response .exec-report-mongoxer .exec-report-cmd { border-left: 3px solid #558B2F; }
+
+.rc-rich-response .exec-report-jenkinser .exec-report-cmd { border-left: 3px solid #1E88E5; }
+
+.rc-rich-response .exec-report-gitter .exec-report-cmd { border-left: 3px solid #000000; }
+
+.rc-rich-response .exec-report-filecreator .exec-report-cmd { border-left: 3px solid #00897B; }
+
+.rc-rich-response .exec-report-mover .exec-report-cmd { border-left: 3px solid #5D4037; }
+
+.rc-rich-response .exec-report-deleter .exec-report-cmd { border-left: 3px solid #B91C1C; }
+
+.rc-rich-response .exec-report-apirer .exec-report-cmd { border-left: 3px solid #3B0764; }
+
+.rc-rich-response .exec-report-unrealer .exec-report-cmd { border-left: 3px solid #1F3A8A; }
+
+.rc-rich-response .exec-report-blenderer .exec-report-cmd { border-left: 3px solid #EA7600; }
+
+.rc-rich-response .exec-report-playwrighter .exec-report-cmd { border-left: 3px solid #D90368; }
+
+.rc-rich-response .exec-report-emailer .exec-report-cmd { border-left: 3px solid #5C6BC0; }
+
+.rc-rich-response .exec-report-telegrammer .exec-report-cmd { border-left: 3px solid #1a237e; }
+
+.rc-rich-response .exec-report-whatsapper .exec-report-cmd { border-left: 3px solid #006400; }
+
+.rc-rich-response .exec-report-instantmessagingdoctor .exec-report-cmd { border-left: 3px solid #E76F51; }
+
+.rc-rich-response .exec-report-notifier .exec-report-cmd { border-left: 3px solid #DB2777; }
+
+.rc-rich-response .exec-report-kyberkeygen .exec-report-cmd { border-left: 3px solid #7B2FBE; }
+
+.rc-rich-response .exec-report-kybercipher .exec-report-cmd { border-left: 3px solid #D35400; }
+
+.rc-rich-response .exec-report-kyberdecipher .exec-report-cmd { border-left: 3px solid #D94F7A; }
+
+.rc-rich-response .exec-report-keyboarder .exec-report-cmd { border-left: 3px solid #F44336; }
+
+.rc-rich-response .exec-report-mouser .exec-report-cmd { border-left: 3px solid #FF1744; }
+
+.rc-rich-response .exec-report-windower .exec-report-cmd { border-left: 3px solid #1E6FB8; }
+
+.rc-rich-response .exec-report-kalier .exec-report-cmd { border-left: 3px solid #00C838; }
+
+.rc-rich-response .exec-report-pdfer .exec-report-cmd { border-left: 3px solid #C1272D; }
+
+.rc-rich-response .exec-report-latexer .exec-report-cmd { border-left: 3px solid #C9973F; }
+
+.rc-rich-response .exec-report-stm32er .exec-report-cmd { border-left: 3px solid #1E63FF; }
+
+.rc-rich-response .exec-report-esp32er .exec-report-cmd { border-left: 3px solid #E7352C; }
+
+.rc-rich-response .exec-report-esphomer .exec-report-cmd { border-left: 3px solid #0E8A4F; }
+
+.rc-rich-response .exec-report-arduiner .exec-report-cmd { border-left: 3px solid #008184; }
+
+.rc-rich-response .exec-report-acpx .exec-report-cmd { border-left: 3px solid #BF360C; }
+
+.rc-rich-response .exec-report-skill .exec-report-cmd { border-left: 3px solid #4527A0; }
+
+.rc-rich-response .exec-denied-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-top: 1rem;
+    padding: 0.9rem 1.1rem;
+    border: 2px solid #ef4444;
+    border-left: 8px solid #dc2626;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3a1414 0%, #2a0d0d 100%);
+    color: #ffe3e3;
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
+}
+
+.rc-rich-response .exec-denied-icon {
+    flex: 0 0 auto;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: #ff4d4d;
+    text-shadow: 0 0 10px rgba(255, 77, 77, 0.6);
+}
+
+.rc-rich-response .exec-denied-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rc-rich-response .exec-denied-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #ff6b6b;
+    margin-bottom: 0.25rem;
+}
+
+.rc-rich-response .exec-denied-sub {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #ffd6d6;
+    margin-bottom: 0.5rem;
+}
+
+.rc-rich-response .exec-denied-detail {
+    margin-top: 0.5rem;
+}
+
+.rc-rich-response .exec-denied-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ff9b9b;
+    margin-bottom: 0.2rem;
+}
+
+.rc-rich-response .exec-denied-cmd {
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+    background-color: #1e1212;
+    color: #ffecec;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 99, 99, 0.25);
+    border-left: 3px solid #dc2626;
+    max-height: 16rem;
+    overflow: auto;
+}

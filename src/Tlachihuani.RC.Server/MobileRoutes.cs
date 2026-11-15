@@ -8,6 +8,7 @@ internal static class MobileRoutes
     {
         "\\A/\\z",
         "\\A/agent/mobile/files/\\z",
+        "\\A/agent/mobile/response-file/\\z",
         "\\A/agent/mobile/canvas/selection/\\z",
         "\\A/agent/mobile/canvas/save/\\z",
         "\\A/agent/remote-controller/\\z",

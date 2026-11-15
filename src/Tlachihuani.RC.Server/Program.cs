@@ -10,6 +10,9 @@ using Tlachihuani.Windows;
 if (args.FirstOrDefault() == "--console") NativeConsole.Attach();
 if (args is ["--control"] or ["--dev-control", _, _])
 {
+    // Native JSON is UTF-8 regardless of the interactive Windows code page.
+    Console.InputEncoding = new System.Text.UTF8Encoding(false, true);
+    Console.OutputEncoding = new System.Text.UTF8Encoding(false);
     try
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));

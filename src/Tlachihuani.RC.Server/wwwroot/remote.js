@@ -29,7 +29,85 @@ function connectionError(error){
   return error.message;
 }
 function entry(text){const li=document.createElement('li');li.textContent=`${new Date().toLocaleTimeString()} · ${text}`;$('#activity-list').prepend(li);while($('#activity-list').children.length>100)$('#activity-list').lastChild.remove();}
-function message(text,kind,label){$('.empty')?.remove();const item=document.createElement('div');item.className='message '+kind;const title=document.createElement('small');title.textContent=label;const body=document.createElement('span');body.textContent=text;item.append(title,body);$('#messages').append(item);item.scrollIntoView({block:'nearest'});return item;}
+function message(text,kind,label){$('.empty')?.remove();const item=document.createElement('div');item.className='message '+kind;const title=document.createElement('small');title.textContent=label;const body=document.createElement('div');body.className='response-body';body.textContent=text;item.append(title,body);$('#messages').append(item);item.scrollIntoView({block:'nearest'});return item;}
+
+const responseLanguage=()=>identity?.binding.edition==='spanish'?'es':'en';
+const responseText=(en,es)=>responseLanguage()==='es'?es:en;
+const activeDownloads=new Set();
+async function downloadResponseFile(ticket,filename){
+  if(!session||!has('chat'))throw new Error(responseText('Reconnect before saving a file.','Vuelve a conectarte antes de guardar un archivo.'));
+  const owner=identity.binding.id, token=session.access_token;
+  const controller=new AbortController();activeDownloads.add(controller);
+  const timeout=setTimeout(()=>controller.abort(),120000);
+  try{
+    const response=await fetch(API+'/response-file?ticket='+encodeURIComponent(ticket),{
+      headers:{Authorization:'Bearer '+token},credentials:'omit',cache:'no-store',signal:controller.signal
+    });
+    if(!response.ok){
+      const result=await response.json().catch(()=>null);
+      const messages={
+        file_expired:['This file link expired. Load recent conversation and try again.','Este enlace caducó. Carga la conversación reciente e inténtalo de nuevo.'],
+        file_changed:['The file changed after this reply. Ask Tlamatini to create a new attachment.','El archivo cambió después de esta respuesta. Pide a Tlamatini que genere un adjunto nuevo.'],
+        file_missing:['This file is no longer available in Tlamatini.','Este archivo ya no está disponible en Tlamatini.'],
+        file_forbidden:['This file link is no longer authorized. Load recent conversation to refresh eligible links.','Este enlace ya no está autorizado. Carga la conversación reciente para renovar los enlaces disponibles.'],
+        file_too_large:['This file exceeds the 64 MiB limit.','Este archivo supera el límite de 64 MiB.'],
+        application_unavailable:['Start Tlamatini before saving the file.','Inicia Tlamatini antes de guardar el archivo.']
+      };
+      if(response.status===401)clearSession(responseText('Reconnect to download the file.','Vuelve a conectarte para descargar el archivo.'));
+      const pair=messages[result?.error?.code];
+      throw new Error(pair?responseText(...pair):responseText('The file could not be downloaded. Try again.','No se pudo descargar el archivo. Inténtalo de nuevo.'));
+    }
+    await window.TlamatiniDownload.save(response,filename,{language:responseLanguage(),signal:controller.signal,
+      authorized:()=>!!session&&identity?.binding.id===owner&&session.access_token===token});
+  }catch(error){if(error.name==='AbortError')throw new Error(responseText('The download was interrupted. Try again.','La descarga se interrumpió. Inténtalo de nuevo.'));if(error instanceof TypeError)throw new Error(responseText('The download connection failed. Try again.','Falló la conexión de descarga. Inténtalo de nuevo.'));throw error;}
+  finally{clearTimeout(timeout);activeDownloads.delete(controller);}
+}
+const responseWorkers=[Promise.resolve(),Promise.resolve(),Promise.resolve()];let responseWorker=0;
+function loadCompleteResponse(ticket,binding){
+  const slot=responseWorker++%responseWorkers.length;
+  const next=responseWorkers[slot].then(()=>{
+    if(!session||identity?.binding.id!==binding)throw new Error('Connection changed.');
+    return request('/response-content?ticket='+encodeURIComponent(ticket));
+  });
+  responseWorkers[slot]=next.catch(()=>{});return next;
+}
+function renderResponse(target,value){
+  const generation=Symbol('response');target.responseGeneration=generation;
+  if(value.content_ticket){
+    const binding=identity?.binding.id;
+    const fallback={...value,content_ticket:undefined};
+    renderResponse(target,fallback);target.responseGeneration=generation;
+    const status=document.createElement('p');status.className='muted';status.textContent=responseText('Loading the complete response…','Cargando la respuesta completa…');target.append(status);
+    void loadCompleteResponse(value.content_ticket,binding).then(full=>{
+      if(target.responseGeneration!==generation||!session||identity?.binding.id!==binding||!target.isConnected)return;
+      if(full.format!=='html'||typeof full.html!=='string'||full.content_ticket)throw new Error('Invalid formatted response.');
+      renderResponse(target,{...full,role:value.role});
+    }).catch(()=>{
+      if(target.responseGeneration!==generation||!target.isConnected)return;
+      status.textContent=responseText('Could not load the complete response. Load recent conversation to try again.','No se pudo cargar la respuesta completa. Carga la conversación reciente para intentarlo de nuevo.');
+    });
+    return;
+  }
+  if(window.TlamatiniResponse)window.TlamatiniResponse.render(target,value,{language:responseLanguage(),download:downloadResponseFile});
+  else target.textContent=value.text||'';
+}
+function renderReceipt(target,receipt){
+  const value=receipt.result||{};
+  if(receipt.kind==='conversation.submit'&&!value.cancelled){renderResponse(target,value);return;}
+  if(receipt.kind==='conversation.history'&&Array.isArray(value.messages)&&value.messages.length){
+    target.replaceChildren();
+    for(const row of value.messages){
+      const card=document.createElement('section');card.className='history-message '+(row.role==='user'?'user':'assistant');
+      const author=document.createElement('small');author.textContent=row.role==='assistant'?'Tlamatini':responseText('You','Tú');
+      if(row.created_at){const date=new Date(row.created_at);if(!isNaN(date))author.textContent+=' · '+date.toLocaleString(responseLanguage());}
+      const content=document.createElement('div');card.append(author,content);renderResponse(content,row);target.append(card);
+    }
+    if(value.truncated){const note=document.createElement('p');note.className='muted';note.textContent=responseText('Earlier content is available in Tlamatini.','El contenido anterior está disponible en Tlamatini.');target.append(note);}
+    return;
+  }
+  target.textContent=resultText(receipt);
+}
+
 function route(){const route=location.hash.slice(1)||(session?'chat':'security');const valid=[...document.querySelectorAll('[data-panel]')].some(p=>p.dataset.panel===route);for(const panel of document.querySelectorAll('[data-panel]'))panel.hidden=panel.dataset.panel!==(valid?route:'chat');for(const link of document.querySelectorAll('nav a')){if(link.hash==='#'+(valid?route:'chat'))link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}}
 addEventListener('hashchange',route);route();
 function pendingLifecycle(){
@@ -58,17 +136,17 @@ function lifecycleControls(){
     : 'Start opens Tlamatini on this PC. Stop closes this edition for all its accounts. Remote-Controller and Torrenter remain independent.';
 }
 function controls(){modeControls();lifecycleControls();const connected=!!session;$('#connection').textContent=connected?'Connected':'Disconnected';$('#connection').classList.toggle('connected',connected);$('#send').disabled=!has('chat');$('#history').disabled=!has('chat');$('#open-workspace').disabled=!has('workspace')||!(executionCapabilities?.workspace_available||executionCapabilities?.web_port);$('#schedule-save').disabled=!has('schedules')||!has('chat');$('#disconnect').disabled=!connected;$('#connect').disabled=!credential?.deviceId||connected||connecting||resetting;$('#enroll').disabled=enrolling||connected||resetting;$('#enroll-form').hidden=!!credential?.deviceId;$('#chat-connection').hidden=connected;$('#chat-connect-link').textContent=credential?.deviceId?'Connect to Tlamatini':'Set up this browser';$('#reset-device').hidden=!credential?.deviceId&&!credential?.pending;$('#reset-device').disabled=connected||connecting||enrolling||resetting;$('#reset-help').hidden=$('#reset-device').hidden;$('#account-line').textContent=identity?`${identity.binding.display_name} · ${identity.binding.edition}`:'Connect an approved device to begin.';$('#identity-title').textContent=approvalProblem?'This browser needs a new approval':credential?.deviceId?'This browser is enrolled':'This device is not enrolled';$('#identity-detail').textContent=approvalProblem?connectionError({code:approvalProblem}):identity?`Permissions: ${identity.scopes.join(', ')}. Session expires ${new Date(session.expires_at).toLocaleTimeString()}.`:credential?.deviceId?'Reconnect with the approved device key. No new invitation is needed.':'Create an invitation in XT → Remote-Controller → Access, then compare this device’s fingerprint locally.';}
-function clearSession(reason){session=null;identity=null;applicationState="unknown";lifecycleSubmitting=null;executionCapabilities=null;modesInitialized=false;clearTimeout(expiryTimer);if(socket){socket.onclose=null;socket.close();socket=null;}controls();$('#service-health').textContent='Connection unavailable';$('#observed-at').textContent='Previous observations are stale';$('#application-state').textContent='Not currently observed';if(reason){notice(reason);entry(reason);}}
+function clearSession(reason){for(const controller of activeDownloads)controller.abort();session=null;identity=null;applicationState="unknown";lifecycleSubmitting=null;executionCapabilities=null;modesInitialized=false;clearTimeout(expiryTimer);if(socket){socket.onclose=null;socket.close();socket=null;}controls();$('#service-health').textContent='Connection unavailable';$('#observed-at').textContent='Previous observations are stale';$('#application-state').textContent='Not currently observed';if(reason){notice(reason);entry(reason);}}
 async function request(path,{method='GET',body,headers={},authenticated=true,credentials='omit'}={}){const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),10000);try{const response=await fetch(API+path,{method,body:body===undefined?undefined:JSON.stringify(body),headers:{...(body===undefined?{}:{'Content-Type':'application/json'}),...(authenticated&&session?{Authorization:'Bearer '+session.access_token}:{}),...headers},credentials,cache:'no-store',signal:controller.signal});let result=null;if(response.status!==204){try{result=await response.json();}catch{throw new Error('The server returned an invalid response.');}}if(!response.ok){if(response.status===401&&authenticated)clearSession('Session ended. Reconnect to continue.');const error=new Error(result?.error?.message||`Request failed (${response.status}).`);error.code=result?.error?.code;throw error;}return result;}catch(error){if(error.name==='AbortError')throw new Error('The request timed out. Its outcome may be unknown.');if(error instanceof TypeError&&/fetch|network|load failed/i.test(error.message)){const detail=connectionError(error);if(authenticated&&session)clearSession(detail);throw new Error(detail);}throw error;}finally{clearTimeout(timeout);}}
 async function database(action,value){return new Promise((resolve,reject)=>{const open=indexedDB.open('tlachihuani-rc-device-v1',1);open.onupgradeneeded=()=>open.result.createObjectStore('identity');open.onerror=()=>reject(new Error('Device storage is unavailable. Enrollment was not saved.'));open.onsuccess=()=>{const db=open.result;const tx=db.transaction('identity',action==='get'?'readonly':'readwrite');const object=tx.objectStore('identity');const operation=action==='get'?object.get(location.origin):action==='delete'?object.delete(location.origin):object.put(value,location.origin);let result;operation.onsuccess=()=>{result=operation.result;};tx.oncomplete=()=>{db.close();resolve(result);};tx.onerror=()=>{db.close();reject(new Error('Device storage could not be updated.'));};};});}
 async function connect(){if(connecting||session||resetting||!credential?.deviceId)return;connecting=true;controls();try{const info=await request('/info',{authenticated:false});if(info.protocol_major!==1||info.mode!=='live'||info.security_profile!=='local-only')throw new Error('This client does not support this service security profile.');accountCapabilitiesSupported=Array.isArray(info.features)&&info.features.includes('account-capabilities');const challenge=await request('/sessions/challenges',{method:'POST',body:{device_id:credential.deviceId},authenticated:false});const challengeBytes=un64(challenge.challenge);const challengeText=new TextDecoder('utf-8',{fatal:true}).decode(challengeBytes).split('\n');if(challengeText.length!==7||challengeText[0]!=='Tlachihuani-RC login v1'||challengeText[2]!==location.origin||challengeText[3]!==credential.deviceId||challengeText[4]!==challenge.id)throw new Error('The authentication challenge has the wrong purpose or origin.');const signature=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},credential.key,challengeBytes);session=await request('/sessions',{method:'POST',body:{device_id:credential.deviceId,challenge_id:challenge.id,signature:b64(signature)},authenticated:false});identity=await request('/session');approvalProblem=null;cursor=identity.cursor;expiryTimer=setTimeout(()=>clearSession('Session expired. Reconnect to continue.'),Math.max(0,new Date(session.expires_at)-Date.now()));notice('');entry('Authenticated with the approved device key.');await refresh();if(has('monitor'))await channel();}catch(error){if(['device_unavailable','account_unavailable'].includes(error.code))approvalProblem=error.code;clearSession(connectionError(error));}finally{connecting=false;controls();}}
 async function channel(){const ticket=await request('/connection-ticket',{method:'POST'});if(!session)return;socket=new WebSocket(location.origin.replace(/^http/,'ws')+API+'/channel','tlachihuani.rc.v1');socket.onopen=()=>socket.send(JSON.stringify({ticket:ticket.ticket}));socket.onmessage=event=>{try{const data=JSON.parse(event.data);for(const item of data.events||[])if(item.cursor>cursor)entry(`${item.kind} · ${item.outcome||'recorded'}`);cursor=data.cursor;void refreshReceipts();}catch{clearSession('The event channel returned an invalid message.');}};socket.onerror=()=>{};socket.onclose=()=>{socket=null;if(session)clearSession('Connection interrupted. Reconnect to verify the server and pending receipts.');};}
 async function refresh(){if(!session||refreshing)return;refreshing=true;try{if(has('monitor')){const snapshot=await request('/snapshot');$('#service-health').textContent=snapshot.service.health;$('#observed-at').textContent='Observed '+new Date(snapshot.service.observed_at).toLocaleTimeString();applicationState=snapshot.application.state;$('#application-state').textContent=applicationState.replaceAll('_',' ');observeCapabilities(snapshot.application.capabilities);}else if((has('chat')||has('workspace'))&&accountCapabilitiesSupported)observeCapabilities(await request('/capabilities'));if(has('schedules'))await schedules();await refreshReceipts();}finally{refreshing=false;}}
-async function refreshReceipts(){for(const [operationId,item] of receipts){if(!session||item.finished)continue;try{const receipt=await request('/operations/'+operationId);if(item.finished)continue;if(receipt.state!==item.renderedState){item.state=receipt.state;item.renderedState=receipt.state;item.node.querySelector('small').textContent=operationName(receipt.kind)+' · '+receipt.state.replaceAll('_',' ');if(receipt.state==='succeeded'){item.node.querySelector('span').textContent=resultText(receipt);item.node.classList.remove('error');if(receipt.result?.options){const modes=document.createElement('small');modes.className='execution-modes';modes.dataset.options=JSON.stringify(receipt.result.options);modes.textContent='Executed with: '+Object.entries(receipt.result.options).filter(([,on])=>on).map(([key])=>modeLabels[key]||key).join(' · ');item.node.append(modes);}item.finished=true;}else if(['failed','cancelled','outcome_unknown'].includes(receipt.state)){item.node.querySelector('span').textContent=receipt.error||receipt.state;item.node.classList.add('error');item.finished=receipt.state!=='outcome_unknown';}}renderOperationControls(receipt,item);}catch(error){notice(error.message);}}controls();}
+async function refreshReceipts(){for(const [operationId,item] of receipts){if(!session||item.finished)continue;try{const receipt=await request('/operations/'+operationId);if(item.finished)continue;if(receipt.state!==item.renderedState){item.state=receipt.state;item.renderedState=receipt.state;item.node.querySelector('small').textContent=operationName(receipt.kind)+' · '+receipt.state.replaceAll('_',' ');if(receipt.state==='succeeded'){renderReceipt(item.node.querySelector('.response-body'),receipt);item.node.classList.remove('error');if(receipt.result?.options){const modes=document.createElement('small');modes.className='execution-modes';modes.dataset.options=JSON.stringify(receipt.result.options);modes.textContent='Executed with: '+Object.entries(receipt.result.options).filter(([,on])=>on).map(([key])=>modeLabels[key]||key).join(' · ');item.node.append(modes);}item.finished=true;}else if(['failed','cancelled','outcome_unknown'].includes(receipt.state)){item.node.querySelector('.response-body').textContent=receipt.error||receipt.state;item.node.classList.add('error');item.finished=receipt.state!=='outcome_unknown';}}renderOperationControls(receipt,item);}catch(error){notice(error.message);}}controls();}
 function renderOperationControls(receipt,item){
   if(item.finished||receipt.state==='outcome_unknown'){item.node.querySelector('.operation-actions')?.remove();item.node.querySelector('.permission')?.remove();return;}
   const progress=receipt.progress;
-  if(progress?.type==='message'&&progress.text)item.node.querySelector('span').textContent=progress.text;
+  if(progress?.type==='message'&&(progress.text||progress.html)){const stamp=JSON.stringify(progress);if(item.progressStamp!==stamp){renderResponse(item.node.querySelector('.response-body'),progress);item.progressStamp=stamp;}}
   if(receipt.kind!=='conversation.submit')return;
   if(!item.node.querySelector('.operation-actions')){
     const actions=document.createElement('div');actions.className='actions operation-actions';

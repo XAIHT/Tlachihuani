@@ -1,5 +1,25 @@
 # Tlachihuani handoff · 14 November 2026 · 0.3.3 pre-release
 
+## Development rich responses and file downloads · 14 November, 17:38 Mexico City
+
+Completed in Tlachihuani, canonical Tlamatini-RC assets and both main editions.
+RC renders the same prepared HTML as main history; response canvas actions save
+files locally with English/Spanish labels, original-byte verification and trusted
+message-owned artifact records. Main migration 0225_remote_response_files and
+module/source inventories are included. Large responses use scoped content tickets.
+Read [the complete evidence and delivery record](docs/verification/2026-11-14-rc-rich-responses.md).
+
+Passed: 20 English + 20 Spanish headed RC cases; 12 additional mobile checks;
+275 English and 277 Spanish main regressions; 285 RC core checks; build and
+15-file canonical/server/built asset parity. Actual parser saves and file bytes
+were exercised in isolated databases. No installed update or live model campaign.
+Legacy files without trusted ownership records must be regenerated.
+
+Angela will rebuild/reinstall both main applications, then Tlachihuani. Do not
+patch the running installation or delete the separate canonical client source.
+Owned test browsers/hosts are stopped, .NET build servers shut down, and the
+rc-rich-responses queue ended with finish.ready. Do not resume old queues.
+
 ## Development lifecycle-button fix · 14 November, 16:56 Mexico City
 
 Start now respects observed ready/loading state as well as permission. Both controls

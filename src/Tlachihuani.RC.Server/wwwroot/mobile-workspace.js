@@ -113,6 +113,36 @@
     return;
   }
   document.body.classList.add('mobile-chat-app');
+  // A response attachment belongs to the saved message/account. The phone saves
+  // its bytes locally; it never invokes the desktop canvas or a host Save As.
+  const chatLog=byId('chat-log');
+  if(chatLog){
+    function downloads(){
+      for(const anchor of chatLog.querySelectorAll('.message[data-message-id] a[onclick]')){
+        const handler=anchor.getAttribute('onclick')||'';
+        const match=handler.match(/^\s*loadCanvas\(\s*("(?:\\.|[^"\\])*"|'[^'\\]*')\s*\)\s*;?\s*$/);
+        if(!match)continue;
+        let name;try{name=match[1][0]==='"'?JSON.parse(match[1]):match[1].slice(1,-1);}catch{continue;}
+        if(typeof name!=='string'||!name||name.length>512)continue;
+        const messageId=anchor.closest('.message').dataset.messageId;
+        if(!/^[1-9][0-9]*$/.test(messageId))continue;
+        const button=element('button',t('Save file: ','Guardar archivo: ')+name,'mobile-response-download');button.type='button';
+        const status=element('span',null,'mobile-response-download-status');status.setAttribute('role','status');
+        button.addEventListener('click',async()=>{
+          if(button.disabled)return;button.disabled=true;status.textContent=t('Downloading…','Descargando…');
+          try{
+            const response=await fetch('/agent/mobile/response-file/?'+new URLSearchParams({message_id:messageId,name}),{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(120000)});
+            await window.TlamatiniDownload.save(response,name,{language:es?'es':'en'});
+            status.textContent=t('Download started. Check your browser’s downloads.','Descarga iniciada. Revisa las descargas de tu navegador.');
+          }catch(error){status.textContent=error.message||t('Download failed. Try again.','Falló la descarga. Inténtalo de nuevo.');}
+          finally{button.disabled=false;}
+        });
+        anchor.replaceWith(button,status);
+      }
+    }
+    new MutationObserver(downloads).observe(chatLog,{childList:true,subtree:true});downloads();
+  }
+
   const avatar=byId('tlm-avatar-dock');
   if(avatar){const status=element('button',t('Status','Estado'),'mobile-status');status.type='button';status.setAttribute('aria-label',t('Hear Tlamatini’s status','Escuchar el estado de Tlamatini'));status.addEventListener('click',()=>avatar.click());header.append(status);}
   // Phone photo selection uses the same checked upload/chip path as desktop

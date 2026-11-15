@@ -22,7 +22,7 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.state import ProjectState
 
 from agent import remote_controller_bridge as bridge
-from agent.models import RemoteControllerProfile, RemoteControllerRevocation
+from agent.models import AgentMessage, RemoteControllerProfile, RemoteControllerRevocation
 
 
 class RemoteControllerSchemaChecks(unittest.TestCase):
@@ -49,13 +49,22 @@ class RemoteControllerSchemaChecks(unittest.TestCase):
             for model in models:
                 editor.create_model(model)
 
+        # Exercise the additive artifact-manifest migration from the actual
+        # pre-225 AgentMessage table; no production database is involved.
+        with connection.schema_editor() as editor:
+            editor.remove_field(AgentMessage, AgentMessage._meta.get_field("response_files"))
         state = ProjectState.from_apps(apps)
+        state.remove_field("agent", "agentmessage", "response_files")
         state.remove_model("agent", "remotecontrollerprofile")
         state.remove_model("agent", "remotecontrollerrevocation")
         module = importlib.import_module("agent.migrations.0224_remote_controller")
         migration = module.Migration("0224_remote_controller", "agent")
         with connection.schema_editor() as editor:
             cls.applied_state = migration.apply(state, editor)
+        module = importlib.import_module("agent.migrations.0225_response_files")
+        migration = module.Migration("0225_response_files", "agent")
+        with connection.schema_editor() as editor:
+            cls.applied_state = migration.apply(cls.applied_state, editor)
 
     def setUp(self):
         self.assertEqual(Path(connection.settings_dict["NAME"]).resolve(), self.database)
@@ -100,7 +109,7 @@ class RemoteControllerSchemaChecks(unittest.TestCase):
         changes = MigrationAutodetector(
             self.applied_state, ProjectState.from_apps(apps),
         ).changes(graph=MigrationGraph())
-        self.assertEqual(changes, {}, "Migration 0224 must match the live models without a follow-up migration")
+        self.assertEqual(changes, {}, "Migrations 0224 and 0225 must match the live models")
 
     def test_migration_creates_real_profile_columns(self):
         with connection.cursor() as cursor:

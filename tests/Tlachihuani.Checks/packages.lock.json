@@ -5,7 +5,7 @@
       "tlachihuani.client": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Windows": "[0.34.1, )"
+          "Tlachihuani.Windows": "[0.34.2, )"
         }
       },
       "tlachihuani.contracts": {
@@ -14,26 +14,26 @@
       "tlachihuani.core": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[0.34.1, )"
+          "Tlachihuani.Contracts": "[0.34.2, )"
         }
       },
       "tlachihuani.rc": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[0.34.1, )"
+          "Tlachihuani.Contracts": "[0.34.2, )"
         }
       },
       "tlachihuani.tray": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Client": "[0.34.1, )"
+          "Tlachihuani.Client": "[0.34.2, )"
         }
       },
       "tlachihuani.windows": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Core": "[0.34.1, )",
-          "Tlachihuani.RC": "[0.34.1, )"
+          "Tlachihuani.Core": "[0.34.2, )",
+          "Tlachihuani.RC": "[0.34.2, )"
         }
       }
     },

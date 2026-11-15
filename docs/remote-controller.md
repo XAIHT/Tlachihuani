@@ -110,12 +110,13 @@ without monitoring requires the updated server and displays upgrade guidance.
 Remote conversation requests enter Tlamatini's existing `AgentConsumer` and use
 the selected account's history, configuration and normal answer persistence.
 One account cannot run overlapping desktop and remote model requests. Remote chat
-uses Multi-Turn, Ask Execs and Exec Report; ACPX delegation is disabled for this
-entry point. The adapter forwards only the frames emitted by its owned consumer.
+forwards the six explicitly selected execution modes. The adapter forwards only the frames emitted by its owned consumer.
 
 **Load recent conversation** uses the typed `conversation.history` operation to
 read only the selected account's saved messages. It returns at most 40 rows within
-a 24,000-byte escaped-JSON budget, with explicit truncation. It does not merge
+a 24,000-byte escaped-JSON receipt budget. Large saved assistant responses use
+account-bound content tickets to load their complete HTML separately; omitted
+older rows remain explicitly identified. It does not merge
 another account's history or trigger a model request.
 
 Execution requests show **Proceed** or **Deny** for the exact pending prompt.
@@ -239,3 +240,38 @@ permission and current application-state checks still apply. Offline means the
 account adapter is not currently observed, not proof that its process stopped.
 The trusted broker checks the installed process before acting. See the
 [development button regression](verification/2026-11-14-rc-lifecycle-buttons.md).
+
+## Rich replies and saving response files
+
+Conversation and loaded history render Tlamatini’s prepared HTML, preserving
+inline presentation, code, tables, diagrams and the separate execution report.
+The RC renderer sanitizes active content and isolates response styles. User
+messages remain literal text. It uses the same existing DOMPurify 3.4.16 dependency
+carried by Tlamatini, with its license included.
+
+**Save file** / **Guardar archivo** replaces response **Load in canvas** actions
+in RC, including the full mobile workspace. The browser downloads the original
+bytes to its own device. Size and SHA-256 are verified before the download starts;
+HTML, SVG and scripts are downloaded as files. A failed download offers a retry
+and does not report success. Files are limited to 64 MiB.
+
+Both main editions persist trusted, message-owned attachment records in
+AgentMessage.response_files through additive migration
+0225_remote_response_files. Only artifacts actually created by the response
+parser or returned by supported successful tools are eligible. Model-authored
+links, guessed names and arbitrary paths cannot grant file access. Old messages
+without these records ask the user to regenerate the attachment. Downloads recheck
+account consent, file identity and original bytes; changed files require a fresh
+response. Tickets expire after 30 minutes and after application restart; loading
+recent conversation refreshes eligible links.
+
+The fixed response-file and response-content endpoints require the approved RC
+chat scope. Full-workspace saving additionally retains the existing workspace
+session/account checks. Tokens, response bodies and file bytes are not cached in
+the service worker. Formatted responses exceeding the native receipt budget load
+through a bounded 8 MiB content endpoint, with at most three client loads at once.
+
+Build both main editions and then Tlachihuani to deliver these matching changes.
+The canonical Tlamatini-RC/public assets and the packaged wwwroot assets must stay
+identical. This is development work; installed acceptance is a separate gate.
+See [the rendering and file verification record](verification/2026-11-14-rc-rich-responses.md).

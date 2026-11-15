@@ -44,6 +44,8 @@ for name in ["agent.test_remote_controller_runtime", "agent.test_remote_controll
     suite.addTests(unittest.defaultTestLoader.loadTestsFromName(name))
 suite.addTests(unittest.defaultTestLoader.loadTestsFromName("agent.test_prompt_shape_sentences.PromptShapeSentenceTests"))
 suite.addTests(unittest.defaultTestLoader.loadTestsFromName("rc_account_schema_checks"))
+suite.addTests(unittest.defaultTestLoader.loadTestsFromName("agent.test_remote_response_files"))
+suite.addTests(unittest.defaultTestLoader.loadTestsFromName("agent.test_file_creator_response_receipts"))
 suite.addTests(unittest.defaultTestLoader.loadTestsFromName("rc_response_source_checks"))
 result = unittest.TextTestRunner(verbosity=2).run(suite)
 report.parent.mkdir(parents=True, exist_ok=True)

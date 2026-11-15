@@ -50,6 +50,8 @@ internal static class RcWeb
         });
         var app = builder.Build();
         var workspace = new MobileWorkspace(runtime);
+        var responseFiles = new ResponseFiles(runtime);
+        app.Lifetime.ApplicationStopped.Register(responseFiles.Dispose);
         app.Lifetime.ApplicationStopped.Register(workspace.Dispose);
         var origin = new Uri(config.PublicOrigin);
         app.Use(async (context, next) =>
@@ -57,7 +59,7 @@ internal static class RcWeb
             context.Response.Headers.CacheControl = "no-store";
             context.Response.Headers.XContentTypeOptions = "nosniff";
             context.Response.Headers["Referrer-Policy"] = "no-referrer";
-            context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'";
+            context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'";
             context.Response.Headers["Permissions-Policy"] = "microphone=(self), camera=(), geolocation=()";
             try
             {
@@ -83,6 +85,8 @@ internal static class RcWeb
         });
         app.UseRateLimiter();
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(20), AllowedOrigins = { origin.GetLeftPart(UriPartial.Authority) } });
+        app.MapGet(Prefix + "/response-content", (HttpContext c) => responseFiles.Content(c, Auth(runtime, c, "chat")));
+        app.MapGet(Prefix + "/response-file", (HttpContext c) => responseFiles.Download(c, Auth(runtime, c, "chat")));
         app.MapPost(Prefix + "/workspace", (HttpContext c) => Results.Json(workspace.Open(c, Token(c)), RcProtocol.Json));
         app.MapPost("/workspace/{id}/renew-session", (HttpContext c, string id) => Results.Json(workspace.Renew(c, id, Token(c)), RcProtocol.Json));
         app.MapMethods("/workspace/{id}/{**route}", ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"], workspace.Handle);
@@ -178,6 +182,10 @@ internal static class RcWeb
             ["/remote-sw.js"] = ("remote-sw.js", "text/javascript; charset=utf-8"), ["/remote.webmanifest"] = ("remote.webmanifest", "application/manifest+json"),
             ["/mobile-transport.js"] = ("mobile-transport.js", "text/javascript; charset=utf-8"),
             ["/mobile-workspace.js"] = ("mobile-workspace.js", "text/javascript; charset=utf-8"),
+            ["/remote-response.js"] = ("remote-response.js", "text/javascript; charset=utf-8"),
+            ["/remote-response.css"] = ("remote-response.css", "text/css; charset=utf-8"),
+            ["/vendor/purify.min.js"] = ("vendor/purify.min.js", "text/javascript; charset=utf-8"),
+            ["/mobile-download.js"] = ("mobile-download.js", "text/javascript; charset=utf-8"),
             ["/mobile-workspace.css"] = ("mobile-workspace.css", "text/css; charset=utf-8"),
             ["/icons/xt-192.png"] = ("icons/xt-192.png", "image/png"), ["/icons/xt-512.png"] = ("icons/xt-512.png", "image/png")
         };

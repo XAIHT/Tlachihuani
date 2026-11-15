@@ -11,7 +11,7 @@
     if (typeof value !== 'string' || !value || /^(#|data:|blob:|mailto:|tel:|javascript:)/i.test(value)) return value;
     let url; try { url = new URL(value, document.baseURI); } catch { return value; }
     if (![local.host, upstream.host].includes(url.host) || !['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol)) return value;
-    if (url.pathname.startsWith(prefix + '/') || /^\/mobile-(transport\.js|workspace\.(js|css))$/.test(url.pathname)) return value;
+    if (url.pathname.startsWith(prefix + '/') || /^\/mobile-(transport\.js|download\.js|workspace\.(js|css))$/.test(url.pathname)) return value;
     const ws = url.protocol.startsWith('ws');
     return (ws ? local.protocol === 'https:' ? 'wss:' : 'ws:' : local.protocol) + '//' + local.host + prefix + url.pathname + url.search + url.hash;
   }

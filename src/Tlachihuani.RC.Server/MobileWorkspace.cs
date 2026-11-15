@@ -238,7 +238,7 @@ internal sealed class MobileWorkspace(RcRuntime runtime) : IDisposable
             var type = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
             context.Response.ContentType = response.Content.Headers.ContentType?.ToString() ?? type;
             context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self'; worker-src 'self' blob:; font-src 'self' data:; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'";
-            foreach (var name in new[] { "Content-Disposition", "Content-Range", "Accept-Ranges", "X-Canvas-Revision" })
+            foreach (var name in new[] { "Content-Disposition", "Content-Range", "Accept-Ranges", "X-Canvas-Revision", "X-Content-SHA256" })
                 if (response.Content.Headers.TryGetValues(name, out var header) || response.Headers.TryGetValues(name, out header)) context.Response.Headers[name] = header.ToArray();
             if (type is "text/html" or "text/css" && !string.Equals(response.Content.Headers.ContentDisposition?.DispositionType, "attachment", StringComparison.OrdinalIgnoreCase))
             {
@@ -254,11 +254,11 @@ internal sealed class MobileWorkspace(RcRuntime runtime) : IDisposable
                     // Repeated transport wrappers would also rebase RC renewal
                     // requests into the application instead of the RC service.
                     content = new Regex("<head\\b[^>]*>", RegexOptions.IgnoreCase).Replace(content, m => m.Value + bootstrap, 1);
-                    content = new Regex("</head\\s*>", RegexOptions.IgnoreCase).Replace(content, "<link rel=\"stylesheet\" href=\"/mobile-workspace.css\"><script defer src=\"/mobile-workspace.js\"></script></head>", 1);
+                    content = new Regex("</head\\s*>", RegexOptions.IgnoreCase).Replace(content, "<link rel=\"stylesheet\" href=\"/mobile-workspace.css\"><script defer src=\"/mobile-download.js\"></script><script defer src=\"/mobile-workspace.js\"></script></head>", 1);
                 }
                 await context.Response.WriteAsync(content, context.RequestAborted);
             }
-            else await response.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
+            else { if (response.Content.Headers.ContentLength is { } contentLength) context.Response.ContentLength = contentLength; await response.Content.CopyToAsync(context.Response.Body, context.RequestAborted); }
         }
     }
 
