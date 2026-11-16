@@ -1,8 +1,7 @@
 // Visible, read-only evidence when the real Chrome window and document disagree.
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {spawn} from 'node:child_process';
-import {root,python,attachBrowser} from './rc_installed_driver.mjs';
+import {root,attachBrowser} from './rc_installed_driver.mjs';
 const output=path.resolve(process.argv[2]);if(!output.startsWith(path.join(root,'artifacts')+path.sep))throw new Error('Expected owned test artifacts.');
 const page=await attachBrowser(JSON.parse(await fs.readFile(path.join(output,'browser.json'),'utf8')));
 try{
@@ -15,6 +14,6 @@ try{
  console.log(files);await fs.writeFile(path.join(output,'file-diagnosis.json'),JSON.stringify(files,null,2));
  const layout=await page.evaluate(`['body','#chat-container','#chat-workspace','#main-chat-container','#subchat-container','#chat-log','#tools-chat-form-container','#chat-form','#chat-message-input','.chat-composer-actions'].map(selector=>{const e=document.querySelector(selector);if(!e)return{selector};const r=e.getBoundingClientRect(),s=getComputedStyle(e);return{selector,box:{x:r.x,y:r.y,width:r.width,height:r.height},style:Object.fromEntries(['display','position','left','width','minWidth','maxWidth','flex','flexDirection','justifyContent','alignItems','transform','overflow','margin','padding'].map(k=>[k,s[k]])),inline:e.getAttribute('style')}})`);
  console.log(layout);await fs.writeFile(path.join(output,'layout-diagnosis.json'),JSON.stringify(layout,null,2));
- const shot=await page.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await fs.writeFile(path.join(output,'focus-diagnosis.png'),Buffer.from(shot.data,'base64'));
- await new Promise((r,j)=>{const p=spawn(python,[path.join(root,'artifacts/rc-implementation/capture.py'),'mobile-focus-diagnosis'],{stdio:'inherit',windowsHide:false});p.once('error',j);p.once('exit',code=>code?j(new Error('Desktop capture failed')):r());});
+ // Whole desktop only, taken by Tlamatini's Shoter agent; never a page-only capture.
+ await page.photo('focus-diagnosis');
 }finally{page.close();}

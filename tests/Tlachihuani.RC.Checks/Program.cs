@@ -243,6 +243,83 @@ Test("283 permissions: stale in-flight principal cannot admit removed authority"
 Test("284 permissions: failed durable update keeps grant and session", f => {var login=f.Login();using(var locked=new FileStream(Path.Combine(f.Directory,"state.json"),FileMode.Open,FileAccess.Read,FileShare.Read)){try{f.Access.ChangeDeviceScopes(f.Device.Id,["chat"],f.Device.Revision,f.Sid);throw new Exception("Expected durable write failure");}catch(IOException){}catch(UnauthorizedAccessException){}}Eq(f.Device.Revision,f.Store.Read(s=>s.Devices[f.Device.Id].Revision));True(f.Access.Authenticate(login.AccessToken).Scopes.Contains("launch"));});
 Test("285 permissions: durable update survives reopening the store", f => {var u=f.Access.ChangeDeviceScopes(f.Device.Id,["chat","launch"],f.Device.Revision,f.Sid);var saved=JsonSerializer.Deserialize<DurableState>(File.ReadAllText(Path.Combine(f.Directory,"state.json")),RcProtocol.Json)!;True(saved.Devices[u.Id].Scopes.SequenceEqual(new[]{"chat","launch"}));Eq(u.Revision,saved.Devices[u.Id].Revision);});
 
+
+// Approval resolution must follow the request identity across every client.
+static OperationReceipt PendingChat(Fixture f, string requestId = "approval-a")
+{
+    var op = f.Ops.Submit(f.Principal(), "approval-chat", "conversation.submit", J("{\"text\":\"Read-only fixture\"}"));
+    f.Ops.TakeNext(f.Adapter, f.Sid, "application");
+    f.Ops.Progress(op.Id, f.Adapter, f.Sid, JsonSerializer.SerializeToElement(new {type="permission", request_id=requestId}));
+    return op;
+}
+foreach (var decision in new[]{"proceed", "deny"}) Test("286 resolution: " + decision + " removes only its pending prompt", f =>
+{
+    var op=PendingChat(f);
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,JsonSerializer.SerializeToElement(new {type="permission",request_id="approval-a",decision}));
+    True(f.Ops.Get(f.Principal(),op.Id).PendingPermission is null);
+});
+Test("287 resolution: old decision cannot dismiss a newer prompt", f =>
+{
+    var op=PendingChat(f);
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-b\"}"));
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\",\"decision\":\"proceed\"}"));
+    Eq("approval-b",f.Ops.Get(f.Principal(),op.Id).PendingPermission!.Value.GetProperty("request_id").GetString());
+});
+Test("288 resolution: a delayed prompt cannot reopen a resolved request", f =>
+{
+    var op=PendingChat(f);
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\",\"decision\":\"deny\"}"));
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\"}"));
+    True(f.Ops.Get(f.Principal(),op.Id).PendingPermission is null);
+});
+Test("289 resolution: invalid decisions preserve pending consent", f =>
+{
+    var op=PendingChat(f);
+    foreach(var decision in new[]{"null","true","123","\"allow\""})
+        Fault("invalid_request",()=>f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\",\"decision\":"+decision+"}")));
+    True(f.Ops.Get(f.Principal(),op.Id).PendingPermission is not null);
+});
+Test("290 resolution: competing client decisions dispatch only once", f =>
+{
+    var op=PendingChat(f);
+    JsonElement Answer(string decision)=>JsonSerializer.SerializeToElement(new {operation_id=op.Id,request_id="approval-a",decision});
+    f.Ops.Submit(f.Principal(),"first-answer","conversation.permission",Answer("deny"));
+    f.Ops.Submit(f.Principal(),"second-answer","conversation.permission",Answer("proceed"));
+    Eq("deny",f.Ops.TakeNext(f.Adapter,f.Sid,"application",true)!.Payload.GetProperty("decision").GetString());
+    True(f.Ops.TakeNext(f.Adapter,f.Sid,"application",true) is null);
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\"}"));
+    True(f.Ops.Get(f.Principal(),op.Id).PendingPermission is null);
+});
+Test("291 resolution: foreign adapters cannot clear approval", f =>
+{
+    var op=PendingChat(f);
+    Fault("forbidden",()=>f.Ops.Progress(op.Id,RcProtocol.Id(),f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\",\"decision\":\"deny\"}")));
+    True(f.Ops.Get(f.Principal(),op.Id).PendingPermission is not null);
+});
+
+Test("292 resolution: restart rejects stale progress without changing the stored contract", f =>
+{
+    var op=PendingChat(f);
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\",\"decision\":\"deny\"}"));
+    True(!File.ReadAllText(Path.Combine(f.Directory,"state.json")).Contains("resolved_permission_ids",StringComparison.Ordinal));
+    var recovered = new Operations(f.Store,f.Clock);
+    recovered.Recover();
+    Fault("operation_conflict",()=>recovered.Progress(op.Id,f.Adapter,f.Sid,J("{\"type\":\"permission\",\"request_id\":\"approval-a\"}")));
+    Eq("outcome_unknown",recovered.Get(f.Principal(),op.Id).State);
+});
+Test("293 resolution: the answered list forgets its oldest answer first", f =>
+{
+    var op=PendingChat(f);
+    for (var i = 0; i < 257; i++)
+        f.Ops.Progress(op.Id,f.Adapter,f.Sid,JsonSerializer.SerializeToElement(new {type="permission",request_id="answered-"+i,decision="deny"}));
+    // Answer 1 is still remembered, so its late prompt stays hidden.
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,JsonSerializer.SerializeToElement(new {type="permission",request_id="answered-1"}));
+    Eq("approval-a",f.Ops.Get(f.Principal(),op.Id).PendingPermission!.Value.GetProperty("request_id").GetString());
+    // Answer 0 was the oldest of 257 and was forgotten, so its prompt can show again.
+    f.Ops.Progress(op.Id,f.Adapter,f.Sid,JsonSerializer.SerializeToElement(new {type="permission",request_id="answered-0"}));
+    Eq("answered-0",f.Ops.Get(f.Principal(),op.Id).PendingPermission!.Value.GetProperty("request_id").GetString());
+});
+
 var results = new List<object>(); var failed = 0;
 foreach (var test in tests)
 {

@@ -273,18 +273,13 @@ async function capture(tab, label, focusSelector = null) {
     ? `document.querySelector(${JSON.stringify(focusSelector)}).scrollIntoView({block:'start',behavior:'instant'})`
     : 'scrollTo(0,0)');
   await sleep(700);
-  await verifyForeground(tab, 'page capture ' + label);
-  const result = await tab.send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  const pageFile = path.join(output, label + '-page.png');
-  await fs.writeFile(pageFile, Buffer.from(result.data, 'base64'));
-  const desktopLabel = runId + '-' + label;
+  // Whole desktop only, taken by Tlamatini's Shoter agent; never a page-only capture.
   await verifyForeground(tab, 'desktop capture ' + label);
-  const shot = await start(python, [path.join(artifacts, 'rc-implementation', 'capture.py'), desktopLabel]);
+  const desktopFile = path.join(output, label + '-desktop.png');
+  const shot = await start(python, [path.join(root, 'tests', 'integration', 'rc_shoter_photo.py'), output, label + '-desktop.png']);
   await boundedExit(shot, 'Shoter evidence', 30000);
   const foreground = await verifyForeground(tab, 'completed desktop capture ' + label);
-  const desktopFile = path.join(output, label + '-desktop.png');
-  await fs.copyFile(path.join(artifacts, 'rc-implementation', 'evidence', desktopLabel + '.png'), desktopFile);
-  evidence.push({label, page: pageFile, desktop: desktopFile, foreground});
+  evidence.push({label, desktop: desktopFile, foreground});
 }
 
 async function status(fixture) {

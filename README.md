@@ -183,3 +183,15 @@ For the next development session, read [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUD
   <b>Created by Angela López Mendoza · XAIHT</b><br />
   <a href="https://github.com/angelahack1/Tlachihuani">Tlachihuani</a> · <a href="https://github.com/XAIHT/Tlamatini">Tlamatini</a>
 </p>
+
+## Hosted Tlamatini-RC development
+
+The hosted client, cloud relay and service-owned outbound connector have an
+isolated HTTPS development profile with English and Spanish interfaces. Use the
+[English validation guide](docs/hosted-development.md) or
+[guía de validación en español](docs/hosted-development.es.md) to build and test
+the browser, real OIDC provider and Linux container.
+
+This profile does not enable Internet access, modify the installed applications
+or deploy to xaiht.org. The production encryption and trusted-client gates stay
+closed. Torrenter remains independent.

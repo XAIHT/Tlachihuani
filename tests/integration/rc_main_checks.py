@@ -47,6 +47,7 @@ suite.addTests(unittest.defaultTestLoader.loadTestsFromName("rc_account_schema_c
 suite.addTests(unittest.defaultTestLoader.loadTestsFromName("agent.test_remote_response_files"))
 suite.addTests(unittest.defaultTestLoader.loadTestsFromName("agent.test_file_creator_response_receipts"))
 suite.addTests(unittest.defaultTestLoader.loadTestsFromName("rc_response_source_checks"))
+suite.addTests(unittest.defaultTestLoader.loadTestsFromName("agent.test_exec_permission_sync"))
 result = unittest.TextTestRunner(verbosity=2).run(suite)
 report.parent.mkdir(parents=True, exist_ok=True)
 report.write_text(json.dumps({"edition": str(edition_root), "tests": result.testsRun,

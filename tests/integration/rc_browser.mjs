@@ -25,8 +25,9 @@ async function until(expression,label,timeout=12000){const deadline=Date.now()+t
 async function click(selector){await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'center',behavior:'instant'})`);await sleep(100);const rect=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)}),r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;if(!e.contains(document.elementFromPoint(x,y)))throw new Error('Obstructed control');return{x,y};})()`);await cdp.send('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...rect});await cdp.send('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...rect});await sleep(150);}
 async function field(selector,value){await click(selector);await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('input',{bubbles:true}));})()`);}
 async function route(name){await evaluate(`location.hash=${JSON.stringify(name)}`);await sleep(200);}
-async function photo(name){await evaluate('scrollTo(0,0)');const result=await cdp.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await fs.writeFile(path.join(output,name+'.png'),Buffer.from(result.data,'base64'));}
-async function desktop(name){await cdp.send('Page.bringToFront');await sleep(700);await new Promise((resolve,reject)=>{const shot=spawn('C:/Development/XAIHT/Tlamatini/python/python.exe',[path.join(root,'artifacts','rc-implementation','capture.py'),name],{stdio:'inherit',windowsHide:false});shot.once('error',reject);shot.once('exit',code=>code?reject(new Error('Desktop evidence failed')):resolve());});}
+// Every photo is the whole desktop taken by Tlamatini's Shoter agent; never a page-only capture.
+async function photo(name){await evaluate('scrollTo(0,0)');await desktop(name);}
+async function desktop(name){await cdp.send('Page.bringToFront');await sleep(700);await new Promise((resolve,reject)=>{const shot=spawn('C:/Development/XAIHT/Tlamatini/python/python.exe',[path.join(root,'tests','integration','rc_shoter_photo.py'),output,name+'.png'],{stdio:['ignore','pipe','inherit'],windowsHide:false});let out='';shot.stdout.on('data',b=>out+=b);shot.once('error',reject);shot.once('exit',code=>{try{const v=JSON.parse(out.trim().split('\n').at(-1)||'{}');if(code||!v.ok)throw new Error('Shoter photo failed: '+(v.error||'exit code '+code));resolve(v);}catch(e){reject(e);}});});}
 try{
  for(let i=0;i<100;i++){try{if((await fetch(base+'/api/rc/v1/health')).ok)break;}catch{}await sleep(150);}
  const profile=path.join(output,'profile');await fs.mkdir(profile,{recursive:true});
@@ -37,7 +38,7 @@ try{
  const tabs=await(await fetch(`http://127.0.0.1:${port}/json/list`)).json();const tab=tabs.find(t=>t.type==='page');if(!tab)throw new Error('No browser page');
  cdp=await connect(tab.webSocketDebuggerUrl);await cdp.send('Page.enable');await cdp.send('Runtime.enable');await cdp.send('Network.enable');await cdp.send('Page.bringToFront');
  await cdp.send('Page.navigate',{url:base+'/remote.html'});await until('!!document.querySelector("#prompt")','client loaded');
- await new Promise((resolve,reject)=>{const shot=spawn('C:/Development/XAIHT/Tlamatini/python/python.exe',[path.join(root,'artifacts','rc-implementation','capture.py'),'rc-browser-start'],{stdio:'inherit',windowsHide:false});shot.once('error',reject);shot.once('exit',code=>code?reject(new Error('Desktop evidence failed')):resolve());});
+ await desktop('rc-browser-start');
  record('Live client loads without simulated account',!await evaluate('document.body.innerText.includes("simulated")'));
  record('Disconnected client cannot submit work',await evaluate('document.querySelector("#send").disabled'));
  record('Microphone is not requested on load',await evaluate('document.body.innerText.includes("Voice is unavailable")'));

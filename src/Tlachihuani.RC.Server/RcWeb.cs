@@ -90,7 +90,7 @@ internal static class RcWeb
         app.MapPost(Prefix + "/workspace", (HttpContext c) => Results.Json(workspace.Open(c, Token(c)), RcProtocol.Json));
         app.MapPost("/workspace/{id}/renew-session", (HttpContext c, string id) => Results.Json(workspace.Renew(c, id, Token(c)), RcProtocol.Json));
         app.MapMethods("/workspace/{id}/{**route}", ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"], workspace.Handle);
-        app.MapGet(Prefix + "/info", () => new { protocol_major = 1, product = "Tlachihuani-RC Server", security_profile = config.SecurityProfile, post_quantum = false, mode = "live", features = new[] { "device-enrollment", "sessions", "operations", "schedules", "events", "account-capabilities" } });
+        app.MapGet(Prefix + "/info", () => new { protocol_major = 1, installation_id = runtime.Store.Read(s => s.InstallationId), authentication_origin = config.PublicOrigin, product = "Tlachihuani-RC Server", security_profile = config.SecurityProfile, post_quantum = false, mode = "live", features = new[] { "device-enrollment", "sessions", "operations", "schedules", "events", "account-capabilities" } });
         app.MapGet(Prefix + "/health", () => new { protocol_major = 1, ready = runtime.ListenerReady && runtime.Operations.Accepting });
         app.MapPost(Prefix + "/enrollments", async (HttpContext c) =>
         {
@@ -178,6 +178,9 @@ internal static class RcWeb
         var assets = new Dictionary<string, (string File, string Type)>(StringComparer.Ordinal)
         {
             ["/"] = ("remote.html", "text/html; charset=utf-8"), ["/remote.html"] = ("remote.html", "text/html; charset=utf-8"),
+            ["/remote-transport.js"] = ("remote-transport.js", "text/javascript; charset=utf-8"),
+            ["/remote-hosted.js"] = ("remote-hosted.js", "text/javascript; charset=utf-8"),
+            ["/remote-i18n.js"] = ("remote-i18n.js", "text/javascript; charset=utf-8"),
             ["/remote.js"] = ("remote.js", "text/javascript; charset=utf-8"), ["/remote.css"] = ("remote.css", "text/css; charset=utf-8"),
             ["/remote-sw.js"] = ("remote-sw.js", "text/javascript; charset=utf-8"), ["/remote.webmanifest"] = ("remote.webmanifest", "application/manifest+json"),
             ["/mobile-transport.js"] = ("mobile-transport.js", "text/javascript; charset=utf-8"),

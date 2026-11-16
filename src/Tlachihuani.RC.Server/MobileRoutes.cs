@@ -163,7 +163,6 @@ internal static class MobileRoutes
         "\\A/agent/update_pptxer_connection/[^/?#]{1,512}/\\z",
         "\\A/agent/update_torrenter_connection/[^/?#]{1,512}/\\z",
         "\\A/agent/update_terminater_connection/[^/?#]{1,512}/\\z",
-        "\\A/agent/terminater/api/\\z",
         "\\A/agent/terminater/state/\\z",
         "\\A/agent/update_stm32er_connection/[^/?#]{1,512}/\\z",
         "\\A/agent/update_esp32er_connection/[^/?#]{1,512}/\\z",

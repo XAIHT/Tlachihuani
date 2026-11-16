@@ -20,7 +20,7 @@ internal static class MobileChecks
         }
         Add("unknown mode is refused", _ => Refuse("invalid_request", () => Operations.ValidateOperation("conversation.submit", J("{\"text\":\"x\",\"options\":{\"command\":true}}"))));
         Add("duplicate mode is refused", _ => Refuse("invalid_request", () => Operations.ValidateOperation("conversation.submit", J("{\"text\":\"x\",\"options\":{\"acpx_enabled\":true,\"acpx_enabled\":false}}"))));
-        foreach (var key in new[] { "exec_report_enabled", "acpx_enabled", "ask_execs_enabled" })
+        foreach (var key in new[] { "exec_report_enabled", "acpx_enabled", "ask_execs_enabled", "step_by_step_enabled" })
             Add(key + " requires multiturn", _ => Refuse("invalid_request", () => Operations.ValidateOperation("conversation.submit", JsonSerializer.SerializeToElement(new { text = "hello", options = new Dictionary<string, bool> { [key] = true, ["multi_turn_enabled"] = false } }))));
         Add("changing modes cannot reuse an execution key", f => { var p=f.Principal();f.Ops.Submit(p,"same","conversation.submit",J("{\"text\":\"x\",\"options\":{\"acpx_enabled\":false}}"));Refuse("idempotency_conflict",()=>f.Ops.Submit(p,"same","conversation.submit",J("{\"text\":\"x\",\"options\":{\"acpx_enabled\":true}}"))); });
         Add("offline queued requests expire without an adapter", f => {var p=f.Principal();var receipt=f.Ops.Submit(p,"offline","conversation.submit",J("{\"text\":\"x\"}"),1);f.Clock.Advance(TimeSpan.FromSeconds(2));f.Ops.Tick();Require(f.Ops.Get(p,receipt.Id).State=="failed");Require(f.Ops.Get(p,receipt.Id).Error=="deadline_exceeded");Require(f.Ops.TakeNext(f.Adapter,f.Sid,"application") is null);});

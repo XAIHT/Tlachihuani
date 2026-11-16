@@ -9,6 +9,7 @@
     <Project Path="src/Tlachihuani.Jobs/Tlachihuani.Jobs.csproj" />
     <Project Path="src/Tlachihuani.RC/Tlachihuani.RC.csproj" />
     <Project Path="src/Tlachihuani.RC.Server/Tlachihuani.RC.Server.csproj" />
+    <Project Path="src/Tlachihuani.RC.Cloud/Tlachihuani.RC.Cloud.csproj" />
     <Project Path="src/Tlachihuani.Tray/Tlachihuani.Tray.csproj" />
   </Folder>
   <Folder Name="/tests/">

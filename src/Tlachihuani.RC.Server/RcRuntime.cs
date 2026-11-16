@@ -12,6 +12,7 @@ internal sealed class RcRuntime : IDisposable
     internal readonly StateStore Store;
     internal readonly Access Access;
     internal readonly Operations Operations;
+    internal readonly HostedConnector Hosted;
     internal readonly TimeProvider Clock = TimeProvider.System;
     internal readonly string InstanceId = RcProtocol.Id();
     internal readonly DateTimeOffset Started = DateTimeOffset.UtcNow;
@@ -29,11 +30,12 @@ internal sealed class RcRuntime : IDisposable
         Access = new(Store, settings.Configuration, Clock);
         Operations = new(Store, Clock);
         Operations.Recover();
+        Hosted = new(this);
     }
     internal object Status() => new
     {
         protocol_major = 1, service = RcProtocol.ServiceName, display_name = RcProtocol.DisplayName,
-        instance_id = InstanceId, started_at = Started, observed_at = Clock.GetUtcNow(),
+        instance_id = InstanceId, installation_id = Store.Read(s => s.InstallationId), hosted = Hosted.Status(), started_at = Started, observed_at = Clock.GetUtcNow(),
         health = !Operations.Accepting ? "stopping" : ListenerReady ? "ready" : "setup_required",
         listener = ListenerReady, origin = Settings.Configuration.PublicOrigin,
         security_profile = Settings.Configuration.SecurityProfile, post_quantum = false,
@@ -54,6 +56,9 @@ internal sealed class RcRuntime : IDisposable
         object result = op switch
         {
             "status" => Status(),
+            "hosted-status" => Hosted.Status(),
+            "hosted-configure" => Hosted.Configure(req["configuration"]?.Deserialize<HostedConnectorConfiguration>(RcProtocol.Json) ?? throw new RcFault("invalid_request", "Hosted configuration is required.", 400)),
+            "hosted-disconnect" => Hosted.Disconnect(),
             "development-stop" when !Settings.Installed => StopDevelopment(),
             "accounts" => Accounts(sid),
             "devices" => Store.Read(s => new { devices = s.Devices.Values.Where(d => s.Bindings[d.BindingId].WindowsSid == sid).Select(d => new { d.Id, d.BindingId, d.Name, d.Scopes, d.EnrolledAt, d.Revoked, d.Revision, account_name = s.Bindings[d.BindingId].DisplayName, edition = s.Bindings[d.BindingId].Edition }).ToArray() }),

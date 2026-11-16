@@ -1,5 +1,87 @@
 # Tlachihuani handoff · 14 November 2026 · 0.3.3 pre-release
 
+## Approval synchronization and latest predeployment scope · 15 November 2026
+
+Angela found a real installed failure: approving RC-TEST-02 in RC completed the
+command but left the main chat approval modal open until Ctrl+R. Development fixes
+now synchronize the exact request across main English, main Spanish and RC, make
+answers atomic, and prevent stale prompts/receipts from affecting newer approvals.
+The canonical client and packaged mirrors use shell cache v13.
+
+Final checks: 307 English, 309 Spanish, 294 RC core, 41 headed approval UI,
+15 client, 89 hosted relay/browser, 25 real OIDC and 8 Linux-container checks.
+All 18 packaged assets match canonical/source/built Windows/built cloud copies.
+See [correction and complete evidence](docs/verification/2026-11-15-approval-sync.md)
+and [the full predeployment checklist](docs/remote-control-predeployment-checklist.md).
+Initial failures and corrected final runs are retained. No installed application,
+release version or production deployment was changed; no commit/tag/push.
+
+Angela will rebuild/reinstall both main editions and then Tlachihuani. Verify the
+exact installed payloads against those builds before resuming with RC-TEST-02 in
+both windows, then denial/cancellation and the remaining local/hosted checks.
+The prior walkthrough only covered the local installed connection. The latest
+cloud code still accepts only development-loopback and rejects public origins;
+xaiht.org deployment and real external-phone acceptance remain explicit gates.
+
+All owned test processes/containers are closed, test ports are free, compiler
+servers are stopped. Other containers were running, so Docker Desktop was left
+on. The approval console stays open and its queue ends with finish.ready; do not
+restart it. Artifacts: rc-approval-sync-20261115 and hosted validation
+20261115-195008-4d96aa8e.
+
+## Hardening review and revised videos · 15 November 2026
+
+Reviewed the new RC queue, connector, revocation and execution-mode changes.
+Fixed two reproducible defects in development: exponential retry overflow after
+1,024 failures in both main editions, and receipt wording that could conceal an
+unknown execution outcome. Canonical/client mirror assets match; shell cache v12.
+Final regression stages passed 1,013 checks; the initial OIDC foreground failure
+and its successful 25/25 retry are both retained. No installed update or deployment.
+
+Revised EN/ES videos are in `artifacts/rc-hardening-review/watch/Watch.html`,
+with 12 chapters each, narration/captions, and 36 recorded assertions. They show
+expanding execution modes, Multiturn dependencies, uncertain results and late
+completion without resubmission. Prior videos remain historical. See
+[findings, evidence and qualification limits](docs/verification/2026-11-15-hardening-review.md).
+Passing this development campaign does not establish mission-critical readiness.
+All owned test workers/containers are closed and test ports are free. The
+hardening-review console is left open; its queue ended with `finish.ready`.
+Do not restart old test queues. The installed applications remain untouched.
+
+## Recorded hosted walkthrough · 15 November 2026
+
+Actual English (3:32) and Spanish (3:50) development-lab videos are available in
+`artifacts/rc-hosted-video/watch/Watch.html`, with narration, captions and twelve
+chapters each. The share ZIP excludes test credentials and browser profiles.
+Thirty combined OIDC/connector/browser/sample assertions passed. The main adapter
+is deterministic test data; this does not certify the unfinished public product.
+See [recording evidence](docs/verification/2026-11-15-hosted-video.md).
+
+## Hosted RC development foundation · 15 November 2026
+
+Implemented the hosted client in English/Spanish, cross-platform cloud
+OIDC/directory/relay, and service-owned outbound connector for the explicit
+HTTPS loopback development profile. **443 distinct checks passed**: 51 API/relay,
+34 headed hosted-browser, 25 real Keycloak/OIDC, 8 Linux-container, 285 RC core
+and 40 final local rich-response cases (20 per edition). See
+[the complete record](docs/verification/2026-11-15-rc-hosted-development.md) for
+source hashes, fixtures, the retained foreground-guard interruption and resumed
+stages. Use [the runner guide](docs/hosted-development.md), also available
+[in Spanish](docs/hosted-development.es.md).
+
+This is a development foundation, not the completed public remote product.
+The relay can read lab traffic. Public/PQ modes fail closed; reviewed endpoint
+crypto, independent trusted-client delivery, consumer account provisioning,
+production operations and external-phone/installed acceptance remain open.
+No deployment, installation, main-account DB change, commit, tag or version
+change occurred. Preserve pre-existing version/lock/MobileRoutes changes.
+The canonical Tlamatini-RC source is still separate and must not be deleted.
+
+All owned test processes/containers and compiler servers are cleaned up at the
+end of this run; see the retained final-cleanup.json and visible transcript in
+artifacts/rc-hosted-implementation. The existing console remains open and idle;
+its queue ends with finish.ready. Do not restart an old queue automatically.
+
 ## Development rich responses and file downloads · 14 November, 17:38 Mexico City
 
 Completed in Tlachihuani, canonical Tlamatini-RC assets and both main editions.

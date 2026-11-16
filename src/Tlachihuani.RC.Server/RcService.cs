@@ -30,12 +30,13 @@ internal sealed class RcService(RcRuntime runtime, ILogger<RcService> log) : Bac
                 if (web is not null) { await web.DisposeAsync(); web = null; }
             }
             log.LogInformation("Remote-Controller local control ready; listener {Ready}; security {Profile}", runtime.ListenerReady, runtime.Settings.Configuration.SecurityProfile);
-            await Task.WhenAll(listeners.Select(p => Listen(p, token)).Append(Scheduler(token)));
+            await Task.WhenAll(listeners.Select(p => Listen(p, token)).Append(Scheduler(token)).Append(runtime.Hosted.Run(token)));
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
         finally
         {
             runtime.Operations.BeginStop(); runtime.ListenerReady = false;
+            runtime.Hosted.Dispose();
             foreach (var listener in listeners) listener.Dispose();
             runtime.Access.Dispose();
             if (web is not null)

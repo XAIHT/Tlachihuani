@@ -7,6 +7,26 @@ namespace Tlachihuani.RC;
 public sealed class Operations(StateStore store, TimeProvider clock)
 {
     private int accepting = 1;
+    // Accessed only inside store.Write's serialized mutation. This bounded UI
+    // replay guard is deliberately transient: recovery ends running authority,
+    // so an earlier process cannot resume progress. Durable receipt format stays
+    // compatible with existing installations and older readers.
+    // Answered approvals per running conversation, so a delayed prompt cannot reopen
+    // one. Each list keeps the newest 256 (oldest out first) and is dropped once its
+    // operation stops running.
+    private sealed class ResolvedRequests
+    {
+        private readonly HashSet<string> ids = new(StringComparer.Ordinal);
+        private readonly Queue<string> order = new();
+        public bool Contains(string id) => ids.Contains(id);
+        public void Add(string id)
+        {
+            if (!ids.Add(id)) return;
+            order.Enqueue(id);
+            while (order.Count > 256) ids.Remove(order.Dequeue());
+        }
+    }
+    private readonly Dictionary<string, ResolvedRequests> resolvedPermissions = new(StringComparer.Ordinal);
     public bool Accepting => Volatile.Read(ref accepting) == 1;
     public void BeginStop() => Interlocked.Exchange(ref accepting, 0);
     public static void Permit(Principal principal, string scope)
@@ -104,6 +124,7 @@ public sealed class Operations(StateStore store, TimeProvider clock)
                         || !HasConversationAuthority(s, owner) || owner.PendingPermission is not JsonElement pending
                         || pending.GetProperty("request_id").GetString() != item.Payload.GetProperty("request_id").GetString())
                     { s.Operations[item.Id] = item with { State = "failed", Error = "permission_expired" }; continue; }
+                    RememberPermission(s, owner.Id, pending.GetProperty("request_id").GetString()!);
                     s.Operations[target] = owner with { PendingPermission = null };
                 }
                 s.Operations[item.Id] = running;
@@ -123,6 +144,9 @@ public sealed class Operations(StateStore store, TimeProvider clock)
             if (!progress.TryGetProperty("request_id", out var request) || request.ValueKind != JsonValueKind.String)
                 throw new RcFault("invalid_request", "Permission request identity is required.", 400);
             _ = RcProtocol.Text(request.GetString(), "permission request", 128);
+            if (progress.TryGetProperty("decision", out var decision)
+                && (decision.ValueKind != JsonValueKind.String || decision.GetString() is not ("proceed" or "deny")))
+                throw new RcFault("invalid_request", "Invalid permission decision.", 400);
         }
         store.Write(s =>
         {
@@ -132,13 +156,37 @@ public sealed class Operations(StateStore store, TimeProvider clock)
             if (operation.State != "running") throw new RcFault("operation_conflict", "Operation is no longer running.");
             _ = Access.Device(s, operation.DeviceId);
             var pending = operation.PendingPermission;
-            if (progress.TryGetProperty("type", out var kind) && kind.GetString() == "permission")
-                pending = progress.TryGetProperty("decision", out _) ? null : progress.Clone();
+            resolvedPermissions.TryGetValue(operation.Id, out var resolved);
+            if (progressType.GetString() == "permission")
+            {
+                var requestId = progress.GetProperty("request_id").GetString()!;
+                if (progress.TryGetProperty("decision", out _))
+                {
+                    RememberPermission(s, operation.Id, requestId);
+                    // A late resolution of A must never dismiss a newer prompt B.
+                    if (pending?.GetProperty("request_id").GetString() == requestId) pending = null;
+                }
+                else
+                {
+                    if (resolved?.Contains(requestId) == true) return false;
+                    pending = progress.Clone();
+                }
+            }
             s.Operations[operation.Id] = operation with { Progress = progress.Clone(), PendingPermission = pending };
             StateStore.Event(s, clock, "operation.progress", binding.Id, operation.Id, "running");
             return true;
         });
     }
+    private void RememberPermission(DurableState s, string operationId, string requestId)
+    {
+        // Operations that are no longer running cannot receive prompts: forget them.
+        foreach (var stale in resolvedPermissions.Keys.Where(id => !s.Operations.TryGetValue(id, out var o) || o.State != "running").ToArray())
+            resolvedPermissions.Remove(stale);
+        if (!resolvedPermissions.TryGetValue(operationId, out var requests))
+            resolvedPermissions[operationId] = requests = new();
+        requests.Add(requestId);
+    }
+
     public void CompleteApplication(string operationId, string adapterId, string windowsSid, JsonElement? result, string? error)
     {
         var isLaunch = store.Read(s => s.Operations.TryGetValue(operationId, out var operation) && operation.Kind is "application.start" or "application.stop");
@@ -161,12 +209,14 @@ public sealed class Operations(StateStore store, TimeProvider clock)
                 throw new RcFault("operation_conflict", "Operation is not awaiting an adapter result.");
             }
             s.Operations[operation.Id] = operation with { State = desired, Result = result?.Clone(), Error = error, Progress = null, PendingPermission = null, Payload = JsonSerializer.SerializeToElement(new { }) };
+            resolvedPermissions.Remove(operation.Id);
             StateStore.Event(s, clock, "operation.completed", binding.Id, operation.Id, desired);
             return true;
         });
     }
     public void Recover() => store.Write(s =>
     {
+        resolvedPermissions.Clear();
         foreach (var item in s.Operations.Values.ToArray())
         {
             if (item.State == "running") s.Operations[item.Id] = item with { State = "outcome_unknown", Error = "host_restarted" };
@@ -184,6 +234,7 @@ public sealed class Operations(StateStore store, TimeProvider clock)
             foreach (var item in s.Operations.Values.Where(item => Owned(s, item)).ToArray())
             {
                 s.Operations[item.Id] = item with { State = "outcome_unknown", Error = "adapter_disconnected", PendingPermission = null };
+                resolvedPermissions.Remove(item.Id);
                 StateStore.Event(s, clock, "operation.uncertain", item.BindingId, item.Id, "outcome_unknown");
             }
             return true;
@@ -308,8 +359,8 @@ public sealed class Operations(StateStore store, TimeProvider clock)
                     || options.EnumerateObject().GroupBy(p => p.Name).Any(g => g.Count() > 1))
                     throw new RcFault("invalid_request", "Execution modes must be supported boolean settings.", 400);
                 if (options.TryGetProperty("multi_turn_enabled", out var multi) && !multi.GetBoolean()
-                    && new[] { "exec_report_enabled", "acpx_enabled", "ask_execs_enabled" }.Any(name => options.TryGetProperty(name, out var mode) && mode.GetBoolean()))
-                    throw new RcFault("invalid_request", "Exec-Report, ACPX and Ask Execs require Multiturn.", 400);
+                    && new[] { "exec_report_enabled", "acpx_enabled", "ask_execs_enabled", "step_by_step_enabled" }.Any(name => options.TryGetProperty(name, out var mode) && mode.GetBoolean()))
+                    throw new RcFault("invalid_request", "Exec-Report, ACPX, Ask Execs and Step by step require Multiturn.", 400);
             }
         }
         else if (allowed.Length != 0)

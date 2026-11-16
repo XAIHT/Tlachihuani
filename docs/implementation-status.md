@@ -1,5 +1,17 @@
 # Implementation status · 0.3.3 pre-release
 
+## Hosted development foundation · 15 November 2026
+
+The English/Spanish hosted client, OIDC sign-in, bounded relay and outbound RC
+connector are implemented in an explicit HTTPS loopback lab. **443 distinct
+checks passed**, including real headed-browser, Keycloak, Linux-container and
+existing RC regressions. Public Internet mode remains disabled and unfinished:
+reviewed endpoint encryption/PQ, trusted-client distribution and production
+account provisioning are still required. Torrenter remains independent; no
+installed update or xaiht.org deployment occurred. Read the
+[verification record](verification/2026-11-15-rc-hosted-development.md),
+[English guide](hosted-development.md) or [guía en español](hosted-development.es.md).
+
 ## Installed connection walkthrough · 14 November 2026
 
 The installed local-PC connection procedure now passes through real XT controls,
