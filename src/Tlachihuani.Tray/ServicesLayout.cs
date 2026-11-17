@@ -69,7 +69,7 @@ internal sealed partial class ServicesForm
             ActionButton("Stop provider", () => Provider("stop")), ActionButton("Restart provider", () => Provider("restart"))), 0, 1);
         provider.Controls.Add(new Panel { Dock = DockStyle.Fill, BackColor = Studio.Hairline, Margin = Padding.Empty }, 0, 2);
         provider.Controls.Add(CommandRow("REST workspace", webState, ActionButton("Restart web", () => Call(new() { ["op"] = "restart-web" })),
-            ActionButton("Open workspace", OpenWorkspace, ButtonTone.Primary)), 0, 3);
+            ActionButton("Open workspace", () => OpenWorkspace(signIn: true), ButtonTone.Primary)), 0, 3);
         provider.Controls.Add(impactLine, 0, 4);
         page.Controls.Add(Studio.Card(provider, new Padding(14, 6, 6, 6)), 0, 2);
         return page;
@@ -78,7 +78,7 @@ internal sealed partial class ServicesForm
     {
         var page = Studio.Grid([-1], [-1, 8, -1, 8, -1]);
         page.Controls.Add(Studio.Card(CommandRow("Tlamatini account", Studio.Label("The workspace uses your current login.", Studio.Small, Studio.Muted),
-            ActionButton("Open downloads", OpenWorkspace)), new Padding(14, 6, 6, 6)), 0, 0);
+            ActionButton("Open downloads", () => OpenWorkspace(signIn: false))), new Padding(14, 6, 6, 6)), 0, 0);
         page.Controls.Add(Studio.Card(CommandRow("API credentials", Studio.Label("Account access and permissions", Studio.Small, Studio.Muted),
             ActionButton("Issue API credential", Issue), ActionButton("Revoke access", Revoke, ButtonTone.Danger)), new Padding(14, 6, 6, 6)), 0, 2);
         page.Controls.Add(Studio.Card(CommandRow("File erasure", Studio.Label("Review the exact files before approving removal.", Studio.Small, Studio.Muted),

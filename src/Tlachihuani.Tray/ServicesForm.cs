@@ -90,11 +90,15 @@ internal sealed partial class ServicesForm : StudioForm
         if(op!="start"&&!ServiceDialogs.Confirm(this, op == "stop" ? "Stop Torrenter?" : "Restart Torrenter?", "Active transfers will be checkpointed. " + impact, op == "stop" ? "Stop provider" : "Restart provider"))return;
         await Call(new(){["op"]=op});
     }
-    private async Task OpenWorkspace()
+    // "Open workspace" always passes through the Tlamatini login page (?signin=1),
+    // so the queue shown belongs only to the account that signs in there, even if
+    // the browser is already signed in with another account. "Open downloads"
+    // keeps the current login, as its Access-tab label says.
+    private async Task OpenWorkspace(bool signIn)
     {
         var current=await Call(new(){["op"]="status"});
         if((bool?)current["web"]!=true)throw new InvalidOperationException("The workspace is offline.");
-        Process.Start(new ProcessStartInfo("http://127.0.0.1:12064/"){UseShellExecute=true});
+        Process.Start(new ProcessStartInfo(signIn?"http://127.0.0.1:12064/?signin=1":"http://127.0.0.1:12064/"){UseShellExecute=true});
     }
     private async Task Revoke()
     {
