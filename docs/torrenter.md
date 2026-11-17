@@ -1,6 +1,6 @@
 # Operating Torrenter
 
-Documentation for **[0.3.3 pre-release](releases/v0.3.3.md)**. See the
+Latest version: **[0.36.0](releases/v0.36.0.md)**. See the
 [dated recovery verification](verification/2026-11-10-torrenter-recovery.md) for
 source results and installed-audit limits.
 

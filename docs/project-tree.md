@@ -1,8 +1,8 @@
-# Project files · 0.3.3 pre-release
+# Project files · 0.36.0
 
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
-Current source inventory for [Tlachihuani 0.3.3 pre-release](releases/v0.3.3.md),
+Latest version: **[Tlachihuani 0.36.0](releases/v0.36.0.md)**. Source inventory
 updated 11 November 2026. Includes tracked files and new documentation in this
 working tree; ignored installers, local evidence and build intermediates are excluded.
 
@@ -41,6 +41,7 @@ docs/release-building.md
 docs/releases/v0.2.0.md
 docs/releases/v0.2.1.md
 docs/releases/v0.3.3.md
+docs/releases/v0.36.0.md
 docs/security-and-installation.md
 docs/skill-inventory.md
 docs/source-review.md
@@ -152,6 +153,7 @@ tests/desktop/table_server.py
 tests/desktop/torrenter-table.md
 tests/desktop/torrenter_table.py
 tests/desktop/torrenter_workspace.py
+tests/desktop/workspace_signin.py
 tests/integration/check_setup_payload.py
 tests/integration/check_setup_zip.py
 tests/integration/jobs_swarm.py

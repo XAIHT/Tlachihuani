@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/releases/v0.3.3.md">What's new in 0.3.3</a> ·
+  <a href="docs/releases/v0.36.0.md">What's new in 0.36.0</a> ·
   <a href="#installation">Install &amp; uninstall</a> ·
   <a href="packaging/setup/README.md">Package guide</a> ·
   <a href="#first-download">First download</a> ·
@@ -47,7 +47,17 @@ If XT is missing after setup, open **Tlachihuani XT** from Start or press **Win+
 3. **Start the transfer.** Choose the files you want and select **Download selected files**. You can close the browser or Tlamatini while the Jobs service continues downloading.
 4. **Find your files.** Select the completed transfer and open **Verified output** for its saved directory and each file’s SHA-256. The usual destination is **Downloads → Torrenter**. If Windows refuses delivery there, check Verified output for the application’s `content_generated` fallback.
 
-## What's new in 0.3.3 pre-release
+## What's new in 0.36.0
+
+- **Remote-Controller.** A third service, `Tlachihuani.RemoteController`, hosts
+  the Tlamatini-RC web client with per-account permissions granted in XT, and
+  approvals stay synchronized across both main editions and RC. See the
+  [0.36.0 notes](docs/releases/v0.36.0.md).
+- **A workspace that is always yours.** XT's **Open workspace** now opens the
+  Tlamatini login page first, even if the browser is already signed in, so the
+  queue shown belongs only to the account that just signed in.
+
+### Carried forward from 0.3.3
 
 - **A queue that keeps moving.** An unfinished transfer with no payload progress
   for 180 seconds yields its slot when another eligible download is blocked.
@@ -98,7 +108,7 @@ Use **Windows 11 x64**. The download includes private .NET and Python runtimes; 
 
 ### Install with the Windows wizard
 
-1. Get the matching **Tlachihuani-0.3.3-windows-x64.zip** pre-release from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **0.3.3** in the installer before proceeding. The release command produces the ZIP in `dist\`.
+1. Get the matching **Tlachihuani-0.36.0-windows-x64.zip** from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **0.36.0** in the installer before proceeding. The release command produces the ZIP in `dist\`.
 2. Sign in as the Windows user who will operate XT. Open **Installer.exe** and choose whether **XT should appear at Windows sign-in**. This choice applies to all Windows users on the PC. Select **Review**, check the version, operator, destination and startup choice, then choose **Install** and approve Windows' administrator prompt.
 3. After **Installation complete**, XT appears gray in your normal Windows session. Check the hidden-icons arrow beside the clock. **Start menu and Desktop shortcuts** always let you reopen it. If the entire wizard was launched as administrator, open XT from either shortcut yourself.
 4. Choose **Start Services** only when needed. Both services remain **Stopped / Manual** after installation and reboot. Login opens XT only when you selected that option; it never starts services or downloads. With the option unchecked, open XT manually after signing in.
@@ -125,9 +135,9 @@ Or run `.\Build-Release.cmd` in a visible PowerShell console. Each run reads the
 
 The current checkout, including local edits, supplies the code; the tag supplies its version. Keep your local tags current. Prerelease tags are ignored, and a highest release tag outside the checkout's history stops the build. Fresh staging prevents old published files from leaking into a new ZIP. Build logs and source provenance stay under `artifacts/release-builds/`. See the [release command guide](docs/release-building.md) for prerequisites and acceptance checks.
 
-For **0.3.3 pre-release**, the existing builder needs a numeric `v0.3.3` or
-`0.3.3` tag selected by those rules; GitHub's **pre-release** publication flag is
-separate. A suffixed tag such as `v0.3.3-rc.1` is not selected by this builder.
+For **0.36.0**, the builder selects the numeric `v0.36.0` tag by those rules;
+GitHub's release flags are separate. A suffixed tag such as `v0.36.0-rc.1` is not
+selected by this builder.
 This documentation update does not generate a ZIP, change tags or publish a release.
 
 <details>
@@ -152,7 +162,7 @@ These lower-level commands are for component development. **Check** exercises th
 
 | For operators | For developers |
 | :--- | :--- |
-| [0.3.3 pre-release notes](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
+| [0.36.0 release notes](docs/releases/v0.36.0.md) · [0.3.3](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
 | [Torrenter workspace and REST API](docs/torrenter.md) | [Architecture and process responsibilities](docs/architecture.md) |
 | [Service lifecycle](docs/lifecycle.md) | [Controller commands and JSON replies](docs/control-protocol.md) |
 | [Panel and tray](docs/panel-and-tray.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |

@@ -1,6 +1,6 @@
 # Verification
 
-The **[0.3.3 pre-release](../docs/releases/v0.3.3.md)** documentation incorporates
+Latest version: **[0.36.0](../docs/releases/v0.36.0.md)**. The documentation incorporates
 the [10 November source recovery results](../docs/verification/2026-11-10-torrenter-recovery.md):
 64 automated checks and 48 visible browser checks. Those dated results are not
 certification of a newly built installer.

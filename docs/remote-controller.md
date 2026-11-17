@@ -1,4 +1,6 @@
-# Tlachihuani-RC Server · 0.3.3 pre-release
+# Tlachihuani-RC Server · 0.36.0
+
+Latest version: **[0.36.0](releases/v0.36.0.md)**.
 
 Created for Angela López Mendoza · XAIHT.
 

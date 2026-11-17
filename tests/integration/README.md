@@ -1,6 +1,6 @@
 # Integration checks
 
-For **[0.3.3 pre-release](../../docs/releases/v0.3.3.md)**, run the source tests from
+For **[0.36.0](../../docs/releases/v0.36.0.md)**, run the source tests from
 one verified visible foreground console with the prepared Python environment and
 the private libtorrent package on its module path:
 

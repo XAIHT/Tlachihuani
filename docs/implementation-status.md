@@ -1,4 +1,6 @@
-# Implementation status · 0.3.3 pre-release
+# Implementation status · 0.36.0
+
+Latest version: **[0.36.0](releases/v0.36.0.md)**. Dated sections keep the versions they tested.
 
 ## Hosted development foundation · 15 November 2026
 
@@ -56,8 +58,8 @@ Exact evidence paths and scope are in the linked verification record.
 
 ## Previous implementation evidence
 
-Current documentation: **[0.3.3 pre-release](releases/v0.3.3.md)**, updated
-11 November 2026. The latest source evidence is the
+Latest version: **[0.36.0](releases/v0.36.0.md)**. The 0.3.3 documentation was
+updated 11 November 2026; its source evidence is the
 [10 November Torrenter recovery record](verification/2026-11-10-torrenter-recovery.md):
 64 automated checks, 48 headed-browser checks across both controller editions,
 four real local-peer transfers and 432 independently matched existing files.
@@ -70,7 +72,7 @@ package tests below retain the versions actually tested. No new package or
 installed-service acceptance is implied by this documentation bump.
 
 The active checkout is `C:\Development\XAIHT\repo\Tlachihuani`. Its product
-metadata already declares 0.3.3. The [11 November documentation check](verification/2026-11-11-documentation.md)
+metadata declares 0.36.0. The [11 November documentation check](verification/2026-11-11-documentation.md)
 records the path correction and documentation-only validation separately from
 the historical runtime tests below.
 
@@ -147,7 +149,7 @@ The following entries are the historical October 11 foundation record.
 
 The following foundation inventory and limitations describe the 11 October
 baseline. Later Jobs and installer evidence appears above; do not read this
-historical list as the current 0.3.3 feature inventory.
+historical list as the current 0.36.0 feature inventory.
 
 This page distinguishes working code from the broader design. No SCM service, registry startup entry, local Git repository or GitHub repository was created. Tlamatini remains a separate, read-only checkout at `C:\Development\XAIHT\Tlamatini`, https://github.com/XAIHT/Tlamatini.
 
