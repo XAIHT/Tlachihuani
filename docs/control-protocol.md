@@ -2,6 +2,8 @@
 
 The implemented synchronous subset and the required reply receipt byte are documented in [implementation status](implementation-status.md). Force-stop, consent IPC and persistent operation receipts below are future work.
 
+Jobs and Remote-Controller have their own native interfaces: XT manages Torrenter providers over the Jobs pipe ([Torrenter](torrenter.md)), and `Tlachihuani.RC.Server.exe --control` serves trusted native adapters and XT over an installation-specific, ACL-protected pipe ([Remote-Controller](remote-controller.md#storage-and-native-control)). Neither accepts browser-supplied commands.
+
 The browser API, transient controller CLI and service IPC have separate responsibilities. The protocol is local-only; no TCP listener or new inbound firewall rule is planned.
 
 ## SCM and pipe roles

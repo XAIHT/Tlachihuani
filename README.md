@@ -42,7 +42,7 @@ If XT is missing after setup, open **Tlachihuani XT** from Start or press **Win+
 
 ## First download
 
-1. **Open your workspace.** Use the Tlamatini menu above, or choose **Open workspace** in XT. If both Tlamatini editions are available, choose the account you want to use.
+1. **Open your workspace.** Use the Tlamatini menu above, or choose **Open workspace** in XT. XT always shows the Tlamatini login page first, so the queue that opens belongs to the account you sign in with, even if the browser was signed in with another one. If both Tlamatini editions are available, choose the edition, then sign in.
 2. **Pick what to download.** Select **Add torrent**, paste a magnet or open a `.torrent` file, then choose **Inspect metadata**. Jobs can look up four magnets at once. Additional magnets wait in order, and their peer timeout starts when a slot opens.
 3. **Start the transfer.** Choose the files you want and select **Download selected files**. You can close the browser or Tlamatini while the Jobs service continues downloading.
 4. **Find your files.** Select the completed transfer and open **Verified output** for its saved directory and each file’s SHA-256. The usual destination is **Downloads → Torrenter**. If Windows refuses delivery there, check Verified output for the application’s `content_generated` fallback.
@@ -167,6 +167,8 @@ These lower-level commands are for component development. **Check** exercises th
 | [Service lifecycle](docs/lifecycle.md) | [Controller commands and JSON replies](docs/control-protocol.md) |
 | [Panel and tray](docs/panel-and-tray.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |
 | [Windows privileges and local IPC](docs/security-and-installation.md) | [Implementation status and verification evidence](docs/implementation-status.md) |
+| [Remote-Controller (Tlamatini-RC)](docs/remote-controller.md) | [Hosted RC development lab](docs/hosted-development.md) |
+| [Remote-control predeployment checklist](docs/remote-control-predeployment-checklist.md) | [Workspace sign-in verification](docs/verification/2026-11-17-workspace-signin.md) |
 
 <details>
 <summary><b>Under the hood · API, repositories and contributor references</b></summary>

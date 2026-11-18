@@ -4,6 +4,24 @@ Latest version: **[0.36.0](docs/releases/v0.36.0.md)**. `Directory.Build.props` 
 internal project lock references declare 0.36.0. Dated sections below keep the
 versions they describe.
 
+## XT workspace sign-in and 0.36.0 · 17 November 2026
+
+XT **Services → Runtime → Open workspace** now opens `127.0.0.1:12064/?signin=1`,
+and the Jobs launcher sends the browser to the edition's login page before the
+workspace. The queue shown therefore belongs only to the account that just
+signed in; **Open downloads** keeps the current login. Headed source checks
+passed **20/20 English and 20/20 Spanish** on isolated ports. See the
+[17 November record](docs/verification/2026-11-17-workspace-signin.md).
+
+`Directory.Build.props` and the internal lock references now declare **0.36.0**,
+matching the `v0.36.0` tag, and every current documentation pointer names 0.36.0.
+The installed XT and Jobs still run their previous build until a package with this
+change is installed.
+
+Next: build and install a 0.36.0 package with this change when Angela authorizes it
+(installing Jobs restarts it and checkpoints active transfers), then click
+**Open workspace** in the installed XT.
+
 ## Approval synchronization and latest predeployment scope · 15 November 2026
 
 Angela found a real installed failure: approving RC-TEST-02 in RC completed the

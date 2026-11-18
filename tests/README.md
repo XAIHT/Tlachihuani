@@ -13,3 +13,9 @@ metadata queue, delivery, release packaging and setup tests. Start with the
 The [foundation results](../docs/verification/2026-10-11-foundation.md) remain
 historical evidence. SCM registration, cross-account security and shell tray
 behavior require separate installed acceptance.
+
+`Tlachihuani.RC.Checks` (run by `scripts/Build.ps1 -Mode Check`) and
+`Tlachihuani.RC.ContainerChecks` cover the Remote-Controller; the `rc_*` scripts in
+[integration](integration/README.md#remote-controller-checks) cover its browser,
+installed and hosted flows. The XT **Open workspace** sign-in has its own headed
+check, [workspace_signin.py](desktop/README.md#open-workspace-sign-in).

@@ -2,6 +2,20 @@
 
 Latest version: **[0.36.0](releases/v0.36.0.md)**. Dated sections keep the versions they tested.
 
+## XT workspace sign-in and 0.36.0 · 17 November 2026
+
+XT **Services → Runtime → Open workspace** now opens `127.0.0.1:12064/?signin=1`,
+and the Jobs launcher sends the browser to the edition's login page before the
+workspace. The queue shown therefore belongs only to the account that just
+signed in; **Open downloads** keeps the current login. Headed source checks
+passed **20/20 English and 20/20 Spanish** on isolated ports. See the
+[17 November record](verification/2026-11-17-workspace-signin.md).
+
+`Directory.Build.props` and the internal lock references now declare **0.36.0**,
+matching the `v0.36.0` tag, and every current documentation pointer names 0.36.0.
+The installed XT and Jobs still run their previous build until a package with this
+change is installed.
+
 ## Hosted development foundation · 15 November 2026
 
 The English/Spanish hosted client, OIDC sign-in, bounded relay and outbound RC

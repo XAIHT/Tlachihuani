@@ -21,6 +21,24 @@ flowchart LR
 
 The service continues when no browser is open, Tlamatini is closed, the tray exits, or the user logs off. The tray only exists in participating interactive sessions. Windows isolates service UI from the user's desktop; a separate session process is required. This split follows [Microsoft's interactive-services guidance](https://learn.microsoft.com/en-us/windows/win32/services/interactive-services).
 
+## Implemented planes · 0.36.0
+
+The current product runs three independent own-process Windows services and the
+per-session XT tray. The installer registers every service **Manual and stopped**,
+each under its own virtual account `NT SERVICE\<service name>`.
+
+| Process | Role | Details |
+|---|---|---|
+| `Tlachihuani` (`Tlachihuani.Service.exe`) | Original lifecycle and health service | [Lifecycle](lifecycle.md) |
+| `Tlachihuani.Jobs` | Provider host: Torrenter worker and the account-scoped REST/web facade on `127.0.0.1:12064` | [Torrenter](torrenter.md) |
+| `Tlachihuani.RemoteController` (`RCServer/Tlachihuani.RC.Server.exe`) | Tlamatini-RC web client, enrollment, device grants, sessions, receipts, events and schedules; local-only on `127.0.0.1:12481` by default | [Remote-Controller](remote-controller.md) |
+| `Tlachihuani.Tray` (XT) | Session tray, Services and Remote-Controller panels, and the interactive-session application-launch broker used by RC | [Panel and tray](panel-and-tray.md) |
+
+`Tlachihuani.RC.Cloud` is a separate cross-platform development host (hosted BFF,
+computer directory and opaque relay) for the isolated HTTPS loopback lab. It
+executes no Tlamatini commands and is not part of the Windows package. See
+[hosted development](hosted-development.md).
+
 ## Recommended stack
 
 Use C# with .NET 10 for the independent Windows layer: a Worker Service host, native SCM integration, WinForms `NotifyIcon`, and a small shared control client. This fits the Windows lifecycle and tray requirements while a language-neutral JSON bridge keeps Tlamatini's Python integration small. The alternative Python/pywin32 stack could reuse developer familiarity, but would carry a second Python packaging/runtime surface for a Windows-only companion. The .NET choice is a proposal to implement here, not an installed dependency.
@@ -39,6 +57,10 @@ Follow [Microsoft's Worker Service guide](https://learn.microsoft.com/en-us/dotn
 | `src/Tlachihuani.Control` | Short-lived JSON CLI used by Tlamatini; start/status/stop even when service is down |
 | `src/Tlachihuani.Tray` | One XT icon per participating Windows session, status/menu, open Tlamatini |
 | `src/Tlachihuani.Elevated` | Fixed-service force-stop and other explicitly scoped administrative operations |
+| `src/Tlachihuani.Jobs` | Implemented: provider registry, Torrenter worker lifetime, REST/web facade and launcher page on port 12064 |
+| `src/Tlachihuani.RC` | Implemented: Remote-Controller contracts, access/permissions, durable operations and state store |
+| `src/Tlachihuani.RC.Server` | Implemented: Remote-Controller service, web client assets, mobile workspace and outbound hosted connector |
+| `src/Tlachihuani.RC.Cloud` | Implemented for development only: hosted BFF, OIDC sign-in, computer directory and bounded relay |
 
 Core and Contracts do not import Service, Tray, or Tlamatini. The service contains no desktop automation, microphone capture, browser host, model integration, or arbitrary process launcher in the foundation release. Future workloads are cancellable implementations behind a narrow Core interface, with their privileges evaluated separately.
 

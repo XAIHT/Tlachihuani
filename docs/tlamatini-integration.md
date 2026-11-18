@@ -1,5 +1,12 @@
 # Future Tlamatini integration — explicitly deferred
 
+> **Implemented since this design (0.36.0):** both Tlamatini editions provide
+> **Panels → Torrenter Workspace**, **Panels → Torrenter Sources** and the account
+> page **Panels → Tlachihuani · Remote-Controller**. XT's **Open workspace** signs
+> in through the edition's own login page. The **Panels → Tlachihuani** lifecycle
+> dialog described below remains a design target. See [Torrenter](torrenter.md) and
+> [Remote-Controller](remote-controller.md).
+
 Reference checkout: `C:\Development\XAIHT\Tlamatini`; upstream: [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini). Every path below is relative to that checkout unless labeled proposed. **No file in that checkout should be changed during this scaffold or the first standalone implementation phase.**
 
 ## Observed integration points

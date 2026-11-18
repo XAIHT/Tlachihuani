@@ -25,6 +25,17 @@ visible administrator session; it is not part of a documentation check.
 
 Evidence: [10 November recovery verification](../../docs/verification/2026-11-10-torrenter-recovery.md).
 
+## Remote-Controller checks
+
+`scripts/Build.ps1 -Mode Check` runs `Tlachihuani.RC.Checks`. `rc_scm.ps1` runs the
+real RC executable under a fixed temporary SCM acceptance registration and leaves
+the production registrations alone. The other `rc_*.mjs` / `rc_*.py` scripts drive
+the browser client, main-application adapters, installed lifecycle, mobile views,
+prompts and receipts; `rc_hosted_*.mjs` and `scripts/Test-HostedDevelopment.ps1`
+cover the hosted lab. Read the matching record before running one: the
+[Remote-Controller guide](../../docs/remote-controller.md#development-and-evidence),
+[hosted development](../../docs/hosted-development.md) and `docs/verification/2026-11-13*` to `2026-11-15*`.
+
 ## Native acceptance
 
 SCM transitions, named-pipe identities/ACLs, independent process lifetime and safe force-stop. Use an explicitly authorized Windows test installation. Never terminate unrelated user processes. See [the acceptance matrix](../../docs/verification-plan.md).
