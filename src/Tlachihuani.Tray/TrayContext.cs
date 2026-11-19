@@ -44,6 +44,8 @@ internal sealed class TrayContext : ApplicationContext
         if (show) ShowPanel();
         _ = RunAsync("status");
         _ = Task.Run(() => new RcApplicationBroker().RunAsync(closing.Token));
+        TlachihuaniLog.Info("xt", $"XT started (version {Application.ProductVersion.Split('+')[0]}, Windows user {Environment.UserName}).");
+        _ = Task.Run(() => XaihtLink.Shared.RunAsync(closing.Token));
     }
 
     private void ShowPanel() => WindowActivation.Show(form);
@@ -139,6 +141,7 @@ internal sealed class TrayContext : ApplicationContext
     protected override void ExitThreadCore()
     {
         closing.Cancel(); timer.Stop(); tray.Visible = false; form.AllowExit = true; form.Close();
+        TlachihuaniLog.Info("xt", "XT exited.");
         base.ExitThreadCore();
     }
     protected override void Dispose(bool disposing)

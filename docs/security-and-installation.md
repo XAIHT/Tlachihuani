@@ -36,4 +36,6 @@ Uninstall: request confirmation in the future uninstaller, stop only this servic
 
 Proposed log retention: 5 files × 10 MiB, plus bounded Windows Event Log startup/fatal/lifecycle entries. Limit event payload lengths and escape text before browser rendering. Keep installation paths and detailed errors behind staff/operator views. Never store Tlamatini passwords, browser cookies, API keys, chat messages, or full inherited environment blocks.
 
+XT writes `Tlachihuani.log` (5 MB, one previous file kept) in `%LOCALAPPDATA%\XAIHT\Tlachihuani` for each Windows user; Services → See log shows it. Since 0.37.0 XT can be connected to xaiht.org: it makes outgoing HTTPS requests only, with no listening port or firewall rule, and keeps one computer key in `xaiht-link.json`, protected with Windows DPAPI for that user. xaiht.org stores only the key's SHA-256. Received messages are logged, never executed. See the [xaiht.org link](xaiht-link.md).
+
 No network control endpoint, firewall opening, remote shell, automatic updater, credential store, or scheduled worker is part of the initial design. Add a capability only after its actual workload and permission needs are specified.

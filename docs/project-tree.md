@@ -1,9 +1,9 @@
-# Project files · 0.36.0
+# Project files · 0.37.0
 
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
-Latest version: **[Tlachihuani 0.36.0](releases/v0.36.0.md)**. Source inventory
-updated 18 November 2026. Includes tracked files and new documentation in this
+Latest version: **[Tlachihuani 0.37.0](releases/v0.37.0.md)**. Source inventory
+updated 19 November 2026. Includes tracked files and new documentation in this
 working tree; ignored installers, local evidence and build intermediates are excluded.
 
 ~~~text
@@ -45,6 +45,7 @@ docs/releases/v0.2.0.md
 docs/releases/v0.2.1.md
 docs/releases/v0.3.3.md
 docs/releases/v0.36.0.md
+docs/releases/v0.37.0.md
 docs/remote-control-predeployment-checklist.md
 docs/remote-controller.md
 docs/remote-mobile-parity.md
@@ -69,6 +70,8 @@ docs/verification/2026-11-15-hardening-review.md
 docs/verification/2026-11-15-hosted-video.md
 docs/verification/2026-11-15-rc-hosted-development.md
 docs/verification/2026-11-17-workspace-signin.md
+docs/verification/2026-11-19-xaiht-link.md
+docs/xaiht-link.md
 global.json
 integrations/tlamatini/README.md
 LICENSE
@@ -190,6 +193,7 @@ src/Tlachihuani.Service/Program.cs
 src/Tlachihuani.Service/README.md
 src/Tlachihuani.Service/ServiceWorker.cs
 src/Tlachihuani.Service/Tlachihuani.Service.csproj
+src/Tlachihuani.Tray/LogViewerForm.cs
 src/Tlachihuani.Tray/packages.lock.json
 src/Tlachihuani.Tray/Program.cs
 src/Tlachihuani.Tray/RcApplicationBroker.cs
@@ -203,11 +207,13 @@ src/Tlachihuani.Tray/ServicesLayout.cs
 src/Tlachihuani.Tray/StatusForm.cs
 src/Tlachihuani.Tray/StudioForm.cs
 src/Tlachihuani.Tray/Tlachihuani.Tray.csproj
+src/Tlachihuani.Tray/TlachihuaniLog.cs
 src/Tlachihuani.Tray/TrayContext.cs
 src/Tlachihuani.Tray/TrayIcons.cs
 src/Tlachihuani.Tray/TrayMenu.cs
 src/Tlachihuani.Tray/TrayServices.cs
 src/Tlachihuani.Tray/WindowActivation.cs
+src/Tlachihuani.Tray/XaihtLink.cs
 src/Tlachihuani.Windows/DownloadDelivery.cs
 src/Tlachihuani.Windows/Installation.cs
 src/Tlachihuani.Windows/JobsEndpoint.cs
@@ -229,6 +235,7 @@ tests/desktop/torrenter-table.md
 tests/desktop/torrenter_table.py
 tests/desktop/torrenter_workspace.py
 tests/desktop/workspace_signin.py
+tests/desktop/xaiht_link.py
 tests/integration/check_setup_payload.py
 tests/integration/check_setup_zip.py
 tests/integration/jobs_swarm.py

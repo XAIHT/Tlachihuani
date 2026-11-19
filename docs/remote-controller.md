@@ -1,8 +1,12 @@
-# Tlachihuani-RC Server · 0.36.0
+# Tlachihuani-RC Server · 0.37.0
 
-Latest version: **[0.36.0](releases/v0.36.0.md)**.
+Latest version: **[0.37.0](releases/v0.37.0.md)**.
 
 Created for Angela López Mendoza · XAIHT.
+
+> **xaiht.org messages (0.37.0).** XT itself, not this service, receives the
+> messages sent from the Tlamatini-RC page on xaiht.org and writes them to
+> Tlachihuani.log. See the [xaiht.org link](xaiht-link.md).
 
 Remote-Controller is a separate Windows service plane. Its fixed SCM name is
 `Tlachihuani.RemoteController`, display name is **Remote-Controller**, and executable

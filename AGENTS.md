@@ -2,8 +2,8 @@
 
 Read [CLAUDE.md](CLAUDE.md) and [NEXT_SESSION.md](NEXT_SESSION.md) before implementation.
 
-Latest version: **[0.36.0](docs/releases/v0.36.0.md)**, as requested by Angela on
-17 November 2026. Every current documentation pointer names 0.36.0. Historical
+Latest version: **[0.37.0](docs/releases/v0.37.0.md)**, as requested by Angela on
+19 November 2026. Every current documentation pointer names 0.37.0. Historical
 versions and dated verification results remain historical. This documentation
 bump does not authorize builds, tags, commits or publication.
 

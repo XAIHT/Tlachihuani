@@ -1,6 +1,20 @@
-# Implementation status · 0.36.0
+# Implementation status · 0.37.0
 
-Latest version: **[0.36.0](releases/v0.36.0.md)**. Dated sections keep the versions they tested.
+Latest version: **[0.37.0](releases/v0.37.0.md)**. Dated sections keep the versions they tested.
+
+## xaiht.org link, Tlachihuani.log and 0.37.0 · 19 November 2026
+
+XT writes **Tlachihuani.log** and shows it with **Services → See log**. The new
+**xaiht.org** tab connects the computer to the **Tlamatini-RC** page on xaiht.org;
+XT asks for messages over outgoing HTTPS, the page shows the computer online, and
+each JSON message sent with **SEND** is written to the log and acknowledged. A
+visible end-to-end check against the real page served locally with a memory store
+passed **21/21**, twice; the web-app's 171 tests passed. xaiht.org's own Cloud SQL
+tables and an installed 0.37.0 package are not yet tested. See the
+[guide](xaiht-link.md) and the [19 November record](verification/2026-11-19-xaiht-link.md).
+
+`Directory.Build.props` and the internal lock references now declare **0.37.0**,
+matching the `v0.37.0` tag, and every current documentation pointer names 0.37.0.
 
 ## XT workspace sign-in and 0.36.0 · 17 November 2026
 
@@ -72,7 +86,7 @@ Exact evidence paths and scope are in the linked verification record.
 
 ## Previous implementation evidence
 
-Latest version: **[0.36.0](releases/v0.36.0.md)**. The 0.3.3 documentation was
+Latest version: **[0.37.0](releases/v0.37.0.md)**. The 0.3.3 documentation was
 updated 11 November 2026; its source evidence is the
 [10 November Torrenter recovery record](verification/2026-11-10-torrenter-recovery.md):
 64 automated checks, 48 headed-browser checks across both controller editions,
@@ -86,7 +100,7 @@ package tests below retain the versions actually tested. No new package or
 installed-service acceptance is implied by this documentation bump.
 
 The active checkout is `C:\Development\XAIHT\repo\Tlachihuani`. Its product
-metadata declares 0.36.0. The [11 November documentation check](verification/2026-11-11-documentation.md)
+metadata declares 0.37.0. The [11 November documentation check](verification/2026-11-11-documentation.md)
 records the path correction and documentation-only validation separately from
 the historical runtime tests below.
 
@@ -163,7 +177,7 @@ The following entries are the historical October 11 foundation record.
 
 The following foundation inventory and limitations describe the 11 October
 baseline. Later Jobs and installer evidence appears above; do not read this
-historical list as the current 0.36.0 feature inventory.
+historical list as the current 0.37.0 feature inventory.
 
 This page distinguishes working code from the broader design. No SCM service, registry startup entry, local Git repository or GitHub repository was created. Tlamatini remains a separate, read-only checkout at `C:\Development\XAIHT\Tlamatini`, https://github.com/XAIHT/Tlamatini.
 

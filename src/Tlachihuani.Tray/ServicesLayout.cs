@@ -7,41 +7,57 @@ internal sealed partial class ServicesForm
     private readonly Label engineState = Studio.Label("Engine · checking", Studio.Small);
     private readonly Label webState = Studio.Label("Web · checking", Studio.Small);
     private readonly Label impactLine = Studio.Label("", Studio.Small, Studio.Muted);
-    private readonly StudioButton runtimeTab = new("Runtime", ButtonTone.Tab), accessTab = new("Access", ButtonTone.Tab);
+    private readonly Label linkState = Studio.Label("Not connected", Studio.Small, Studio.Muted);
+    private readonly Label linkServer = Studio.Label("—", Studio.Small);
+    private readonly Label linkContact = Studio.Label("—", Studio.Small);
+    private readonly Label linkMessages = Studio.Label("—", Studio.Small);
+    private readonly StudioButton runtimeTab = new("Runtime", ButtonTone.Tab), accessTab = new("Access", ButtonTone.Tab),
+        linkTab = new("xaiht.org", ButtonTone.Tab);
     private readonly Dictionary<string, StudioButton> buttons = new();
-    private readonly Control runtime, access;
+    private readonly Control runtime, access, link;
+    private StudioButton connect = null!, disconnect = null!;
 
     public ServicesForm(Icon icon) : base(icon, "Tlachihuani · Services", "Tlachihuani   /   Service control", "Services", new(778, 500), new(668, 466))
     {
         HeaderCommands.Controls.Add(Command("Remote-Controller…", () => RemoteControllerLauncher.Open(this)));
+        HeaderCommands.Controls.Add(Command("See log", () => { using var viewer = new LogViewerForm(Icon); viewer.ShowDialog(this); }));
         var layout = Studio.Grid([-1], [38, 8, -1]);
-        var switcher = Studio.Actions(runtimeTab, accessTab);
+        var switcher = Studio.Actions(runtimeTab, accessTab, linkTab);
         switcher.AccessibleName = "Service views"; layout.Controls.Add(switcher, 0, 0);
         var pages = new Panel { Dock = DockStyle.Fill, Margin = Padding.Empty };
-        runtime = BuildRuntime(); access = BuildAccess(); pages.Controls.Add(runtime); pages.Controls.Add(access);
+        runtime = BuildRuntime(); access = BuildAccess(); link = BuildLink();
+        pages.Controls.Add(runtime); pages.Controls.Add(access); pages.Controls.Add(link);
         layout.Controls.Add(pages, 0, 2); BodyArea.Controls.Add(layout);
-        runtimeTab.Click += (_, _) => ShowView(false); accessTab.Click += (_, _) => ShowView(true);
-        foreach (var tab in new[] { runtimeTab, accessTab }) tab.KeyDown += (_, e) =>
+        var tabs = new[] { runtimeTab, accessTab, linkTab };
+        for (int i = 0; i < tabs.Length; i++)
         {
-            if (e.KeyCode is not (Keys.Left or Keys.Right)) return;
-            bool showAccess = runtimeTab.Selected; ShowView(showAccess);
-            (showAccess ? accessTab : runtimeTab).Focus(); e.Handled = true;
-        };
-        ShowView(false);
+            int view = i;
+            tabs[i].Click += (_, _) => ShowView(view);
+            tabs[i].KeyDown += (_, e) =>
+            {
+                if (e.KeyCode is not (Keys.Left or Keys.Right)) return;
+                int next = (view + (e.KeyCode == Keys.Right ? 1 : tabs.Length - 1)) % tabs.Length;
+                ShowView(next); tabs[next].Focus(); e.Handled = true;
+            };
+        }
+        ShowView(0);
         var close = Command("Close", Close); Commands.Controls.Add(close);
         Commands.Controls.Add(Command("Refresh", () => _ = Run())); CancelButton = close;
         UpdateActions();
+        timer.Tick += (_, _) => PaintLink();
         timer.Tick += async (_, _) => await Run();
-        Shown += async (_, _) => { timer.Start(); await Run(); };
+        Shown += async (_, _) => { PaintLink(); timer.Start(); await Run(); };
         FormClosed += (_, _) => { timer.Stop(); closing.Cancel(); };
     }
 
-    private void ShowView(bool showAccess)
+    private void ShowView(int view)
     {
-        runtime.Visible = !showAccess; access.Visible = showAccess;
-        runtimeTab.SelectTab(!showAccess); accessTab.SelectTab(showAccess);
-        runtimeTab.AccessibleDescription = showAccess ? "Show service runtime" : "Selected view";
-        accessTab.AccessibleDescription = showAccess ? "Selected view" : "Show access controls";
+        runtime.Visible = view == 0; access.Visible = view == 1; link.Visible = view == 2;
+        runtimeTab.SelectTab(view == 0); accessTab.SelectTab(view == 1); linkTab.SelectTab(view == 2);
+        runtimeTab.AccessibleDescription = view == 0 ? "Selected view" : "Show service runtime";
+        accessTab.AccessibleDescription = view == 1 ? "Selected view" : "Show access controls";
+        linkTab.AccessibleDescription = view == 2 ? "Selected view" : "Show the xaiht.org link";
+        if (view == 2) PaintLink();
     }
     private StudioButton ActionButton(string caption, Func<Task> action, ButtonTone tone = ButtonTone.Secondary)
     {
@@ -84,6 +100,66 @@ internal sealed partial class ServicesForm
         page.Controls.Add(Studio.Card(CommandRow("File erasure", Studio.Label("Review the exact files before approving removal.", Studio.Small, Studio.Muted),
             ActionButton("Review erasure", ReviewDeletion)), new Padding(14, 6, 6, 6)), 0, 4);
         return page;
+    }
+    // xaiht.org → Tlamatini-RC → Add this computer gives a key; Connect saves it here.
+    private Control BuildLink()
+    {
+        var page = Studio.Grid([-1], [68, 10, -1]);
+        connect = Command("Connect…", ConnectLink, ButtonTone.Primary);
+        disconnect = Command("Disconnect", DisconnectLink, ButtonTone.Danger);
+        page.Controls.Add(Studio.Card(CommandRow("xaiht.org link", linkState, connect, disconnect), new Padding(14, 8, 6, 8)), 0, 0);
+        var details = Studio.Grid([118, -1], [26, 26, 26, -1]);
+        void Detail(int row, string title, Label value)
+        {
+            details.Controls.Add(Studio.Label(title, Studio.Caption, Studio.Muted), 0, row); details.Controls.Add(value, 1, row);
+        }
+        Detail(0, "WEBSITE", linkServer); Detail(1, "LAST CONTACT", linkContact); Detail(2, "MESSAGES", linkMessages);
+        var note = Studio.Label("XT asks xaiht.org for messages over HTTPS, so this computer opens no port and works on any network. "
+            + "Every message is written to Tlachihuani.log (See log).", Studio.Small, Studio.Muted);
+        note.AutoEllipsis = false; note.TextAlign = ContentAlignment.TopLeft;
+        details.Controls.Add(note, 0, 3); details.SetColumnSpan(note, 2);
+        page.Controls.Add(Studio.Card(details, new Padding(14, 8, 14, 8)), 0, 2);
+        return page;
+    }
+    private void ConnectLink()
+    {
+        XaihtLinkSettings? current = null;
+        try { current = XaihtLinkStore.Load(); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or FormatException
+            or InvalidDataException or System.Security.Cryptography.CryptographicException) { }
+        var chosen = ServiceDialogs.RequestXaihtLink(this, current?.Server ?? XaihtLinkStore.DefaultServer);
+        if (chosen is null) return;
+        try { XaihtLinkStore.Save(chosen); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException)
+        { ServiceDialogs.Notice(this, "xaiht.org link", "The key could not be saved: " + ex.Message); return; }
+        TlachihuaniLog.Info("xaiht.org", $"Key saved for {chosen.Server} by the Windows user.");
+        XaihtLink.Shared.Reconfigure(); PaintLink();
+    }
+    private void DisconnectLink()
+    {
+        if (!ServiceDialogs.Confirm(this, "Disconnect from xaiht.org?", "This computer stops asking xaiht.org for messages and forgets its key. "
+            + "Remove the computer on xaiht.org too if you will not connect it again.", "Disconnect")) return;
+        try { XaihtLinkStore.Delete(); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        { ServiceDialogs.Notice(this, "xaiht.org link", "The key could not be removed: " + ex.Message); return; }
+        TlachihuaniLog.Info("xaiht.org", "Disconnected from xaiht.org by the Windows user; the key was removed.");
+        XaihtLink.Shared.Reconfigure(); PaintLink();
+    }
+    private void PaintLink()
+    {
+        var s = XaihtLink.Shared.Status;
+        bool saved = File.Exists(XaihtLinkStore.FilePath);
+        linkState.Text = s.State switch
+        {
+            "online" => "Online" + (s.Computer is null ? "" : $"   /   {s.Computer}"),
+            "connecting" => "Connecting…", "offline" => "Offline   /   retrying", "rejected" => "Key not accepted",
+            "error" => "Key unreadable", _ => saved ? "Waiting for XT" : "Not connected"
+        };
+        linkState.ForeColor = s.State == "online" ? Studio.AccentHover : s.State is "rejected" or "error" ? Studio.Danger : Studio.Muted;
+        linkServer.Text = s.Server ?? (saved ? "saved" : "—");
+        linkContact.Text = s.LastContact is { } contact ? $"{contact.LocalDateTime:HH:mm:ss}   ·   {s.Detail}" : s.Detail;
+        linkMessages.Text = s.LastMessage is { } last ? $"{s.Received} received   ·   last at {last.LocalDateTime:HH:mm:ss}" : $"{s.Received} received since XT started";
+        disconnect.Enabled = saved;
     }
     private void PaintState()
     {

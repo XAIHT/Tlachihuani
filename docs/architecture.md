@@ -21,7 +21,7 @@ flowchart LR
 
 The service continues when no browser is open, Tlamatini is closed, the tray exits, or the user logs off. The tray only exists in participating interactive sessions. Windows isolates service UI from the user's desktop; a separate session process is required. This split follows [Microsoft's interactive-services guidance](https://learn.microsoft.com/en-us/windows/win32/services/interactive-services).
 
-## Implemented planes · 0.36.0
+## Implemented planes · 0.37.0
 
 The current product runs three independent own-process Windows services and the
 per-session XT tray. The installer registers every service **Manual and stopped**,
@@ -32,7 +32,13 @@ each under its own virtual account `NT SERVICE\<service name>`.
 | `Tlachihuani` (`Tlachihuani.Service.exe`) | Original lifecycle and health service | [Lifecycle](lifecycle.md) |
 | `Tlachihuani.Jobs` | Provider host: Torrenter worker and the account-scoped REST/web facade on `127.0.0.1:12064` | [Torrenter](torrenter.md) |
 | `Tlachihuani.RemoteController` (`RCServer/Tlachihuani.RC.Server.exe`) | Tlamatini-RC web client, enrollment, device grants, sessions, receipts, events and schedules; local-only on `127.0.0.1:12481` by default | [Remote-Controller](remote-controller.md) |
-| `Tlachihuani.Tray` (XT) | Session tray, Services and Remote-Controller panels, and the interactive-session application-launch broker used by RC | [Panel and tray](panel-and-tray.md) |
+| `Tlachihuani.Tray` (XT) | Session tray, Services and Remote-Controller panels, the interactive-session application-launch broker used by RC, Tlachihuani.log with See log, and the xaiht.org link | [Panel and tray](panel-and-tray.md), [xaiht.org link](xaiht-link.md) |
+
+Since 0.37.0 XT also receives messages from the **Tlamatini-RC** page on
+xaiht.org (the XAIHT `web-app`). XT asks `https://xaiht.org/api/rc/poll` with its
+computer key over outgoing HTTPS, writes each JSON message to Tlachihuani.log and
+acknowledges it. No Windows service, listening port or firewall rule is involved.
+See the [xaiht.org link](xaiht-link.md).
 
 `Tlachihuani.RC.Cloud` is a separate cross-platform development host (hosted BFF,
 computer directory and opaque relay) for the isolated HTTPS loopback lab. It

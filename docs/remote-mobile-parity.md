@@ -9,7 +9,7 @@ Panel, and Admin Panel**. Carry every other menu, page and action, including
 **Torrenter Workspace** and **Torrenter Sources**. English and Spanish must keep
 the same behavior and separate account/edition identities.
 
-Latest version: **[0.36.0](releases/v0.36.0.md)**. Firewall/network transport work
+Latest version: **[0.37.0](releases/v0.37.0.md)**. Firewall/network transport work
 is deferred by Angela; acceptance first runs through the real local connection.
 
 ## Required mobile surface

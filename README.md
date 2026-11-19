@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/releases/v0.36.0.md">What's new in 0.36.0</a> ·
+  <a href="docs/releases/v0.37.0.md">What's new in 0.37.0</a> ·
   <a href="#installation">Install &amp; uninstall</a> ·
   <a href="packaging/setup/README.md">Package guide</a> ·
   <a href="#first-download">First download</a> ·
@@ -47,7 +47,16 @@ If XT is missing after setup, open **Tlachihuani XT** from Start or press **Win+
 3. **Start the transfer.** Choose the files you want and select **Download selected files**. You can close the browser or Tlamatini while the Jobs service continues downloading.
 4. **Find your files.** Select the completed transfer and open **Verified output** for its saved directory and each file’s SHA-256. The usual destination is **Downloads → Torrenter**. If Windows refuses delivery there, check Verified output for the application’s `content_generated` fallback.
 
-## What's new in 0.36.0
+## What's new in 0.37.0
+
+- **Messages from xaiht.org.** Connect this computer to the **Tlamatini-RC** page
+  on xaiht.org from **Services → xaiht.org**. The page shows the computer online
+  from any network, and a message sent with **SEND** arrives as JSON in XT's log.
+  No port is opened. See the [xaiht.org link guide](docs/xaiht-link.md).
+- **Tlachihuani.log and See log.** XT keeps its own log and shows it from
+  **Services → See log**. See the [0.37.0 notes](docs/releases/v0.37.0.md).
+
+### Carried forward from 0.36.0
 
 - **Remote-Controller.** A third service, `Tlachihuani.RemoteController`, hosts
   the Tlamatini-RC web client with per-account permissions granted in XT, and
@@ -97,6 +106,8 @@ and is included in Stop Services. Torrenter remains its own Jobs plane.
 | Bring Torrenter online | **XT → Start Services** | The icon turns color when the services and API are ready. |
 | Check a slow download | **XT → Show panel → Services…** | Inspect Jobs, engine and web readiness. Open the workspace for the transfer’s progress, trackers and peers. |
 | Stop background work | **XT → Stop Services** | The services and their workers stop. The gray XT icon stays available to start them again. |
+| Read XT's log | **XT → Show panel → Services… → See log** | Tlachihuani.log opens inside XT and follows new lines, including messages from xaiht.org. |
+| Receive messages from xaiht.org | **Services… → xaiht.org → Connect…** | Paste the key from xaiht.org → Tlamatini-RC. See the [xaiht.org link guide](docs/xaiht-link.md). |
 | Close only the tray | **XT → Exit tray** | The icon disappears. If a service is running, the menu reads **Exit tray (service keeps running)**. |
 
 > [!NOTE]
@@ -108,7 +119,7 @@ Use **Windows 11 x64**. The download includes private .NET and Python runtimes; 
 
 ### Install with the Windows wizard
 
-1. Get the matching **Tlachihuani-0.36.0-windows-x64.zip** from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **0.36.0** in the installer before proceeding. The release command produces the ZIP in `dist\`.
+1. Get the matching **Tlachihuani-0.37.0-windows-x64.zip** from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **0.37.0** in the installer before proceeding. If an earlier version is installed, [uninstall it](#uninstall-and-keep-your-downloads) first; your downloads stay. The release command produces the ZIP in `dist\`.
 2. Sign in as the Windows user who will operate XT. Open **Installer.exe** and choose whether **XT should appear at Windows sign-in**. This choice applies to all Windows users on the PC. Select **Review**, check the version, operator, destination and startup choice, then choose **Install** and approve Windows' administrator prompt.
 3. After **Installation complete**, XT appears gray in your normal Windows session. Check the hidden-icons arrow beside the clock. **Start menu and Desktop shortcuts** always let you reopen it. If the entire wizard was launched as administrator, open XT from either shortcut yourself.
 4. Choose **Start Services** only when needed. Both services remain **Stopped / Manual** after installation and reboot. Login opens XT only when you selected that option; it never starts services or downloads. With the option unchecked, open XT manually after signing in.
@@ -135,10 +146,10 @@ Or run `.\Build-Release.cmd` in a visible PowerShell console. Each run reads the
 
 The current checkout, including local edits, supplies the code; the tag supplies its version. Keep your local tags current. Prerelease tags are ignored, and a highest release tag outside the checkout's history stops the build. Fresh staging prevents old published files from leaking into a new ZIP. Build logs and source provenance stay under `artifacts/release-builds/`. See the [release command guide](docs/release-building.md) for prerequisites and acceptance checks.
 
-For **0.36.0**, the builder selects the numeric `v0.36.0` tag by those rules;
-GitHub's release flags are separate. A suffixed tag such as `v0.36.0-rc.1` is not
+For **0.37.0**, the builder selects the numeric `v0.37.0` tag by those rules;
+GitHub's release flags are separate. A suffixed tag such as `v0.37.0-rc.1` is not
 selected by this builder.
-This documentation update does not generate a ZIP, change tags or publish a release.
+Building the ZIP and publishing a release are separate steps.
 
 <details>
 <summary><b>Show PowerShell commands and runtime requirements</b></summary>
@@ -162,12 +173,13 @@ These lower-level commands are for component development. **Check** exercises th
 
 | For operators | For developers |
 | :--- | :--- |
-| [0.36.0 release notes](docs/releases/v0.36.0.md) · [0.3.3](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
+| [0.37.0 release notes](docs/releases/v0.37.0.md) · [0.36.0](docs/releases/v0.36.0.md) · [0.3.3](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
 | [Torrenter workspace and REST API](docs/torrenter.md) | [Architecture and process responsibilities](docs/architecture.md) |
 | [Service lifecycle](docs/lifecycle.md) | [Controller commands and JSON replies](docs/control-protocol.md) |
 | [Panel and tray](docs/panel-and-tray.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |
 | [Windows privileges and local IPC](docs/security-and-installation.md) | [Implementation status and verification evidence](docs/implementation-status.md) |
 | [Remote-Controller (Tlamatini-RC)](docs/remote-controller.md) | [Hosted RC development lab](docs/hosted-development.md) |
+| [xaiht.org link and Tlachihuani.log](docs/xaiht-link.md) | [xaiht.org link verification](docs/verification/2026-11-19-xaiht-link.md) |
 | [Remote-control predeployment checklist](docs/remote-control-predeployment-checklist.md) | [Workspace sign-in verification](docs/verification/2026-11-17-workspace-signin.md) |
 
 <details>

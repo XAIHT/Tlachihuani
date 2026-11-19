@@ -1,6 +1,6 @@
 # Build the Windows release ZIP
 
-Latest version: **[0.36.0](releases/v0.36.0.md)**.
+Latest version: **[0.37.0](releases/v0.37.0.md)**.
 
 Open a visible Command Prompt in the Tlachihuani repository root and run:
 
@@ -21,10 +21,10 @@ machines need none of these development tools.
 
 ## Version and source
 
-The numeric product version is **0.36.0**. The existing builder selects the
-`v0.36.0` tag under the rules below. A documentation edit or GitHub channel
+The numeric product version is **0.37.0**. The existing builder selects the
+`v0.37.0` tag under the rules below. A documentation edit or GitHub channel
 label does not select or stamp the binary version. Do not expect a suffixed
-`v0.36.0-rc.1` tag to be selected. This update creates no tag or package.
+`v0.37.0-rc.1` tag to be selected. Tagging and packaging are separate steps.
 
 Each invocation reads local Git tags again. The highest numeric stable tag in
 `vX.Y.Z` or `X.Y.Z` form supplies the version; creation dates and lexical sorting

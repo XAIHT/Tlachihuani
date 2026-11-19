@@ -1,6 +1,6 @@
 # Verification
 
-Latest version: **[0.36.0](../docs/releases/v0.36.0.md)**. The documentation incorporates
+Latest version: **[0.37.0](../docs/releases/v0.37.0.md)**. The documentation incorporates
 the [10 November source recovery results](../docs/verification/2026-11-10-torrenter-recovery.md):
 64 automated checks and 48 visible browser checks. Those dated results are not
 certification of a newly built installer.
@@ -18,4 +18,5 @@ behavior require separate installed acceptance.
 `Tlachihuani.RC.ContainerChecks` cover the Remote-Controller; the `rc_*` scripts in
 [integration](integration/README.md#remote-controller-checks) cover its browser,
 installed and hosted flows. The XT **Open workspace** sign-in has its own headed
-check, [workspace_signin.py](desktop/README.md#open-workspace-sign-in).
+check, [workspace_signin.py](desktop/README.md#open-workspace-sign-in), and the xaiht.org
+link has [xaiht_link.py](desktop/README.md#xaihtorg-link-and-tlachihuanilog).

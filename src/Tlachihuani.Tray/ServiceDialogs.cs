@@ -70,6 +70,37 @@ internal sealed class ServiceDialogs : StudioForm
         return dialog.Open(owner) == DialogResult.OK ? (account.Text.Trim(), (string)options.Single(o => o.Checked).Tag!) : null;
     }
 
+    // Services → xaiht.org → Connect…: the website and the computer key that
+    // xaiht.org → Tlamatini-RC → Add this computer shows once.
+    internal static XaihtLinkSettings? RequestXaihtLink(Form owner, string server)
+    {
+        using var dialog = new ServiceDialogs(owner, "Tlachihuani · xaiht.org link", "Tlachihuani   /   xaiht.org", "Connect to xaiht.org", new(580, 352));
+        var form = Studio.Grid([-1], [23, 34, 9, 23, 34, -1]);
+        var website = new TextBox { Text = server };
+        var key = new TextBox { UseSystemPasswordChar = true, PlaceholderText = "xrc_…" };
+        form.Controls.Add(Studio.Label("Website", Studio.Small), 0, 0); form.Controls.Add(Studio.Field(website, "Website"), 0, 1);
+        form.Controls.Add(Studio.Label("Computer key", Studio.Small), 0, 3); form.Controls.Add(Studio.Field(key, "Computer key"), 0, 4);
+        var help = Studio.Label("Sign in at xaiht.org, open Tlamatini-RC and choose Add this computer. Paste the key it shows here. "
+            + "The key is kept for your Windows account only.", Studio.Small, Studio.Muted);
+        help.AutoEllipsis = false; help.TextAlign = ContentAlignment.TopLeft; help.Padding = new Padding(0, 6, 0, 0);
+        form.Controls.Add(help, 0, 5);
+        dialog.BodyArea.Controls.Add(form);
+        var save = dialog.Choice("Connect", DialogResult.None, ButtonTone.Primary);
+        var cancel = dialog.Choice("Cancel", DialogResult.Cancel);
+        XaihtLinkSettings? result = null;
+        save.Click += (_, _) =>
+        {
+            var normalized = XaihtLinkStore.NormalizeServer(website.Text);
+            var value = key.Text.Trim();
+            if (normalized is null) { dialog.FooterNote.Text = "Use an https:// website address, such as https://xaiht.org."; website.Focus(); return; }
+            if (!XaihtLinkStore.LooksLikeKey(value)) { dialog.FooterNote.Text = "That is not a xaiht.org computer key (it starts with xrc_)."; key.Focus(); return; }
+            result = new XaihtLinkSettings(normalized, value);
+            dialog.DialogResult = DialogResult.OK;
+        };
+        dialog.AcceptButton = save; dialog.CancelButton = cancel; dialog.ActiveControl = key;
+        return dialog.Open(owner) == DialogResult.OK ? result : null;
+    }
+
     internal static void ShowCredential(Form owner, string token)
         => ShowSecret(owner, token, false);
 
