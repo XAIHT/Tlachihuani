@@ -40,6 +40,12 @@ internal sealed class TrayContext : ApplicationContext
         tray = new NotifyIcon { Icon = grayIcon, Text = "Tlachihuani — Checking services", ContextMenuStrip = menu, Visible = true };
         // WinForms NotifyIcon handles Explorer's TaskbarCreated message and adds the icon again.
         tray.DoubleClick += (_, _) => ShowPanel();
+        UiTrace.Attach(menu, "tray menu");
+        tray.MouseClick += (_, e) => UiTrace.Log($"tray icon clicked ({e.Button})");
+        tray.MouseDoubleClick += (_, e) => UiTrace.Log($"tray icon double-clicked ({e.Button})");
+        tray.BalloonTipShown += (_, _) => UiTrace.Log($"tray balloon shown: {tray.BalloonTipTitle} {tray.BalloonTipText}");
+        tray.BalloonTipClicked += (_, _) => UiTrace.Log("tray balloon clicked");
+        logCopier.Start();
         timer.Tick += (_, _) => _ = RunAsync("status"); timer.Start();
         if (show) ShowPanel();
         _ = RunAsync("status");
@@ -61,6 +67,9 @@ internal sealed class TrayContext : ApplicationContext
 
     private async Task RunAsync(string operation)
     {
+        // The status check every 3 seconds is written only when something it sees changes;
+        // a Start/Stop the user asked for is always written in full.
+        using var pass = operation == "status" ? TraceLog.Pass("XT status check") : default;
         if (changing || closing.IsCancellationRequested) return;
         var token = closing.Token;
         bool mutation = operation != "status";
@@ -136,12 +145,25 @@ internal sealed class TrayContext : ApplicationContext
             : jobs.State != "running" ? "Jobs " + StatusForm.Pretty(jobs.State) : !jobs.ApiReady ? "Torrenter API unavailable"
             : "Remote-Controller " + StatusForm.Pretty(remoteController?.State ?? "unavailable");
         tray.Text = "Tlachihuani — " + text;
+        var iconName = !changing && Ready ? "color" : "gray";
+        if (tray.Text != lastTip || iconName != lastIcon)
+        {
+            UiTrace.Log($"tray state: \"{tray.Text}\", icon {iconName}; main service {last?.Service?.ScmState ?? "unknown"}, " +
+                $"Jobs {jobs?.State ?? "unknown"} (API {(jobs?.ApiReady == true ? "ready" : "not ready")}), " +
+                $"Remote-Controller {remoteController?.State ?? "unknown"} (ready {remoteController?.Ready.ToString() ?? "unknown"}), " +
+                $"ready {Ready}, stopped {Stopped}, changing {changing}");
+            lastTip = tray.Text; lastIcon = iconName;
+        }
     }
+    private string lastTip = "", lastIcon = "";
+    private readonly ServiceLogCopier logCopier = new();
 
     protected override void ExitThreadCore()
     {
         closing.Cancel(); timer.Stop(); tray.Visible = false; form.AllowExit = true; form.Close();
+        logCopier.Dispose();
         TlachihuaniLog.Info("xt", "XT exited.");
+        TraceLog.Flush(TimeSpan.FromSeconds(3));
         base.ExitThreadCore();
     }
     protected override void Dispose(bool disposing)

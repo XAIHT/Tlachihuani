@@ -32,7 +32,7 @@ if ($UpdateTray -and (Get-Process -Name Tlachihuani.Tray -ErrorAction SilentlyCo
 }
 $required = @('Tlachihuani.Jobs.exe','Tlachihuani.Jobs.dll','Tlachihuani.Windows.dll',
     'runtime\python.exe','worker\worker.py','worker\api.py','worker\engine.py',
-    'worker\storage.py','worker\delivery.py','wwwroot\index.html')
+    'worker\storage.py','worker\delivery.py','worker\tracing.py','wwwroot\index.html')
 function Get-PayloadDigest([string]$file) {
     $stream = [IO.File]::OpenRead($file)
     $sha = [Security.Cryptography.SHA256]::Create()

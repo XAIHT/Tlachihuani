@@ -6,6 +6,7 @@ internal static class Guard {
     [DllImport("msi.dll",CharSet=CharSet.Unicode)] static extern int MsiQueryProductState(string product);
     static int Main(string[] args){
         try{
+            SetupLog.Write("installer action started: "+String.Join(" ",args)+" (as "+System.Security.Principal.WindowsIdentity.GetCurrent().Name+")");
             if(args.Length==2 && args[0]=="state") Ownership.Provision(args[1]);
             else if(args.Length==3 && (args[0]=="install"||args[0]=="repair"||args[0]=="remove")){
                 if(!String.Equals(Ownership.Program,Path.GetFullPath(args[2]).TrimEnd('\\'),StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Unexpected install root.");
@@ -13,9 +14,11 @@ internal static class Guard {
                 // state. A deferred LocalSystem process cannot infer that transaction
                 // state by querying its own interactive user's product registration.
                 Ownership.Inspect(args[0]=="remove",args[0]!="install",args[1]);
-            }else return 87;
+            }else{SetupLog.Warn("installer action refused: unknown arguments");return 87;}
+            SetupLog.Write("installer action finished: "+args[0]);
             return 0;
         }catch(Exception ex){
+            SetupLog.Error("installer action failed: "+ex);
             string message=Product.Name+" setup: "+ex.Message;
             try{File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),"Logs",
                 Product.Name+"-identity-"+Guid.NewGuid().ToString("N")+".log"),message);}

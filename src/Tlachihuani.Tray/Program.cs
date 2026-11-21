@@ -6,6 +6,10 @@ internal static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        Tlachihuani.Windows.LogPaths.UseUserLog(args.FirstOrDefault() switch
+        {
+            "--rc-stop-console" => "xt-rc-stop", "--remote-controller" => "xt-rc-panel", _ => "xt"
+        });
         if (args is ["--rc-stop-console", var edition, var pid, var created])
         {
             Environment.ExitCode = RcConsoleStop.Run(edition, pid, created);

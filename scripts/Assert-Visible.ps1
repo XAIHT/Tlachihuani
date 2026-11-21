@@ -51,3 +51,8 @@ public static class ForegroundConsoleProbe {
         $Host.UI.RawUI.WindowTitle = $oldTitle
     }
 }
+
+# Verbose script log: every script that dot-sources this file is recorded from here on
+# (transcript plus every executed line); see Trace-Script.ps1.
+$tlachihuaniScriptTrace = Join-Path $PSScriptRoot 'Trace-Script.ps1'
+if (Test-Path -LiteralPath $tlachihuaniScriptTrace) { . $tlachihuaniScriptTrace; Start-TlachihuaniScriptTrace -Script $MyInvocation.PSCommandPath }

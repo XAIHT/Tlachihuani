@@ -8,7 +8,8 @@ internal sealed class WindowActivation : IDisposable
 
     internal WindowActivation(Form window, EventWaitHandle signal)
     {
-        timer.Tick += (_, _) => { if (signal.WaitOne(0)) Show(window); };
+        // Five checks a second: written only when a second launch actually asks to show the window.
+        timer.Tick += (_, _) => { using var pass = Tlachihuani.Contracts.TraceLog.Pass("XT window activation check"); if (signal.WaitOne(0)) Show(window); };
         timer.Start();
     }
 

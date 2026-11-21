@@ -1,0 +1,60 @@
+<Project>
+  <!--
+    Tlachihuani verbose tracing (Angela, 20 November 2026).
+    Every product project under src\ is compiled from traced copies of its sources:
+    a TraceLog.Enter at every method and a TraceLog.Step before every statement
+    (tools\Tlachihuani.TraceWeaver). The repository's .cs files are not changed.
+
+      TlachihuaniTrace=lines    (default) methods and every statement
+      TlachihuaniTrace=methods  methods only
+      TlachihuaniTrace=off      original sources, no weaving
+  -->
+  <PropertyGroup>
+    <TlachihuaniTrace Condition="'$(TlachihuaniTrace)' == ''">lines</TlachihuaniTrace>
+    <_TlProduct Condition="$(MSBuildProjectDirectory.Replace('/', '\').Contains('\src\Tlachihuani.'))">true</_TlProduct>
+    <_TlWeave Condition="'$(_TlProduct)' == 'true' and '$(TlachihuaniTrace)' != 'off'">true</_TlWeave>
+    <_TlWeaverProject>$(MSBuildThisFileDirectory)tools\Tlachihuani.TraceWeaver\Tlachihuani.TraceWeaver.csproj</_TlWeaverProject>
+    <_TlWeaverDll>$(MSBuildThisFileDirectory)tools\Tlachihuani.TraceWeaver\bin\$(Configuration)\net10.0\Tlachihuani.TraceWeaver.dll</_TlWeaverDll>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(_TlProduct)' == 'true'">
+    <!-- Build the weaver first; nothing of it is referenced or shipped. The weaver is in
+         Tlachihuani.slnx: a solution build gives a project outside the solution the Debug
+         configuration whatever was asked, and the weave target would then find no Release
+         weaver (the 0.37.0 release build failed exactly so). -->
+    <ProjectReference Include="$(_TlWeaverProject)" ReferenceOutputAssembly="false" Private="false" PrivateAssets="all"
+                      GlobalPropertiesToRemove="RuntimeIdentifier;SelfContained;PublishDir;_IsPublishing" />
+  </ItemGroup>
+
+  <!-- The services and the hosted lab forward framework logging into the trace log. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'Tlachihuani.Jobs' or '$(MSBuildProjectName)' == 'Tlachihuani.Service' or '$(MSBuildProjectName)' == 'Tlachihuani.RC.Server' or '$(MSBuildProjectName)' == 'Tlachihuani.RC.Cloud'">
+    <Compile Include="$(MSBuildThisFileDirectory)src\Shared\TraceLoggerProvider.cs" Link="Shared\TraceLoggerProvider.cs" />
+  </ItemGroup>
+  <!-- The web servers (Jobs web facade, Remote-Controller, hosted lab) log every request. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'Tlachihuani.Jobs' or '$(MSBuildProjectName)' == 'Tlachihuani.RC.Server' or '$(MSBuildProjectName)' == 'Tlachihuani.RC.Cloud'">
+    <Compile Include="$(MSBuildThisFileDirectory)src\Shared\TraceHttp.cs" Link="Shared\TraceHttp.cs" />
+  </ItemGroup>
+  <!-- The hosted lab does not reference Tlachihuani.Contracts; it compiles the logger itself. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'Tlachihuani.RC.Cloud'">
+    <Compile Include="$(MSBuildThisFileDirectory)src\Tlachihuani.Contracts\TraceLog.cs" Link="Shared\TraceLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)src\Tlachihuani.Contracts\TraceLog.Passes.cs" Link="Shared\TraceLog.Passes.cs" />
+  </ItemGroup>
+
+  <Target Name="TlachihuaniWeaveTrace" BeforeTargets="CoreCompile" Condition="'$(_TlWeave)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <PropertyGroup>
+      <_TlOut>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)traced\</_TlOut>
+      <_TlDotnet>$(DOTNET_HOST_PATH)</_TlDotnet>
+      <_TlDotnet Condition="'$(_TlDotnet)' == ''">dotnet</_TlDotnet>
+    </PropertyGroup>
+    <ItemGroup>
+      <_TlSource Include="@(Compile)" Condition="'%(Extension)' == '.cs' and !$([System.String]::Copy('%(FullPath)').Contains('\obj\')) and !$([System.String]::Copy('%(FullPath)').Contains('\src\Shared\')) and '%(Filename)' != 'TraceLog'" />
+      <_TlWoven Include="@(_TlSource->'$(_TlOut)%(RecursiveDir)%(Filename)%(Extension)')" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(_TlOut)sources.txt" Lines="@(_TlSource->'%(FullPath)')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <Exec Command="&quot;$(_TlDotnet)&quot; &quot;$(_TlWeaverDll)&quot; &quot;$(_TlOut).&quot; &quot;$(MSBuildProjectDirectory)&quot; &quot;$(_TlOut)sources.txt&quot; $(TlachihuaniTrace)" StandardOutputImportance="normal" />
+    <ItemGroup>
+      <Compile Remove="@(_TlSource)" />
+      <Compile Include="@(_TlWoven)" />
+    </ItemGroup>
+  </Target>
+</Project>

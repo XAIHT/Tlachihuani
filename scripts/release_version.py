@@ -63,4 +63,11 @@ def main():
 
 
 if __name__ == "__main__":
+    import sys
+    try:  # Verbose script log (script-logs, copied into Tlachihuani.log by XT); see script_trace.py.
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import script_trace
+        script_trace.start(__file__)
+    except ImportError:
+        pass
     main()

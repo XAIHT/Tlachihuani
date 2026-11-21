@@ -4,12 +4,18 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Tlachihuani.RC;
+using Tlachihuani.Contracts;
 using Tlachihuani.RC.Server;
+using Tlachihuani.Shared;
 using Tlachihuani.Windows;
 
 if (args.FirstOrDefault() == "--console") NativeConsole.Attach();
 if (args is ["--control"] or ["--dev-control", _, _])
 {
+    // XT starts this tool every few seconds: a run identical to the previous run of the same
+    // request is not written (TraceLog.Pass across runs); a different answer is written in full.
+    using var quietRun = TraceLog.Pass("rc-control", acrossRuns: true);
+    LogPaths.UseUserLog("rc-control");
     // Native JSON is UTF-8 regardless of the interactive Windows code page.
     Console.InputEncoding = new System.Text.UTF8Encoding(false, true);
     Console.OutputEncoding = new System.Text.UTF8Encoding(false);
@@ -19,6 +25,7 @@ if (args is ["--control"] or ["--dev-control", _, _])
         var line = await Console.In.ReadLineAsync(timeout.Token);
         if (line is null || line.Length > RcProtocol.MaxMessageBytes) return 2;
         var request = JsonNode.Parse(line)?.AsObject() ?? throw new InvalidDataException("Expected a JSON object.");
+        quietRun.Rename("rc-control " + (string?)request["op"]);
         JsonObject reply;
         if (args.Length == 1) reply = await RcEndpoint.CallInstalledAsync(request, timeout.Token);
         else if (Guid.TryParseExact(args[1], "N", out var dev) && int.TryParse(args[2], out var pid))
@@ -68,11 +75,17 @@ else if (!installed && args is ["--console", var directory, var id, var portText
 }
 else { Console.Error.WriteLine("Run through SCM, or --console <isolated data directory> <guid> <port>."); return 2; }
 StateStore.RejectProfileOrReparse(settings.Root);
+// Verbose trace log: %ProgramData%\XAIHT\Tlachihuani.RemoteController\logs\rc.log (installed),
+// <data>\logs\rc.log for an acceptance or console run.
+if (installed && !acceptance) LogPaths.UseServiceLog("rc", "rc.log", settings.OperatorSid, LogPaths.RcFolder, LogPaths.RcStateFolder);
+else LogPaths.UseServiceLog("rc", "rc.log", settings.OperatorSid, Path.Combine(settings.Root, "logs"), Path.Combine(settings.Root, "state", "logs"));
+TraceLog.I($"Remote-Controller starting: root {settings.Root}, pipe {settings.Pipe}, operator {settings.OperatorSid}, port {settings.Configuration.Port}, origin {settings.Configuration.PublicOrigin}, installed {settings.Installed}, acceptance {acceptance}");
 var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { Args = [], ContentRootPath = AppContext.BaseDirectory });
 builder.Services.AddWindowsService(o => o.ServiceName = acceptance ? "Tlachihuani.RemoteController.Acceptance" : RcProtocol.ServiceName);
 builder.Logging.ClearProviders();
 if (installed) builder.Logging.AddEventLog(o => o.SourceName = ".NET Runtime");
 else builder.Logging.AddSimpleConsole(o => o.SingleLine = true);
+builder.Logging.AddTlachihuaniTrace();
 builder.Services.Configure<HostOptions>(o => o.ShutdownTimeout = TimeSpan.FromSeconds(30));
 builder.Services.AddSingleton(settings);
 builder.Services.AddSingleton<RcRuntime>();

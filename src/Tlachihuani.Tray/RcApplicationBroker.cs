@@ -29,6 +29,9 @@ internal sealed class RcApplicationBroker
         JsonObject? completion = null;
         while (!token.IsCancellationRequested)
         {
+            // Every 2 seconds: written only when RC has something for XT or the answer changes.
+            var pass = Tlachihuani.Contracts.TraceLog.Pass("XT application broker check");
+            try {
             try
             {
                 // Keep an observed outcome until acknowledged. A transport failure
@@ -78,6 +81,7 @@ internal sealed class RcApplicationBroker
             }
             try { await Task.Delay(TimeSpan.FromSeconds(2), token); }
             catch (OperationCanceledException) when (token.IsCancellationRequested) { break; }
+            } finally { pass.Dispose(); }
         }
     }
 

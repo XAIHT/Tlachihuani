@@ -19,6 +19,9 @@ internal static class RcWeb
         if (!runtime.Settings.Installed) builder.Logging.AddSimpleConsole(o => o.SingleLine = true);
         else builder.Logging.AddEventLog(o => o.SourceName = ".NET Runtime");
         builder.Logging.SetMinimumLevel(LogLevel.Error);
+        // Verbose trace log (Angela, 20 November 2026): everything goes to rc.log with one-time
+        // codes and credentials masked; the console and the Event Log stay at Error.
+        Tlachihuani.Shared.TraceLoggingExtensions.AddTlachihuaniTrace(builder.Logging);
         builder.WebHost.ConfigureKestrel(options =>
         {
             options.AddServerHeader = false;
@@ -54,6 +57,7 @@ internal static class RcWeb
         app.Lifetime.ApplicationStopped.Register(responseFiles.Dispose);
         app.Lifetime.ApplicationStopped.Register(workspace.Dispose);
         var origin = new Uri(config.PublicOrigin);
+        Tlachihuani.Shared.TraceHttp.UseTraceHttp(app);
         app.Use(async (context, next) =>
         {
             context.Response.Headers.CacheControl = "no-store";

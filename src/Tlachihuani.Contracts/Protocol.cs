@@ -40,6 +40,8 @@ public static class Protocol
             throw new ProtocolException("invalid_request", "Message length is outside the protocol limit.");
         byte[] body = new byte[length];
         await stream.ReadExactlyAsync(body, cancellationToken);
+        if (TraceLog.IsOn(TraceLevel.Trace))
+            TraceLog.T($"IPC ⇐ {typeof(T).Name} {length} bytes on {stream.GetType().Name}: {System.Text.Encoding.UTF8.GetString(body)}");
         try
         {
             return JsonSerializer.Deserialize<T>(body, Json)
@@ -54,6 +56,8 @@ public static class Protocol
     public static async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken)
     {
         byte[] body = JsonSerializer.SerializeToUtf8Bytes(value, Json);
+        if (TraceLog.IsOn(TraceLevel.Trace))
+            TraceLog.T($"IPC ⇒ {typeof(T).Name} {body.Length} bytes on {stream.GetType().Name}: {System.Text.Encoding.UTF8.GetString(body)}");
         if (body.Length > MaxFrameBytes)
             throw new ProtocolException("invalid_request", "The response exceeds the protocol limit.");
         byte[] header = new byte[4];

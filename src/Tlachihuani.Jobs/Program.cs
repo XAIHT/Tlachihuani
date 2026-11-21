@@ -1,6 +1,8 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
 using System.Security.Principal;
 using Microsoft.Extensions.Hosting.WindowsServices;
+using Tlachihuani.Contracts;
+using Tlachihuani.Shared;
 using Tlachihuani.Windows;
 using Tlachihuani.Jobs;
 
@@ -9,12 +11,17 @@ if (args.FirstOrDefault() == "--console" && OperatingSystem.IsWindows())
 
 if (args is ["--web", var portText] && int.TryParse(portText, out int httpPort))
 {
+    // The Jobs host passes its own logs folder; stdout is the private transport, so the
+    // web facade only ever logs to its file.
+    if (Environment.GetEnvironmentVariable("TLACHIHUANI_LOG_DIR") is { Length: > 0 } webLogs)
+        TraceLog.Configure("web", [Path.Combine(webLogs, "web.log")], LogPaths.ServiceRotateBytes, LogPaths.ServiceKeepFiles);
     if (await Console.In.ReadLineAsync() != "START") return 2;
     await WebFacade.RunAsync(httpPort);
     return 0;
 }
 if (args is ["--control"] or ["--dev-control", _, _])
 {
+    LogPaths.UseUserLog("jobs-control");
     try
     {
         string pipe; int pid; string image;
@@ -53,11 +60,18 @@ else
     Console.Error.WriteLine("Run through SCM, or --console <isolated state directory> <32-digit guid> <port>.");
     return 2;
 }
+// Verbose trace log: %ProgramData%\XAIHT\Tlachihuani.Jobs\logs\jobs.log (installed), next to the
+// isolated state for a console run. The web facade and the torrent engine write web.log and
+// torrent.log in the same folder (WorkerChannel passes it to them).
+if (installed) LogPaths.UseServiceLog("jobs", "jobs.log", settings.Operator, LogPaths.JobsFolder, LogPaths.JobsStateFolder);
+else LogPaths.UseServiceLog("jobs", "jobs.log", settings.Operator, Path.Combine(settings.State, "logs"));
+TraceLog.I($"Jobs host starting: pipe {settings.Pipe}, operator {settings.Operator}, state {settings.State}, port {settings.Port}, development {settings.Development}, installed {installed}");
 var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { Args = [], ContentRootPath = AppContext.BaseDirectory });
 builder.Services.AddWindowsService(o => o.ServiceName = JobsEndpoint.ServiceName);
 builder.Logging.ClearProviders();
 if (installed) builder.Logging.AddEventLog(o => o.SourceName = ".NET Runtime");
 else builder.Logging.AddSimpleConsole(o => o.SingleLine = true);
+builder.Logging.AddTlachihuaniTrace();
 builder.Services.AddSingleton(settings);
 builder.Services.AddHostedService<JobsHost>();
 using var host = builder.Build();

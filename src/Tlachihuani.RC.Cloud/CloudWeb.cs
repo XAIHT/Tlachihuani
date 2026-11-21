@@ -19,7 +19,8 @@ public static class CloudWeb
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = [], ContentRootPath = AppContext.BaseDirectory });
         builder.Logging.ClearProviders();
         builder.Logging.AddSimpleConsole(options => options.SingleLine = true);
-        builder.Logging.SetMinimumLevel(LogLevel.Warning); // Never log request URLs, tickets, content or credentials.
+        builder.Logging.SetMinimumLevel(LogLevel.Warning); // The console never shows request URLs, tickets, content or credentials.
+        Tlachihuani.Shared.TraceLoggingExtensions.AddTlachihuaniTrace(builder.Logging); // rc-cloud.log, codes masked
         builder.WebHost.ConfigureKestrel(options =>
         {
             options.AddServerHeader = false;
@@ -56,6 +57,7 @@ public static class CloudWeb
         var relay = app.Services.GetRequiredService<CloudRelay>();
         app.Lifetime.ApplicationStopping.Register(relay.Dispose);
         var passwordSlots = new SemaphoreSlim(2, 2);
+        Tlachihuani.Shared.TraceHttp.UseTraceHttp(app);
         app.Use(async (context, next) =>
         {
             context.Response.Headers.CacheControl = "no-store";

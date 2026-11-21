@@ -2,7 +2,9 @@
 using System.Text.Json;
 using Tlachihuani.Client;
 using Tlachihuani.Contracts;
+using Tlachihuani.Windows;
 
+LogPaths.UseUserLog("control");
 ControlReply result;
 var operation = args.FirstOrDefault() ?? "status";
 long cursor = 0;

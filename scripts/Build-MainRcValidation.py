@@ -14,6 +14,13 @@ import subprocess
 import sys
 import time
 
+try:  # Verbose script log (script-logs, copied into Tlachihuani.log by XT); see script_trace.py.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import script_trace
+    script_trace.start(__file__)
+except ImportError:
+    pass
+
 repo = Path(sys.argv[1]).resolve()
 out = Path(sys.argv[2]).resolve()
 if repo not in (Path('C:/Development/XAIHT/Tlamatini'), Path('C:/Development/XAIHT/Tlamatini-Spanish')):

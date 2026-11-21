@@ -27,7 +27,11 @@ internal sealed class WorkerChannel : IDisposable
             WorkingDirectory = AppContext.BaseDirectory
         };
         foreach (string arg in arguments) start.ArgumentList.Add(arg);
+        // The web facade and the torrent engine write their trace logs next to jobs.log.
+        if (Tlachihuani.Contracts.TraceLog.FilePath is { } jobsLog) start.Environment["TLACHIHUANI_LOG_DIR"] = Path.GetDirectoryName(jobsLog);
+        start.Environment["TLACHIHUANI_LOG_LEVEL"] = Tlachihuani.Contracts.TraceLog.Level.ToString();
         var child = Process.Start(start) ?? throw new IOException("Could not start provider process.");
+        Tlachihuani.Contracts.TraceLog.I($"started provider process {child.Id}: {executable} {string.Join(" ", arguments)}");
         try
         {
             OwnedProcesses.Attach(child);
@@ -66,11 +70,15 @@ internal sealed class WorkerChannel : IDisposable
             if (proc is null || proc.HasExited) throw new IOException("Torrent engine unavailable.");
             try
             {
+                var started = Stopwatch.GetTimestamp();
+                Tlachihuani.Contracts.TraceLog.T($"engine ⇐ {Tlachihuani.Contracts.TraceLog.Json(command)}");
                 await proc.StandardInput.WriteLineAsync(command.ToJsonString().AsMemory(), deadline.Token);
                 var line = await proc.StandardOutput.ReadLineAsync(deadline.Token);
-                return JsonNode.Parse(line ?? throw new EndOfStreamException())!.AsObject();
+                var reply = JsonNode.Parse(line ?? throw new EndOfStreamException())!.AsObject();
+                Tlachihuani.Contracts.TraceLog.T($"engine ⇒ ({Stopwatch.GetElapsedTime(started).TotalMilliseconds:0.#} ms) {Tlachihuani.Contracts.TraceLog.Json(reply)}");
+                return reply;
             }
-            catch { CloseProcess(); throw; }
+            catch (Exception ex) { Tlachihuani.Contracts.TraceLog.W($"engine request failed; closing the engine: {ex.GetType().Name}: {ex.Message}"); CloseProcess(); throw; }
         }
         finally { gate.Release(); }
     }

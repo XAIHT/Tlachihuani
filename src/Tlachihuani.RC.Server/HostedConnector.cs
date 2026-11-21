@@ -99,6 +99,10 @@ internal sealed class HostedConnector(RcRuntime runtime) : IDisposable
     {
         while (!stopping.IsCancellationRequested)
         {
+            // About once a second while not connected: written only when the check's outcome changes.
+            // The pass ends before a connection starts, so a live session is written as it happens.
+            var pass = Tlachihuani.Contracts.TraceLog.Pass("RC hosted connector check");
+            try {
             long attemptGeneration;
             lock (gate) attemptGeneration = configurationGeneration;
             void ReportState(string value)
@@ -122,6 +126,7 @@ internal sealed class HostedConnector(RcRuntime runtime) : IDisposable
                     if (attemptGeneration != configurationGeneration) continue;
                     active = connection;
                 }
+                pass.Dispose();
                 try { await Control(configuration, connection.Token); }
                 finally
                 {
@@ -138,6 +143,7 @@ internal sealed class HostedConnector(RcRuntime runtime) : IDisposable
             { connected = false; ReportState(ex is RcFault f ? f.Code : "relay_unavailable"); }
             try { await Task.Delay(Random.Shared.Next(800, 1800), stopping); }
             catch (OperationCanceledException) when (stopping.IsCancellationRequested) { break; }
+            } finally { pass.Dispose(); }
         }
         connected = false; state = "stopped";
     }
@@ -209,6 +215,7 @@ internal sealed class HostedConnector(RcRuntime runtime) : IDisposable
     {
         while (!stop.IsCancellationRequested)
         {
+            using var pass = Tlachihuani.Contracts.TraceLog.Pass("RC hosted heartbeat");
             await Task.Delay(TimeSpan.FromSeconds(15), stop);
             await Send(socket, new { type = "heartbeat" }, stop);
         }

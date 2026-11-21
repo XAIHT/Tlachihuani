@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 
 import libtorrent as lt
 
+import tracing
 from storage import Problem, io_path, packed, require, safe_file
 from delivery import Delivery
 
@@ -135,6 +136,48 @@ def endpoint(url):
     return u.hostname
 
 
+_ERROR_ALERTS = int(lt.alert.category_t.error_notification)
+
+
+def trace_alert(owner, alert):
+    """Every libtorrent alert, as libtorrent words it (errors as warnings)."""
+    if tracing.level > tracing.DEBUG:
+        return
+    try:
+        error = int(alert.category()) & _ERROR_ALERTS
+        tracing.log(tracing.WARN if error else tracing.DEBUG,
+                    f"libtorrent {alert.what()} (owner {owner}): {alert.message()}")
+    except Exception as exc:
+        tracing.warn(f"libtorrent alert {type(alert).__name__} could not be described: {exc}")
+
+
+_last_status = {}
+
+
+def trace_status(ident, handle):
+    """One line per torrent when what it is doing changes (checked every second): its
+    state, progress, transfer, peers or error. A torrent sitting still writes nothing."""
+    try:
+        s = handle.status()
+        error = s.errc.message() if s.errc.value() else ""
+        moving = (str(s.state), bool(s.flags & lt.torrent_flags.paused), s.total_done, s.total_upload,
+                  s.num_peers, s.num_seeds, s.num_connections, s.has_metadata, error)
+        if _last_status.get(ident) == moving:
+            return
+        _last_status[ident] = moving
+        tracing.info(
+            f"torrent {ident} \"{s.name}\": {str(s.state).split('.')[-1]}{' paused' if s.flags & lt.torrent_flags.paused else ''}"
+            f" {s.progress * 100:.3f}%, down {s.download_rate / 1024:.1f} KB/s (payload {s.download_payload_rate / 1024:.1f}),"
+            f" up {s.upload_rate / 1024:.1f} KB/s, done {s.total_done}/{s.total_wanted} bytes"
+            f" (this session down {s.total_download}, up {s.total_upload}; ever down {s.all_time_download}, up {s.all_time_upload}),"
+            f" pieces {s.num_pieces}, peers {s.num_peers} (seeds {s.num_seeds}; swarm {s.list_peers}/{s.list_seeds}),"
+            f" connections {s.num_connections}, tracker \"{s.current_tracker}\", next announce {s.next_announce},"
+            f" queue {s.queue_position}, metadata {s.has_metadata}" + (f", error: {error}" if error else "")
+        )
+    except Exception as exc:
+        tracing.warn(f"torrent {ident} status could not be read: {exc}")
+
+
 class Engine:
     # A silent swarm must not indefinitely occupy another download's slot.
     # These timers are runtime scheduling state, never a change to user intent.
@@ -208,11 +251,17 @@ class Engine:
             "enable_incoming_utp": public,
             "apply_ip_filter_to_trackers": True,
             "upload_rate_limit": 262144,
-            "alert_mask": int(
+            # Verbose log: every alert category, so torrent.log shows every tracker,
+            # peer, piece and block event. The queue is large enough that the alerts
+            # the engine acts on (resume data, pause) are never dropped between ticks.
+            "alert_mask": int(lt.alert.category_t.all_categories)
+            if tracing.level <= tracing.DEBUG
+            else int(
                 lt.alert.category_t.storage_notification
                 | lt.alert.category_t.error_notification
                 | lt.alert.category_t.status_notification
             ),
+            "alert_queue_size": 1000000 if tracing.level <= tracing.DEBUG else 2000,
         }
 
     def session(self, owner):
@@ -450,8 +499,9 @@ class Engine:
             self.failures[ident] = "Disk did not finish pausing for verification. Recheck this download."
 
     def alerts(self):
-        for session in self.sessions.values():
+        for owner, session in self.sessions.items():
             for alert in session.pop_alerts():
+                trace_alert(owner, alert)
                 if isinstance(alert, lt.torrent_paused_alert):
                     for ident, handle in self.handles.items():
                         if handle == alert.handle and ident in self.verification_wait:
@@ -562,6 +612,12 @@ class Engine:
 
     def tick(self):
         now = time.time()
+        if tracing.level <= tracing.INFO and now - getattr(self, "last_status_trace", 0) >= 1:
+            self.last_status_trace = now
+            for ident, handle in list(self.handles.items()):
+                trace_status(ident, handle)
+            for ident, (owner, handle, expires) in list(self.lookups.items()):
+                trace_status(f"{ident} (metadata lookup, owner {owner})", handle)
         self.alerts()
         for ident, (owner, h, expires) in list(self.lookups.items()):
             has_metadata = h.status().has_metadata

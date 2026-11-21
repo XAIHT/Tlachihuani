@@ -3,10 +3,10 @@
 
 This is the onboarding document for Claude, Codex, and every coding agent working on Tlachihuani.
 
-Latest version: **[0.37.0](docs/releases/v0.37.0.md)**, as requested by Angela on
-19 November 2026. Read the [Windows setup guide](packaging/setup/README.md)
+Latest version: **[0.38.0](docs/releases/v0.38.0.md)**, as requested by Angela on
+21 November 2026. Read the [Windows setup guide](packaging/setup/README.md)
 for packaging and migration, and the [10 November recovery record](docs/verification/2026-11-10-torrenter-recovery.md)
-for source verification. This checkout declares `0.37.0` in `Directory.Build.props` and internal
+for source verification. This checkout declares `0.38.0` in `Directory.Build.props` and internal
 project lock references. Preserve those matching values. Future stamps must update
 both together; documentation changes do not rebuild existing binaries or create Git tags.
 

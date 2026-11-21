@@ -18,6 +18,7 @@ internal static class WebFacade
         });
         builder.Configuration.Sources.Clear();
         builder.Logging.ClearProviders(); // stdout is the private inherited transport.
+        Tlachihuani.Shared.TraceLoggingExtensions.AddTlachihuaniTrace(builder.Logging); // file only (web.log)
         builder.WebHost.ConfigureKestrel(k =>
         {
             k.AddServerHeader = false; k.Limits.MaxRequestBodySize = 2 * MaxMetainfo;
@@ -31,13 +32,19 @@ internal static class WebFacade
             await exchange.WaitAsync(client);
             try
             {
+                var started = System.Diagnostics.Stopwatch.GetTimestamp();
+                Tlachihuani.Contracts.TraceLog.T($"Jobs ⇐ {Tlachihuani.Contracts.TraceLog.Json(request)}");
                 await Console.Out.WriteLineAsync(request.ToJsonString());
                 await Console.Out.FlushAsync();
                 // Finish this exchange even when the initiating HTTP request is aborted.
-                return JsonNode.Parse(await replies.Reader.ReadAsync(app.Lifetime.ApplicationStopping))!.AsObject();
+                var reply = JsonNode.Parse(await replies.Reader.ReadAsync(app.Lifetime.ApplicationStopping))!.AsObject();
+                Tlachihuani.Contracts.TraceLog.T($"Jobs ⇒ ({System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds:0.#} ms) {Tlachihuani.Contracts.TraceLog.Json(reply)}");
+                return reply;
             }
             finally { exchange.Release(); }
         }
+        // Every HTTP request from Tlamatini or a browser: who, what, the answer and the time.
+        Tlachihuani.Shared.TraceHttp.UseTraceHttp(app);
         app.Use(async (ctx, next) =>
         {
             var request = ctx.Request;

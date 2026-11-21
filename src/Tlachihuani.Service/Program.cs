@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Tlachihuani.Contracts;
 using Tlachihuani.Core;
 using Tlachihuani.Service;
+using Tlachihuani.Shared;
 using Tlachihuani.Windows;
 
 try
@@ -41,11 +42,17 @@ try
         OperatorProcessAccess.AllowIdentityCheck(installation.OperatorSid);
         installationId = installation.InstallationId; pipeName = installation.PipeName; operatorSid = installation.OperatorSid;
     }
+    // Verbose trace log: %ProgramData%\XAIHT\Tlachihuani\logs\service.log (installed), or the
+    // developer's Tlachihuani.log for a visible console run.
+    if (isService) LogPaths.UseServiceLog("service", "service.log", operatorSid, LogPaths.ServiceFolder);
+    else LogPaths.UseUserLog("service-console");
+    TraceLog.I($"Tlachihuani service starting: installation {installationId}, pipe {pipeName}, operator {operatorSid}, as SCM service {isService}");
     var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { Args = [], ContentRootPath = AppContext.BaseDirectory });
     builder.Services.AddWindowsService(options => options.ServiceName = Protocol.ServiceName);
     builder.Logging.ClearProviders();
     if (!isService) builder.Logging.AddSimpleConsole(options => { options.SingleLine = true; options.TimestampFormat = "HH:mm:ss "; });
     else builder.Logging.AddEventLog(options => { options.SourceName = ".NET Runtime"; options.LogName = "Application"; });
+    builder.Logging.AddTlachihuaniTrace();
     builder.Services.Configure<HostOptions>(options => options.ShutdownTimeout = TimeSpan.FromSeconds(10));
     builder.Services.AddSingleton(new HealthState());
     builder.Services.AddSingleton(new PipeSettings(pipeName, operatorSid, installationId));
@@ -59,5 +66,7 @@ try
 catch (Exception ex)
 {
     Console.Error.WriteLine($"Tlachihuani startup failed: {ex.Message}");
+    TraceLog.E("Tlachihuani service startup failed", ex);
+    TraceLog.Flush(TimeSpan.FromSeconds(3));
     return 1;
 }

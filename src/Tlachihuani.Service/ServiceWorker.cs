@@ -41,13 +41,20 @@ public sealed class ServiceWorker(HealthState health, PipeSettings settings, ILo
     private async Task PulseAsync(CancellationToken token)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
-        while (await timer.WaitForNextTickAsync(token)) health.Pulse();
+        while (await timer.WaitForNextTickAsync(token))
+        {
+            // Every 2 seconds: written only when the pulse sees something different.
+            using var pass = TraceLog.Pass("service health pulse");
+            health.Pulse();
+        }
     }
 
     private async Task ServeAsync(NamedPipeServerStream pipe, CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {
+            // One pass per request (XT asks every 3 seconds), compared with the previous one of the same operation.
+            using var pass = TraceLog.Pass("service request");
             await pipe.WaitForConnectionAsync(token);
             try
             {
@@ -55,6 +62,7 @@ public sealed class ServiceWorker(HealthState health, PipeSettings settings, ILo
                 deadline.CancelAfter(TimeSpan.FromSeconds(3));
                 // The kernel authenticates each connection against the explicit DACL. All three operations are read-only.
                 var request = await Protocol.ReadAsync<Request>(pipe, deadline.Token);
+                pass.Rename("service request " + request.Operation);
                 Reply answer;
                 try { answer = health.Answer(request, settings.InstallationId); }
                 catch (ProtocolException ex)

@@ -57,6 +57,8 @@ internal sealed class RcService(RcRuntime runtime, ILogger<RcService> log) : Bac
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         while (await timer.WaitForNextTickAsync(token))
         {
+            // Once a second: written only when the scheduler finds something to do or something changes.
+            using var pass = TraceLog.Pass("RC scheduler");
             if (!runtime.ListenerReady) continue;
             try
             {
@@ -71,12 +73,15 @@ internal sealed class RcService(RcRuntime runtime, ILogger<RcService> log) : Bac
     {
         while (!token.IsCancellationRequested)
         {
+            // One pass per request, compared with the previous request of the same operation.
+            using var pass = TraceLog.Pass("RC request");
             await pipe.WaitForConnectionAsync(token);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
             deadline.CancelAfter(TimeSpan.FromSeconds(8));
             try
             {
                 var req = await Protocol.ReadAsync<JsonObject>(pipe, deadline.Token);
+                pass.Rename("RC request " + (string?)req["op"]);
                 string? sid = null;
                 pipe.RunAsClient(() => { using var identity = WindowsIdentity.GetCurrent(true); sid = identity?.User?.Value; });
                 JsonObject reply;

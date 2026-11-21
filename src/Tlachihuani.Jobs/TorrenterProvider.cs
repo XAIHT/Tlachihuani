@@ -18,6 +18,8 @@ internal sealed class TorrenterProvider(JobsSettings settings, ILogger log) : IJ
         enabled = !File.Exists(Disabled);
         while (!token.IsCancellationRequested)
         {
+            // Every 2 seconds: written only when the engine or the web part has to be (re)started.
+            using var pass = Tlachihuani.Contracts.TraceLog.Pass("Jobs provider check");
             await lifecycle.WaitAsync(token);
             try
             {
@@ -57,7 +59,10 @@ internal sealed class TorrenterProvider(JobsSettings settings, ILogger log) : IJ
                 webReady = true;
                 while (await web.StandardOutput.ReadLineAsync(token) is string line)
                 {
+                    // One pass per web request, compared with the previous one of the same method and path.
+                    using var pass = Tlachihuani.Contracts.TraceLog.Pass("Jobs web request");
                     var req = JsonNode.Parse(line)!.AsObject();
+                    pass.Rename("Jobs web request " + (string?)req["method"] + " " + (string?)req["path"]);
                     // Only Windows-authenticated native clients may enter the admin channel.
                     req.Remove("admin"); req.Remove("owner");
                     var reply = await worker.Request(req, token);

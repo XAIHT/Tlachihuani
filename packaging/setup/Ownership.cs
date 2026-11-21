@@ -9,6 +9,56 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using System.Diagnostics;
 
+// Verbose setup log, in the same line format as the services' trace logs. The wizard (run by
+// a person) appends to that person's Tlachihuani.log; the Windows Installer actions (run as
+// LocalSystem) append to %ProgramData%\XAIHT\Tlachihuani\logs\setup.log, which XT copies in.
+internal static class SetupLog {
+    static readonly object gate=new object();
+    static readonly int pid=Process.GetCurrentProcess().Id;
+    internal static void Write(string message,[System.Runtime.CompilerServices.CallerMemberName] string member="",[System.Runtime.CompilerServices.CallerFilePath] string file="",[System.Runtime.CompilerServices.CallerLineNumber] int line=0){Emit("INFO ",message,member,file,line);}
+    internal static void Warn(string message,[System.Runtime.CompilerServices.CallerMemberName] string member="",[System.Runtime.CompilerServices.CallerFilePath] string file="",[System.Runtime.CompilerServices.CallerLineNumber] int line=0){Emit("WARN ",message,member,file,line);}
+    internal static void Error(string message,[System.Runtime.CompilerServices.CallerMemberName] string member="",[System.Runtime.CompilerServices.CallerFilePath] string file="",[System.Runtime.CompilerServices.CallerLineNumber] int line=0){Emit("ERROR",message,member,file,line);}
+    static string Target(){
+        var me=WindowsIdentity.GetCurrent().User;
+        if(me!=null && me.IsWellKnown(WellKnownSidType.LocalSystemSid)){
+            string folder=Path.Combine(Ownership.Common,Product.Name,"logs");
+            return Directory.Exists(folder)?Path.Combine(folder,"setup.log"):null;
+        }
+        string custom=Environment.GetEnvironmentVariable("TLACHIHUANI_USER_DIR");
+        string user=String.IsNullOrWhiteSpace(custom)?Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"XAIHT","Tlachihuani"):Path.GetFullPath(custom);
+        Directory.CreateDirectory(user);
+        return Path.Combine(user,"Tlachihuani.log");
+    }
+    static void Emit(string level,string message,string member,string file,int line){
+        try{
+            string path=Target();
+            if(path==null)return;
+            path=Path.GetFullPath(path);
+            string text=DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff zzz",System.Globalization.CultureInfo.InvariantCulture)+"  "+level+"  setup  ["+pid+":"+System.Threading.Thread.CurrentThread.ManagedThreadId+"]  "
+                +Path.GetFileName(file)+":"+line+" "+member+"  "+(message??"").Replace("\r"," ").Replace("\n"," ")+"\r\n";
+            var bytes=new System.Text.UTF8Encoding(false).GetBytes(text);
+            lock(gate){
+                // Same named lock as TraceLog, so lines from XT and setup never interleave.
+                using(var mutex=new System.Threading.Mutex(false,MutexName(path))){
+                    bool locked=false;
+                    try{
+                        try{locked=mutex.WaitOne(2000);}catch(System.Threading.AbandonedMutexException){locked=true;}
+                        using(var stream=new FileStream(path,FileMode.Append,FileAccess.Write,FileShare.ReadWrite|FileShare.Delete))stream.Write(bytes,0,bytes.Length);
+                    }finally{if(locked)mutex.ReleaseMutex();}
+                }
+            }
+        }catch(Exception){}
+    }
+    static string MutexName(string path){
+        using(var sha=System.Security.Cryptography.SHA256.Create()){
+            var hash=sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(path.ToUpperInvariant()));
+            var hex=new System.Text.StringBuilder();
+            for(int i=0;i<16;i++)hex.Append(hash[i].ToString("X2"));
+            return @"Local\XAIHT.TraceLog."+hex;
+        }
+    }
+}
+
 internal static class Ownership {
     internal static readonly string Program = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "XAIHT", Product.Name);
     internal static readonly string Common = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "XAIHT");
@@ -102,6 +152,7 @@ internal static class Ownership {
             string name=PlaneName(plane), data=Path.Combine(Common,name);
             ServiceIdentity.Configure(name,op);
             string svc=((SecurityIdentifier)new NTAccount(@"NT SERVICE\"+name).Translate(typeof(SecurityIdentifier))).Value;
+            SetupLog.Write("service "+name+" (account "+svc+") configured for operator "+op+"; data folder "+data+(Directory.Exists(data)?" (existing)":" (new)"));
             Plain(data);
             if(Directory.Exists(data)) CheckExisting(data,plane!=0,op);
             else {
@@ -115,6 +166,19 @@ internal static class Ownership {
                 if(plane==2)Directory.CreateDirectory(Path.Combine(stage,"settings"),RcSettingsPermissions(svc,op));
                 Directory.Move(stage,data);
             }
+            // Verbose trace logs (service.log, jobs.log, web.log, torrent.log, rc.log): the service
+            // writes, the operator reads (XT copies every line into the user's Tlachihuani.log).
+            // Created for new and existing installations alike; its permissions are always reset.
+            string logs=Path.Combine(data,"logs");
+            Plain(logs);
+            if(!Directory.Exists(logs)) Directory.CreateDirectory(logs,LogsPermissions(svc,op));
+            else Directory.SetAccessControl(logs,LogsPermissions(svc,op));
+            SetupLog.Write("log folder ready: "+logs+" (service "+svc+" writes, operator "+op+" reads)");
         }
+    }
+    static DirectorySecurity LogsPermissions(string service,string op) {
+        var acl=new DirectorySecurity();
+        acl.SetSecurityDescriptorSddlForm("O:BAG:BAD:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;0x1301bf;;;"+service+")(A;OICI;GRGX;;;"+op+")");
+        return acl;
     }
 }

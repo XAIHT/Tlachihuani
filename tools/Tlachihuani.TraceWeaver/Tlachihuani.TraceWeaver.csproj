@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Build-time tool: writes traced copies of Tlachihuani's C# sources (see Program.cs). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- RuntimeIdentifiers (win-x64) comes from Directory.Build.props: a release publish
+         restores every referenced project for win-x64, and the locked restore needs the
+         weaver's lock file to list that runtime too. -->
+    <IsPackable>false</IsPackable>
+    <TlachihuaniTrace>off</TlachihuaniTrace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The C# compiler that ships with the pinned .NET SDK; no package download. -->
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>$(RoslynTargetsPath)\bincore\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>$(RoslynTargetsPath)\bincore\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

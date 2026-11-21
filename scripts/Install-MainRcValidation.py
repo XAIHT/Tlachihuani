@@ -14,6 +14,13 @@ import uuid
 import psutil
 import re
 
+try:  # Verbose script log (script-logs, copied into Tlachihuani.log by XT); see script_trace.py.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import script_trace
+    script_trace.start(__file__)
+except ImportError:
+    pass
+
 workspace=Path(__file__).resolve().parents[1]
 build_base=workspace/'artifacts/main-rc-freeze'
 build_suffix=sys.argv[1] if len(sys.argv)>1 else '20261113-2335'

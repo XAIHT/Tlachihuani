@@ -1,4 +1,5 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (theme colors, layout and painting run on every repaint; UiTrace writes the window events)
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
@@ -190,6 +191,7 @@ internal class StudioForm : Form
         AutoScaleDimensions = new SizeF(96, 96);
         ResumeLayout(true);
         PerformAutoScale();
+        UiTrace.Attach(this);
         var area = Screen.FromControl(Owner ?? this).WorkingArea;
         if (MinimumSize.Width > area.Width || MinimumSize.Height > area.Height)
         {

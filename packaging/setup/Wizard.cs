@@ -59,6 +59,7 @@ internal sealed class Wizard : Form {
         next.BackColor=Removing?Amber:Teal;next.ForeColor=Bg;back.BackColor=Card;back.ForeColor=Ink;
         AcceptButton=next;CancelButton=back;next.Click+=async delegate {await Advance();};
         back.Click+=delegate{
+            SetupLog.Write("button clicked: \""+back.Text+"\" (page "+page+", busy "+busy+")");
             if(busy)return;
             if(installedSuccessfully){
                 try{
@@ -67,7 +68,9 @@ internal sealed class Wizard : Form {
             }
             Close();
         };
-        FormClosing+=delegate(object sender,FormClosingEventArgs e){if(busy)e.Cancel=true;};
+        FormClosing+=delegate(object sender,FormClosingEventArgs e){if(busy)e.Cancel=true;SetupLog.Write("window closing ("+e.CloseReason+(e.Cancel?", refused while busy":"")+")");};
+        startup.CheckedChanged+=delegate{SetupLog.Write("\""+startup.Text+"\" "+(startup.Checked?"checked":"unchecked"));};
+        foreach(Label watched in new[]{stage,heading,detail,notice}){var label=watched;label.TextChanged+=delegate{SetupLog.Write("shown: "+label.Text);};}
         Shown+=delegate{int on=1;DwmSetWindowAttribute(Handle,20,ref on,4);};
         stage.Text="01   /   OVERVIEW";heading.Text=Removing?"Remove the Windows services":"Set up your Windows services";
         detail.Text=Removing?"Remove the primary service, Jobs host, XT shortcuts and packaged program files.\n\nDownloaded files, installation identities and the Jobs journal stay on this PC.":"Install the primary service, Torrenter Jobs and the XT tray companion.\n\nServices stay stopped after installation and every reboot. Choose Start Services in XT when you need them.\n\nStart menu and Desktop shortcuts are always included.";
@@ -79,6 +82,7 @@ internal sealed class Wizard : Form {
         Process.Start(new ProcessStartInfo(Path.Combine(Ownership.Program,"Tray","Tlachihuani.Tray.exe")){UseShellExecute=true});
     }
     async Task Advance(){
+        SetupLog.Write("button clicked: \""+next.Text+"\" (page "+page+", busy "+busy+")");
         if(busy)return;
         if(page==2){Close();return;}
         if(page==0){
@@ -96,7 +100,9 @@ internal sealed class Wizard : Form {
             string stamp=Guid.NewGuid().ToString("N");
             log=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),"Logs","Tlachihuani-"+stamp+".log");
             var start=new ProcessStartInfo(Application.ExecutablePath,"--apply "+op+" "+stamp+" "+(startup.Checked?"1":"0")){UseShellExecute=true,Verb="runas"};
+            SetupLog.Write("asking Windows for administrator access: "+start.FileName+" "+start.Arguments+"; Windows Installer log "+log);
             int rc=await Task.Run(delegate{using(var child=Process.Start(start)){child.WaitForExit();return child.ExitCode;}});
+            SetupLog.Write("elevated setup finished with "+rc+"; product installed now: "+Managed);
             if(rc!=0 && rc!=3010)throw new InvalidOperationException("Windows setup returned "+rc+".");
             if(Managed==Removing)throw new InvalidOperationException("Windows did not confirm the requested installation state.");
             heading.Text=Removing?"Removal complete":"Installation complete";
@@ -110,7 +116,7 @@ internal sealed class Wizard : Form {
                     catch(Exception ex){detail.Text+="\n\nXT could not open: "+ex.Message+" Use the Desktop shortcut to retry.";}
                 }else detail.Text+="\n\nThis wizard is elevated. Open XT from your normal Desktop session.";
             }
-        }catch(Exception ex){heading.Text="Setup did not finish";detail.Text=ex.Message;notice.Text=log==null?"Close and retry when ready.":"If installation began, see "+log;}
+        }catch(Exception ex){SetupLog.Error("setup did not finish: "+ex);heading.Text="Setup did not finish";detail.Text=ex.Message;notice.Text=log==null?"Close and retry when ready.":"If installation began, see "+log;}
         finally{
             busy=false;page=2;stage.Text="04   /   RESULT";progress.Style=ProgressBarStyle.Blocks;progress.Value=100;
             // Keep XT in the original, unelevated operator session. If someone
@@ -140,7 +146,8 @@ internal sealed class Wizard : Form {
                 using(var file=new FileStream(pkg,FileMode.CreateNew,FileAccess.Write,FileShare.None))payload.CopyTo(file);
                 args="/i \""+pkg+"\" TLOPERATOR="+sid+" TLTRAYSTARTUP="+trayStartup;
             }
-            using(var proc=Process.Start(new ProcessStartInfo(Path.Combine(Environment.SystemDirectory,"msiexec.exe"),args+" /qn /norestart /L*v \""+log+"\""){UseShellExecute=false})){proc.WaitForExit();return proc.ExitCode;}
+            SetupLog.Write("running msiexec "+args+" /qn /norestart /L*v \""+log+"\"");
+            using(var proc=Process.Start(new ProcessStartInfo(Path.Combine(Environment.SystemDirectory,"msiexec.exe"),args+" /qn /norestart /L*v \""+log+"\""){UseShellExecute=false})){proc.WaitForExit();SetupLog.Write("msiexec finished with "+proc.ExitCode);return proc.ExitCode;}
         }finally{
             // Preserve the real MSI result if Windows still holds a staging file.
             try{if(File.Exists(pkg))File.Delete(pkg);Directory.Delete(scratch,false);}
@@ -148,10 +155,11 @@ internal sealed class Wizard : Form {
         }
     }
     [STAThread] static int Main(string[] args){
+        SetupLog.Write((Removing?"Uninstaller":"Installer")+" "+Version+" started: "+String.Join(" ",args)+" (Windows user "+WindowsIdentity.GetCurrent().Name+")");
         try{
             if(args.Length==4 && args[0]=="--apply")return Apply(args[1],args[2],args[3]);
             if(args.Length!=0)return 87;
             Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);Application.Run(new Wizard());return 0;
-        }catch(Exception e){MessageBox.Show(e.Message,Product.Name+" setup",MessageBoxButtons.OK,MessageBoxIcon.Error);return 1603;}
+        }catch(Exception e){SetupLog.Error("setup failed: "+e);MessageBox.Show(e.Message,Product.Name+" setup",MessageBoxButtons.OK,MessageBoxIcon.Error);return 1603;}
     }
 }

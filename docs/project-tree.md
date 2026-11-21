@@ -1,9 +1,9 @@
-# Project files · 0.37.0
+# Project files · 0.38.0
 
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
-Latest version: **[Tlachihuani 0.37.0](releases/v0.37.0.md)**. Source inventory
-updated 19 November 2026. Includes tracked files and new documentation in this
+Latest version: **[Tlachihuani 0.38.0](releases/v0.38.0.md)**. Source inventory
+updated 21 November 2026. Includes tracked files and new files in this
 working tree; ignored installers, local evidence and build intermediates are excluded.
 
 ~~~text
@@ -23,6 +23,7 @@ Build-Release.cmd
 CLAUDE.md
 config/README.md
 Directory.Build.props
+Directory.Build.targets
 docs/architecture.md
 docs/control-protocol.md
 docs/design/panel-concept.html
@@ -46,6 +47,7 @@ docs/releases/v0.2.1.md
 docs/releases/v0.3.3.md
 docs/releases/v0.36.0.md
 docs/releases/v0.37.0.md
+docs/releases/v0.38.0.md
 docs/remote-control-predeployment-checklist.md
 docs/remote-controller.md
 docs/remote-mobile-parity.md
@@ -104,10 +106,14 @@ scripts/Prepare-JobsRuntime.ps1
 scripts/README.md
 scripts/Record-HostedWalkthrough.ps1
 scripts/release_version.py
+scripts/script_trace.py
 scripts/Test-HostedDevelopment.ps1
 scripts/Test-Jobs.ps1
 scripts/Test-Setup.ps1
+scripts/Trace-Script.ps1
 src/README.md
+src/Shared/TraceHttp.cs
+src/Shared/TraceLoggerProvider.cs
 src/Tlachihuani.Client/Controller.cs
 src/Tlachihuani.Client/packages.lock.json
 src/Tlachihuani.Client/README.md
@@ -116,6 +122,8 @@ src/Tlachihuani.Contracts/packages.lock.json
 src/Tlachihuani.Contracts/Protocol.cs
 src/Tlachihuani.Contracts/README.md
 src/Tlachihuani.Contracts/Tlachihuani.Contracts.csproj
+src/Tlachihuani.Contracts/TraceLog.cs
+src/Tlachihuani.Contracts/TraceLog.Passes.cs
 src/Tlachihuani.Control/packages.lock.json
 src/Tlachihuani.Control/Program.cs
 src/Tlachihuani.Control/README.md
@@ -202,6 +210,7 @@ src/Tlachihuani.Tray/README.md
 src/Tlachihuani.Tray/RemoteControllerForm.cs
 src/Tlachihuani.Tray/RemoteControllerLauncher.cs
 src/Tlachihuani.Tray/ServiceDialogs.cs
+src/Tlachihuani.Tray/ServiceLogCopier.cs
 src/Tlachihuani.Tray/ServicesForm.cs
 src/Tlachihuani.Tray/ServicesLayout.cs
 src/Tlachihuani.Tray/StatusForm.cs
@@ -212,6 +221,7 @@ src/Tlachihuani.Tray/TrayContext.cs
 src/Tlachihuani.Tray/TrayIcons.cs
 src/Tlachihuani.Tray/TrayMenu.cs
 src/Tlachihuani.Tray/TrayServices.cs
+src/Tlachihuani.Tray/UiTrace.cs
 src/Tlachihuani.Tray/WindowActivation.cs
 src/Tlachihuani.Tray/XaihtLink.cs
 src/Tlachihuani.Windows/DownloadDelivery.cs
@@ -219,6 +229,7 @@ src/Tlachihuani.Windows/Installation.cs
 src/Tlachihuani.Windows/JobsEndpoint.cs
 src/Tlachihuani.Windows/LifecycleGate.cs
 src/Tlachihuani.Windows/LocalPipe.cs
+src/Tlachihuani.Windows/LogPaths.cs
 src/Tlachihuani.Windows/OperatorProcessAccess.cs
 src/Tlachihuani.Windows/packages.lock.json
 src/Tlachihuani.Windows/RcEndpoint.cs
@@ -311,9 +322,13 @@ tests/tutorial/video_certificate.py
 tests/unit/README.md
 tests/unit/workspace_table.test.cjs
 Tlachihuani.slnx
+tools/Tlachihuani.TraceWeaver/packages.lock.json
+tools/Tlachihuani.TraceWeaver/Program.cs
+tools/Tlachihuani.TraceWeaver/Tlachihuani.TraceWeaver.csproj
 workers/torrent/api.py
 workers/torrent/delivery.py
 workers/torrent/engine.py
 workers/torrent/storage.py
+workers/torrent/tracing.py
 workers/torrent/worker.py
 ~~~

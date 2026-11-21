@@ -14,6 +14,7 @@ if (parentStdin && !Console.IsInputRedirected)
     return 2;
 }
 var configurationPath = args[1];
+Tlachihuani.Contracts.TraceLog.Configure("rc-cloud", [Path.Combine(AppContext.BaseDirectory, "logs", "rc-cloud.log")]);
 var stage = "configuration validation";
 try
 {

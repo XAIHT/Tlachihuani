@@ -37,12 +37,15 @@ internal sealed class JobsHost(JobsSettings settings, ILogger<JobsHost> log) : B
     {
         while (!token.IsCancellationRequested)
         {
+            // One pass per request, compared with the previous request of the same operation.
+            using var pass = Tlachihuani.Contracts.TraceLog.Pass("Jobs request");
             await pipe.WaitForConnectionAsync(token);
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
             deadline.CancelAfter(TimeSpan.FromSeconds(20));
             try
             {
                 var req = await Protocol.ReadAsync<JsonObject>(pipe, deadline.Token);
+                pass.Rename("Jobs request " + (string?)req["op"]);
                 string? sid = null;
                 string? proposedRoot = (string?)req["delivery_root"];
                 string? proposedFallback = (string?)req["fallback_root"];

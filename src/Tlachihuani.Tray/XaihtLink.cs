@@ -93,6 +93,10 @@ internal sealed class XaihtLink
         var backoff = TimeSpan.FromSeconds(2);
         while (!closing.IsCancellationRequested)
         {
+            // Each poll is written only when it brings or reports something new; the pass is
+            // closed before every pause so nothing waits unwritten while the link sleeps.
+            var pass = Tlachihuani.Contracts.TraceLog.Pass("xaiht.org poll");
+            try {
             CancellationToken changed;
             lock (gate)
             {
@@ -105,12 +109,14 @@ internal sealed class XaihtLink
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or FormatException or InvalidDataException or CryptographicException)
             {
                 Set("error", "The saved xaiht.org key could not be read. Connect again.", null, null);
+                pass.Dispose();
                 if (!await Pause(Timeout.InfiniteTimeSpan, both.Token, closing)) return;
                 continue;
             }
             if (settings is null)
             {
                 Set("off", "Not connected to xaiht.org.", null, null);
+                pass.Dispose();
                 if (!await Pause(Timeout.InfiniteTimeSpan, both.Token, closing)) return;
                 continue;
             }
@@ -124,15 +130,18 @@ internal sealed class XaihtLink
             catch (RejectedException rejected)
             {
                 Set("rejected", rejected.Message, settings.Server, null);
+                pass.Dispose();
                 if (!await Pause(TimeSpan.FromSeconds(60), both.Token, closing)) return;
             }
             catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or InvalidDataException or IOException)
             {
                 var reason = ex is TaskCanceledException ? "xaiht.org did not answer in time." : ex.Message;
                 Set("offline", "Cannot reach " + settings.Server + ": " + reason, settings.Server, Status.Computer);
+                pass.Dispose();
                 if (!await Pause(backoff, both.Token, closing)) return;
                 backoff = TimeSpan.FromSeconds(Math.Min(60, backoff.TotalSeconds * 2));
             }
+            } finally { pass.Dispose(); }
         }
     }
 

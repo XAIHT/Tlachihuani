@@ -12,6 +12,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = Path(__file__).resolve().parent
+try:  # Verbose script log (script-logs, copied into Tlachihuani.log by XT); see scripts/script_trace.py.
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import script_trace
+    script_trace.start(__file__)
+except ImportError:
+    pass
 if sys.argv[1:] not in ([], ["--isolated-acceptance"]):
     raise SystemExit("Expected no arguments or --isolated-acceptance")
 isolated = bool(sys.argv[1:])
