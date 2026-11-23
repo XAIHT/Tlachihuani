@@ -4,6 +4,28 @@ Latest version: **[0.38.0](docs/releases/v0.38.0.md)**. `Directory.Build.props` 
 internal project lock references declare 0.38.0. Dated sections below keep the
 versions they describe.
 
+## Stable log browsing · 22 November 2026
+
+Angela's production walkthrough reached website receipt **message #1 written**
+for `RC-TEST-001`, but manual confirmation in the log is still pending. The old
+viewer snapped to the end when scrolling left the caret at EOF, and its paused
+append path had no memory bound.
+
+The viewer now pauses on browsing intent, reads 256 KiB pages from disk, searches
+in cancellable chunks and keeps the same opened file through rotation. **Follow
+live** explicitly returns to the current file. **Search all log files**, enabled
+by default, scans current/retained files with up to four parallel workers,
+progress, cancellation, ordered results and explicit incomplete-coverage notices.
+Clear it to search just the selected file. It does not trace its own UI updates.
+See [the guide](docs/log-viewer.md) and
+[focused evidence](docs/verification/2026-11-22-log-viewer.md).
+
+Version remains **0.38.0**. Installed XT and the live connection are untouched.
+Next: open the rebuilt read-only preview with `scripts/Open-LogViewer.ps1`, then
+guide Angela one step at a time to find `RC-TEST-001`. A later package update is
+needed to replace the installed viewer. Do not resend the first test message or
+claim installed acceptance from the synthetic checks.
+
 ## Verbose trace log, quiet idle loops and 0.38.0 · 21 November 2026
 
 Every Tlachihuani process now writes a statement-level trace log. Product

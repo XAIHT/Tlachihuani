@@ -12,6 +12,8 @@ if (args is ["--tray-layout", var directory, var mode]) return TrayLayoutChecks.
 if (args is ["--rc-layout", var rcDirectory, var captureScript, var python]) return RcLayoutChecks.Run(rcDirectory, captureScript, python);
 if (args is ["--rc-broker-checks", var brokerDirectory]) return RcBrokerChecks.Run(brokerDirectory);
 if (args is ["--downloads-access"]) return DownloadAccessChecks.Run();
+if (args is ["--log-viewer", var logDirectory]) return LogViewerChecks.Run(logDirectory);
+if (args is ["--log-viewer-preview", var logFile]) return LogViewerChecks.Preview(logFile);
 
 var passed = 0;
 async Task Check(string name, Func<Task> body) { await body(); Console.WriteLine($"PASS {name}"); passed++; }

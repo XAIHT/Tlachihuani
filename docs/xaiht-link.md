@@ -95,12 +95,18 @@ source, followed by an optional block indented by four spaces:
 The block is the message exactly as sent, including accents and emoji, and stays
 valid JSON. XT also logs its start and exit, a key being saved or removed, and
 changes of the link state (connected, unreachable, key not accepted); an
-unreachable website is logged once, not on every retry. At 5 MB the file moves
-to `Tlachihuani.1.log`, keeping one previous file.
+unreachable website is logged once, not on every retry. XT's log rotation is
+256 MB per file with a retention setting of 40 files; older files are numbered
+`Tlachihuani.1.log`, `Tlachihuani.2.log`, and so on.
 
-**Services → See log** opens the log in XT. It shows the newest 2 MB and follows
-new lines while the cursor stays at the end, like Tlamatini's own log. **Copy
-all**, **Open folder** and **Refresh** are in the footer.
+**Services → See log** opens the log in XT. The updated viewer pauses when you
+scroll or select text, offers **Older / Newer**, retained-file selection and
+cancellable parallel search through all retained logs. **Search all log files**
+is enabled by default and can be cleared for a single-file search. The view
+returns to new entries only with **Follow live**.
+It reads bounded pages rather than accumulating new text while you read slowly.
+See [the browsing guide](log-viewer.md) and its source/installed verification
+boundary before expecting these controls in an older installed binary.
 
 ## Security
 
