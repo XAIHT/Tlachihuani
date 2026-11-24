@@ -165,7 +165,7 @@ internal sealed class XaihtCommands
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
         catch (LeaseLostException) { }
-        catch (Exception ex) when (ex is RcFault or Tlachihuani.Contracts.ProtocolException or IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception or HttpRequestException or JsonException or InvalidOperationException or ArgumentException or OperationCanceledException)
+        catch (Exception ex) when (ex is RcFault or Tlachihuani.Contracts.ProtocolException or IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception or HttpRequestException or JsonException or InvalidOperationException or ArgumentException or OperationCanceledException or InvalidDataException or FormatException)
         {
             var code = ex is RcFault fault ? fault.Code : "bridge_unavailable";
             var message = ex is RcFault known ? known.Message : "The local Tlamatini connection was interrupted. Check XT and the selected running account; work already dispatched is not replayed.";
@@ -242,7 +242,19 @@ internal sealed class XaihtCommands
         // Every chunk still validates the actual signed ticket against Tlamatini.
         // The endpoint may issue freshly timestamped file links, so only the first
         // successful body is retained; later bodies must never change its digest.
-        var fresh = snapshot is null ? await ReadBounded(response.Content, 8 * 1024 * 1024, token) : null;
+        byte[]? fresh = null;
+        if (snapshot is null)
+        {
+            // An answer above the 8 MiB limit must fail ONCE with a named reason.
+            // An escaping InvalidDataException faulted this fire-and-forget relay
+            // silently, so the website re-leased the same request every minute.
+            try { fresh = await ReadBounded(response.Content, 8 * 1024 * 1024, token); }
+            catch (InvalidDataException)
+            {
+                throw new RcFault("response_too_large",
+                    "This full answer is larger than 8 MB, so it cannot be sent to the phone. Read it in Tlamatini on the computer.", 413);
+            }
+        }
         // Revalidate the local grant and endpoint after reading, before any bytes
         // leave the machine. Revocation or account/adapter changes stop delivery.
         var recheck = Local("xaiht-content-authorize", identity);

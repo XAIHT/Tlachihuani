@@ -31,6 +31,16 @@ internal static class XaihtCommandChecks
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(json,Encoding.UTF8,"application/json")});
         }
     }
+    private sealed class OversizedContent : HttpMessageHandler
+    {
+        // Declares a body just over the 8 MiB full-answer limit without allocating it.
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken token)
+        {
+            var body=new StringContent("{}",Encoding.UTF8,"application/json");
+            body.Headers.ContentLength=8*1024*1024+1;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=body});
+        }
+    }
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     private static JsonArray Envelope(string binding, string request, string delivery) => new(new JsonObject
     {
@@ -186,6 +196,21 @@ internal static class XaihtCommandChecks
             }
             finally {relay.ClearSnapshots();}
         }
-        Console.WriteLine("PASS website relay: lost ACK, stable sequence, Unicode, pending approval, terminal watch, stale lease, denial, bounded body.");
+        using(var handler=new Capture())
+        using(var local=new OversizedContent())
+        using(var http=new HttpClient(handler))
+        {
+            // A full answer above 8 MiB must fail ONCE with a named error. It used to
+            // fault the relay silently, so the website re-leased it every minute forever.
+            const string endpoint="http://127.0.0.1:19401/agent/remote-controller/response-content/?ticket=qa-oversized";
+            var relay=new XaihtCommands((_,_)=>Task.FromResult(new JsonObject{["endpoint"]=endpoint}),()=>new HttpClient(local,disposeHandler:false));
+            var batch=Envelope(binding,RcProtocol.Id(),RcProtocol.Id());batch[0]!["id"]=300;
+            batch[0]!["payload"]!["operation"]="response.content";
+            batch[0]!["payload"]!["payload"]=new JsonObject{["ticket"]="qa-oversized",["offset"]=0};
+            relay.Receive(http,settings,identity,batch,token,token);await Finish(relay,token);
+            Require(handler.Values.Count==1 && (string?)handler.Values[0]["error"]?["code"]=="response_too_large",
+                "An oversized full answer was dropped silently instead of failing once with a named error.");
+        }
+        Console.WriteLine("PASS website relay: lost ACK, stable sequence, Unicode, pending approval, terminal watch, stale lease, denial, bounded body, oversized answer.");
     }
 }
