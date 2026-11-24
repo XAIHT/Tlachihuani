@@ -12,6 +12,23 @@ both together; documentation changes do not rebuild existing binaries or create 
 
 `Build-Release.cmd` is the root release entry point. It chooses the highest stable local Git tag numerically, stamps product/internal project versions, rebuilds into fresh staging and verifies before copying the install ZIP to `dist`. It never commits, tags or pushes. See [release building](docs/release-building.md). Setup asks whether XT should appear at sign-in, always installs Start/Desktop shortcuts, and leaves all services stopped/Manual. Startup shortcuts must never start services. Preserve the distinction between the original unelevated wizard and its privileged MSI helper.
 
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](docs/xaiht-link.md) and [dated evidence](docs/verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
+
 ## Project identity and controller
 
 **Project root:** `C:\Development\XAIHT\repo\Tlachihuani`.
@@ -21,7 +38,7 @@ Its GitHub repository is **https://github.com/angelahack1/Tlachihuani**; the ver
 Its Django source root is `C:\Development\XAIHT\Tlamatini\Tlamatini`.
 Its GitHub repository is **https://github.com/XAIHT/Tlamatini**; the verified Git origin is **https://github.com/XAIHT/Tlamatini.git**.
 
-Tlachihuani is a completely separate Windows application/service. **Tlamatini will control it** through a new themed dialog named **Tlachihuani**, under Tlamatini's **Panels** menu. That dialog will raise/start, monitor, gracefully stop, and explicitly force-terminate this service. The panel is planned only; Angela expressly deferred all Tlamatini modifications during this design session.
+Tlachihuani is a separate Windows application/service. Tlamatini's implemented **Panels → Tlachihuani** integration provides typed lifecycle controls; the authorized Remote-Controller adapter also exposes account-bound operations. The original design deferred cross-repository edits, but the current integration is implemented. Host consent and capability checks still govern privileged actions. See the integration and verification guides for current capabilities; do not restore the former planned-only description.
 
 The 2026-10-11 review used Tlamatini HEAD `c18d50815cfe8b1681f805fd4e76c66fbaeabaf6`, not just the older v1.78.0 tag. Recheck source before integration because this is a dated design reference.
 

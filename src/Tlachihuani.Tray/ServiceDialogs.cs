@@ -29,6 +29,12 @@ internal sealed class ServiceDialogs : StudioForm
         dialog.AcceptButton = dialog.CancelButton = ok; dialog.Open(owner);
     }
 
+    internal static void Failure(Form? owner, ServiceErrorReport report)
+    {
+        using var dialog = new ServiceErrorForm(owner, report);
+        if (owner?.Visible == true) dialog.ShowDialog(owner); else dialog.ShowDialog();
+    }
+
     internal static bool Confirm(Form owner, string title, string message, string action)
     {
         using var dialog = new ServiceDialogs(owner, "Tlachihuani · Confirm", "Tlachihuani   /   Confirmation", title, new(540, 240));

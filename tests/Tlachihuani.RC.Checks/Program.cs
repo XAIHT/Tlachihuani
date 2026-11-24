@@ -163,7 +163,7 @@ Test("122 operations: disabled account cannot block other adapter work", f =>
 
 Test("123 operations: cancellation cannot address an unknown conversation", f => Fault("not_found", () => f.Ops.Submit(f.Principal(), "cancel", "conversation.cancel", J("{\"operation_id\":\"" + RcProtocol.Id() + "\"}"))));
 Test("124 operations: cancellation cannot address a different operation kind", f => { var p = f.Principal(); var o = f.Ops.Submit(p, "start", "application.start", J("{}")); Fault("not_found", () => f.Ops.Submit(p, "cancel", "conversation.cancel", J("{\"operation_id\":\"" + o.Id + "\"}"))); });
-Test("125 operations: cancellation can address its owned conversation", f => { var p = f.Principal(); var o = f.Ops.Submit(p, "chat", "conversation.submit", J("{\"text\":\"Hello\"}")); Eq("accepted", f.Ops.Submit(p, "cancel", "conversation.cancel", J("{\"operation_id\":\"" + o.Id + "\"}")).State); });
+Test("125 operations: queued conversation cancellation succeeds before dispatch", f => { var p = f.Principal(); var o = f.Ops.Submit(p, "chat", "conversation.submit", J("{\"text\":\"Hello\"}")); Eq("succeeded", f.Ops.Submit(p, "cancel", "conversation.cancel", J("{\"operation_id\":\"" + o.Id + "\"}")).State); Eq("cancelled",f.Ops.Get(p,o.Id).State); True(f.Ops.TakeNext(f.Adapter,f.Sid) is null); });
 Test("126 operations: cancellation cannot address another account's conversation", f =>
 {
     var binding = f.Access.RegisterBinding("spanish", RcProtocol.Id(), "Other account", f.Sid, f.Adapter);
@@ -318,6 +318,64 @@ Test("293 resolution: the answered list forgets its oldest answer first", f =>
     // Answer 0 was the oldest of 257 and was forgotten, so its prompt can show again.
     f.Ops.Progress(op.Id,f.Adapter,f.Sid,JsonSerializer.SerializeToElement(new {type="permission",request_id="answered-0"}));
     Eq("answered-0",f.Ops.Get(f.Principal(),op.Id).PendingPermission!.Value.GetProperty("request_id").GetString());
+});
+
+static XaihtIdentity Website() => new(new string('a',64), "https://xaiht.org", 7, 8);
+static (XaihtAccess Access, Principal Principal) ApproveWebsite(Fixture f)
+{
+    var access = new XaihtAccess(f.Store,f.Clock); access.SetAccounts(Website(),[f.Binding.Id],f.Sid);
+    return (access,access.Principal(Website(),f.Binding.Id,f.Sid));
+}
+Test("294 website: no implicit account selection", f => {var a=new XaihtAccess(f.Store,f.Clock);Eq(0,a.ApprovedBindings(Website(),f.Sid).Length);Fault("website_not_approved",()=>a.Principal(Website(),f.Binding.Id,f.Sid));});
+Test("295 website: explicit local approval grants chat and monitor only", f => {var(a,p)=ApproveWebsite(f);Eq(f.Binding.Id,a.ApprovedBindings(Website(),f.Sid).Single());True(p.Scopes.Order().SequenceEqual(new[]{"chat","monitor"}));Fault("forbidden",()=>f.Ops.Submit(p,"start","application.start",J("{}")));});
+Test("296 website: wrong local operator cannot grant account access", f => {var a=new XaihtAccess(f.Store,f.Clock);Fault("forbidden",()=>a.SetAccounts(Website(),[f.Binding.Id],"S-1-5-21-99"));Eq(0,a.ApprovedBindings(Website(),f.Sid).Length);});
+Test("297 website: connection key rotation cannot inherit authority", f => {var(a,_)=ApproveWebsite(f);Fault("website_not_approved",()=>a.Principal(Website() with{ConnectionId=new string('b',64)},f.Binding.Id,f.Sid));});
+Test("298 website: another website user cannot inherit authority", f => {var(a,_)=ApproveWebsite(f);Fault("website_not_approved",()=>a.Principal(Website() with{UserId=99},f.Binding.Id,f.Sid));});
+Test("299 website: another computer cannot inherit authority", f => {var(a,_)=ApproveWebsite(f);Fault("website_not_approved",()=>a.Principal(Website() with{ComputerId=99},f.Binding.Id,f.Sid));});
+Test("300 website: another website origin cannot inherit authority", f => {var(a,_)=ApproveWebsite(f);Fault("website_not_approved",()=>a.Principal(Website() with{Origin="https://other.example"},f.Binding.Id,f.Sid));});
+Test("301 website: opposite language account is not selected implicitly", f => {var(a,_)=ApproveWebsite(f);var spanish=f.Access.RegisterBinding("spanish",RcProtocol.Id(),"Same display name",f.Sid,RcProtocol.Id());Fault("website_not_approved",()=>a.Principal(Website(),spanish.Id,f.Sid));});
+Test("302 website: website grant cannot authenticate as a browser", f => {var(_,p)=ApproveWebsite(f);Fault("authentication_failed",()=>f.Access.CreateChallenge(p.DeviceId));});
+Test("303 website: repeated unchanged approval keeps the durable device", f => {var(a,p)=ApproveWebsite(f);a.SetAccounts(Website(),[f.Binding.Id],f.Sid);Eq(p.DeviceId,a.Principal(Website(),f.Binding.Id,f.Sid).DeviceId);});
+Test("304 website: unchecked account immediately loses operation authority", f => {var(a,p)=ApproveWebsite(f);var op=f.Ops.Submit(p,"queued","conversation.submit",J("{\"text\":\"Hello\"}"));a.SetAccounts(Website(),[],f.Sid);Eq("cancelled",f.Store.Read(s=>s.Operations[op.Id].State));Fault("device_unavailable",()=>f.Ops.Get(p,op.Id));});
+Test("305 website: reapproval never revives the revoked device", f => {var(a,p)=ApproveWebsite(f);a.SetAccounts(Website(),[],f.Sid);a.SetAccounts(Website(),[f.Binding.Id],f.Sid);True(p.DeviceId!=a.Principal(Website(),f.Binding.Id,f.Sid).DeviceId);});
+Test("306 website: account disable hides the grant", f => {var(a,_)=ApproveWebsite(f);f.DisableBinding();Eq(0,a.ApprovedBindings(Website(),f.Sid).Length);Fault("account_unavailable",()=>a.Principal(Website(),f.Binding.Id,f.Sid));});
+Test("307 website: durable grant survives reopening state", f => {var(a,p)=ApproveWebsite(f);var state=JsonSerializer.Deserialize<DurableState>(File.ReadAllText(Path.Combine(f.Directory,"state.json")),RcProtocol.Json)!;Eq(p.DeviceId,state.XaihtGrants.Values.Single().DeviceId);Eq("xaiht",state.Devices[p.DeviceId].AuthenticationKind);});
+Test("308 website: redelivery finds original receipt without admission", f => {var(_,p)=ApproveWebsite(f);var key=XaihtAccess.IdempotencyKey(Website(),RcProtocol.Id());var payload=J("{\"text\":\"Hello\"}");var op=f.Ops.Submit(p,key,"conversation.submit",payload,300);f.Clock.Advance(TimeSpan.FromHours(1));Eq(op.Id,f.Ops.FindExisting(p,key,"conversation.submit",payload)!.Id);Eq(1,f.Store.Read(s=>s.Operations.Count));});
+Test("309 website: expired redelivery cannot change original prompt", f => {var(_,p)=ApproveWebsite(f);f.Ops.Submit(p,"fixed","conversation.submit",J("{\"text\":\"First\"}"),300);Fault("idempotency_conflict",()=>f.Ops.FindExisting(p,"fixed","conversation.submit",J("{\"text\":\"Changed\"}")));});
+Test("310 website: reconciliation of missing work never submits", f => {var(_,p)=ApproveWebsite(f);True(f.Ops.FindExisting(p,"absent","conversation.submit",J("{\"text\":\"Hello\"}")) is null);Eq(0,f.Store.Read(s=>s.Operations.Count));});
+Test("311 website: malformed and remote cleartext origins are refused", f => {foreach(var origin in new[]{"http://xaiht.org","https://xaiht.org/path","https://xaiht.org/","https://u@xaiht.org"})Fault("invalid_request",()=>XaihtAccess.Validate(Website() with{Origin=origin}));});
+Test("312 website: disconnect revokes only its website grants", f => {var(a,p)=ApproveWebsite(f);a.RevokeConnection(Website().ConnectionId,f.Sid);Fault("website_not_approved",()=>a.Principal(Website(),f.Binding.Id,f.Sid));True(!f.Store.Read(s=>s.Devices[f.Device.Id].Revoked));});
+Test("313 website: multilingual prompt limit counts UTF-8 not escapes", f => {var(_,p)=ApproveWebsite(f);var accepted=JsonSerializer.SerializeToElement(new{text=new string('界',7999)});Eq("accepted",f.Ops.Submit(p,"unicode","conversation.submit",accepted,300).State);Fault("invalid_request",()=>f.Ops.Submit(p,"oversized","conversation.submit",JsonSerializer.SerializeToElement(new{text=new string('界',8000)}),300));});
+Test("314 website: full conversation queue preserves bounded cancellation lane", f =>
+{
+    var(_,p)=ApproveWebsite(f);OperationReceipt? first=null;
+    for(var i=0;i<32;i++){var op=f.Ops.Submit(p,"held-"+i,"conversation.submit",J("{\"text\":\"Waiting\"}"),300);first??=op;}
+    Fault("queue_limit",()=>f.Ops.Submit(p,"overflow","conversation.submit",J("{\"text\":\"Overflow\"}"),300));
+    f.Ops.TakeNext(f.Adapter,f.Sid,"application");
+    var payload=JsonSerializer.SerializeToElement(new{operation_id=first!.Id});
+    for(var i=0;i<8;i++)Eq("accepted",f.Ops.Submit(p,"cancel-"+i,"conversation.cancel",payload,300).State);
+    Fault("queue_limit",()=>f.Ops.Submit(p,"cancel-overflow","conversation.cancel",payload,300));
+    Eq("conversation.cancel",f.Ops.TakeNext(f.Adapter,f.Sid,"application",true)!.Kind);
+});
+Test("315 website: queued cancel is atomic durable and never reaches adapter", f =>
+{
+    var(_,p)=ApproveWebsite(f);var prompt=f.Ops.Submit(p,"queued-prompt","conversation.submit",J("{\"text\":\"Must never execute\"}"),300);
+    var payload=JsonSerializer.SerializeToElement(new{operation_id=prompt.Id});
+    var cancel=f.Ops.Submit(p,"cancel-queued","conversation.cancel",payload,300);
+    Eq("succeeded",cancel.State);Eq("cancelled",f.Ops.Get(p,prompt.Id).State);True(cancel.Result!.Value.GetProperty("cancelled").GetBoolean());
+    Eq(cancel.Id,f.Ops.Submit(p,"cancel-queued","conversation.cancel",payload,300).Id);
+    True(f.Ops.TakeNext(f.Adapter,f.Sid,"application") is null);
+    var durable=JsonSerializer.Deserialize<DurableState>(File.ReadAllText(Path.Combine(f.Directory,"state.json")),RcProtocol.Json)!;
+    Eq("cancelled",durable.Operations[prompt.Id].State);Eq("succeeded",durable.Operations[cancel.Id].State);
+});
+Test("316 website: queued cancellation cannot target another account", f =>
+{
+    var(_,p)=ApproveWebsite(f);var prompt=f.Ops.Submit(p,"queued-prompt","conversation.submit",J("{\"text\":\"Keep queued\"}"),300);
+    var other=f.Access.RegisterBinding("spanish",RcProtocol.Id(),"Other",f.Sid,RcProtocol.Id());
+    var access=new XaihtAccess(f.Store,f.Clock);access.SetAccounts(Website(),[f.Binding.Id,other.Id],f.Sid);
+    var foreign=access.Principal(Website(),other.Id,f.Sid);
+    Fault("not_found",()=>f.Ops.Submit(foreign,"foreign-cancel","conversation.cancel",JsonSerializer.SerializeToElement(new{operation_id=prompt.Id}),300));
+    Eq("accepted",f.Ops.Get(p,prompt.Id).State);
 });
 
 var results = new List<object>(); var failed = 0;

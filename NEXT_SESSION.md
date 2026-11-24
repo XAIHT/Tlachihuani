@@ -4,6 +4,144 @@ Latest version: **[0.38.0](docs/releases/v0.38.0.md)**. `Directory.Build.props` 
 internal project lock references declare 0.38.0. Dated sections below keep the
 versions they describe.
 
+## Documentation handoff · testing stopped on 23 November
+
+The actual phone passed prompt/answer, same-account reload and display of an
+Executer approval. **Do not resume functional tests automatically.** Angela stopped
+them before denial/no-execution and cancellation were established. Netstat ran
+under its intended read-only exemption; the request retained Ask Execs true.
+
+Website source now explains **Ask before protected actions** in English/Spanish.
+Its separate cloud candidate completed but was not promoted; the earlier website
+deployment remains the active recorded one. New executor/alias tests were saved
+but never run and no runtime fix was made. See the
+[closeout record](docs/verification/2026-11-23-hosted-prompts.md#documentation-closeout-after-tests-were-stopped).
+
+The current task updates documentation only. Do not bump versions, alter private
+configuration, restart installed applications, build executables, deploy or write
+Git until Angela requests the corresponding work.
+
+## Website prompts through XT · 23 November 2026
+
+The signed-in website now submits typed prompts to an explicitly approved local
+English or Spanish Tlamatini account through the existing outgoing XT connection.
+Answers, progress, approval decisions, cancellation and full-response retrieval
+use the existing account adapter and chat engine. Diagnostic messages stay inert.
+Read [the setup guide](docs/xaiht-link.md) and
+[dated verification](docs/verification/2026-11-23-hosted-prompts.md).
+
+Final visible source acceptance passed 76/76 checks, including one genuine model
+answer per edition and separately labelled deterministic control/storage cases.
+Native core passed 318, XT passed 11, website passed 203, and the seven opt-in
+SQL persistence tests subsequently passed 7/7 against real isolated MySQL 8.4.13.
+Existing EN/ES adapter regressions passed 309/311. The reproducible
+headed harness is `tests/integration/rc_hosted_prompts.py`; final evidence is
+`artifacts/rc-prompts-live-20261123-05`. All 558 checked configuration files
+remained byte-identical in the final run. Earlier fixture-induced MCP seed entries
+were restored exactly and mutable test catalog/cache paths now stay in artifacts.
+The source and SQL acceptance did not change an installed service, normal account
+or model configuration, and made no commits, pushes or deployment;
+preexisting 0.39.0/readiness edits remain intact.
+
+MySQL used loopback port 13316 and artifact-owned data/tmp/export directories.
+The server shut down successfully and no test schemas remain. See the
+[run/cleanup result](../../artifacts/rc-rollout-20261123/mysql-latest-result.json)
+and [seven assertion results](../../artifacts/rc-rollout-20261123/mysql-qa-3b0058db/vitest.json).
+The production database was not used.
+
+The subsequently authorized deployment completed on 23 November local time
+(24 November 02:48 UTC). The website receipt is `PRODUCTION_VERIFIED`: Cloud Build
+`b0ba924a-2c59-4deb-8150-ba65b1b66984` built source-manifest SHA-256
+`8f871649fababbcfa2b5fbb449a4f9b5e1ca127c0afe0c91c46869876ba8ff29`;
+running image digest
+`sha256:6c2229b1409a9caeb0a82b3fab20c39eb46831273ba93978bfc3e25e6ff89ae9`
+matches the accepted candidate. Public HTTPS HTML matched its SHA-256, and the
+anonymous result endpoint returned 401/Bearer/no-store. The previous image digest
+and candidate cleanup are recorded for rollback. The subsequent headed anonymous
+production check passed **30/30**, with four English/Spanish screenshots at
+390px/320px, matching served HTML and JS/CSS hashes, expected sign-in gates and
+no horizontal overflow or uncaught JavaScript errors. Google sign-in was not
+performed; no user cookies, authenticated account or physical phone were tested.
+Evidence: `rc-rollout-20261123\website-visible-01\results.json` under the shared
+artifacts directory. These results are separate from the 76-check source harness.
+
+The installed Tray/RCServer update verified **676 files** against fresh Release
+self-contained manifests, retaining existing product version **0.39.0**. Update
+ID: `9f9f76a3ddfc486da1a62d4b81128959`. Account state/bindings, installation
+identities, website key, Windows registration and Jobs queue/downloads were
+preserved. Previous payloads plus protected RC-state/ACL backup remain available;
+restore both together if rollback is necessary. All services remained Stopped /
+Manual. XT was launched unelevated and its startup trace records its overview
+shown; `ShowInTaskbar=false` explains why a process/window-list probe can miss it.
+No additional version bump, commit or push was made.
+
+See [the detailed rollout evidence](docs/verification/2026-11-23-hosted-prompts.md#authorized-website-and-native-rollout)
+and `C:\Development\XAIHT\artifacts\rc-rollout-20261123\website-rollout.json`.
+Angela has now selected **XT → Services → Remote-Controller → Start server**.
+The authenticated native observation at 02:52:01 UTC confirmed Running/ready,
+listener true, zero pending operations and an unchanged website-key fingerprint.
+All 11 preserved account bindings were present but their Tlamatini adapters were
+offline; the main and Jobs services remained stopped. After Angela opened the
+installed English chat, the **02:53:35 UTC** observation confirmed **angela /
+English ready**, with the other ten bindings offline and the website key still
+unchanged. Angela then selected that ready account and **passed a genuine physical-
+phone prompt/answer and reload of the same conversation**. Reuse the artifact's
+`inspect-installed-rc.ps1` during the remaining coordinated tests.
+The final rollout audit also records unchanged HEADs and whitespace exit 0 for
+website/service/English/Spanish; no commits occurred. See
+`rc-rollout-20261123\final-rollout-audit.json` in the shared artifacts directory.
+At 21:06:28.970 local time, the exact Monitor Netstat connection-count prompt ran
+without approval despite the phone checkbox being checked. Installed trace
+confirmed Ask Execs true and a registered broker; native forwarding preserves
+that boolean. The existing Python policy exempts this read-only Netstat operation,
+so the flag was not lost. The phone label overpromised the selective policy.
+Next: clarify that scope and test a genuinely gated operation, including denial
+with no execution and cancellation. Those real control-path tests remain pending;
+the deterministic fixture is not proof that every real tool requests approval.
+HTTPS relay is not end-to-end/PQ encryption.
+
+## Service readiness and diagnostic reports · 22 November 2026
+
+Angela reported the generic "services have not reached API readiness" popup
+after installing 0.39.0. Read-only inspection observed installed product
+`0.39.0+ea04ccda990aba2c35a4e0dcc789fe7b8dd16a42`. The startup trace established
+the cause: Jobs and RC reached readiness, then XT's redundant final Jobs status
+request timed out at three seconds while the provider status path included
+transfer statistics. XT reported failure at 21:12:20 and all services ready at
+21:12:22; the second startup repeated this at 21:12:49/52. This was a false
+startup-failure verdict, not evidence that all services failed to start.
+
+Source now uses authenticated `status` with `include_impact=false` for readiness.
+The Jobs handler answers it without waiting on the provider lifecycle lock or
+requesting a transfer inventory. Normal status/catalog still include impact.
+The real HTTP health check remains required, with its own bounded deadline.
+Start confirms the whole group with bounded retries and returns that snapshot;
+the tray does not replace it with a second one-shot probe. Main health and RC's
+optional/off policy are checked explicitly, including configuration failures.
+
+Probe records retain observed times, durations, SCM states, PIDs/native exit
+codes, provider fields, HTTP status/body (4096-byte limit), exceptions and stack
+traces. Service action failures offer a resizable report and **Copy report**.
+The last redacted report is saved beside Tlachihuani.log as
+`Last-service-error.txt`; original failures survive subsequent refresh failures
+or recovery. Services and Remote-Controller action dialogs use the same report.
+Credentials, private-key blocks and escaped JSON secret values are masked.
+
+Run `scripts/Test-ServiceReadiness.ps1` visibly for the focused regressions and
+native report/copy checks, followed by the existing lifecycle/IPC suite. Evidence
+is under `artifacts/service-readiness-*`; original installed observations and
+the precise startup timeline are under `artifacts/readiness-investigation`.
+Final run `service-readiness-20261122-213315-1607ad` passed 14 focused checks and
+10 existing lifecycle/IPC checks, with zero build warnings/errors, locked restore,
+NuGet audit and whitespace validation passing. The native report screenshot is
+`fixtures/service-error-report.png` within that run; `result.json` reports exit 0.
+Keep failed harness attempts as evidence: early launches lacked PATH, one test
+had a nullable compile error, and regenerated lockfile CRLF failed whitespace
+validation. Those issues were corrected. No installed service or download was
+changed; all three services were observed stopped at 21:31. The current 0.39.0
+version edits were preserved. Source verification does not certify the installer:
+Angela still needs to rebuild/install, then repeat Start Services step by step.
+
 ## Stable log browsing · 22 November 2026
 
 Angela's production walkthrough reached website receipt **message #1 written**

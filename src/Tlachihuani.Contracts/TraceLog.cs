@@ -188,6 +188,8 @@ public static partial class TraceLog
     public static string Redact(string text)
     {
         if (string.IsNullOrEmpty(text)) return text;
+        text = PrivateKeyBlock().Replace(text, "[private key redacted]");
+        text = SecretHeader().Replace(text, "$1: ***");
         text = ComputerKey().Replace(text, "xrc_***");
         text = BearerToken().Replace(text, "$1***");
         text = SecretJsonField().Replace(text, "\"$1\":\"***\"");
@@ -210,8 +212,11 @@ public static partial class TraceLog
     }
 
     [GeneratedRegex(@"xrc_[A-Za-z0-9_\-]{8,}")] private static partial Regex ComputerKey();
+    [GeneratedRegex(@"-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z]+ )?PRIVATE KEY-----")] private static partial Regex PrivateKeyBlock();
+    [GeneratedRegex(@"(?im)\b(Authorization|Proxy-Authorization|Cookie|Set-Cookie)\s*:\s*[^\r\n]+", RegexOptions.None, 1000)] private static partial Regex SecretHeader();
     [GeneratedRegex(@"(?i)(bearer\s+)[A-Za-z0-9._~+/=\-]{8,}")] private static partial Regex BearerToken();
-    [GeneratedRegex("(?i)\"((?:access_|refresh_|id_)?token|secret|password|passwd|authorization|cookie|credential|api_?key|key|invitation|code_verifier|client_secret)\"\\s*:\\s*\"[^\"]*\"")] private static partial Regex SecretJsonField();
+    [GeneratedRegex(@"(?i)""((?:access_|refresh_|id_)?token|secret|password|passwd|authorization|cookie|credential|api_?key|private_key|key|invitation|code_verifier|client_secret)""\s*:\s*""(?:\\.|[^""\\])*""")]
+    private static partial Regex SecretJsonField();
     [GeneratedRegex(@"(?i)\b((?:access_|refresh_)?token|password|passwd|secret|api_?key|Key)\s*=\s*(?!\*\*\*)[^\s,;)}\]]+")] private static partial Regex SecretAssignment();
     // One-time codes in web addresses (RC invitations, sign-in callbacks, tickets).
     [GeneratedRegex(@"(?i)([?&](?:ticket|invite|invitation|code|state|session|token|access_token|key|password|secret|nonce|sig|signature|otp)=)[^&\s#""]+")] private static partial Regex SecretQuery();

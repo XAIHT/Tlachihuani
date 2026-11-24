@@ -86,35 +86,38 @@ internal sealed class TrayContext : ApplicationContext
             try { await serial.WaitAsync(token); }
             catch (OperationCanceledException) when (token.IsCancellationRequested) { return; }
         }
-        string? error = null;
+        Exception? error = null;
+        var startedAt = DateTimeOffset.Now;
+        ServiceSnapshot? observation = null;
         try
         {
             if (mutation)
             {
                 try
                 {
-                    if (operation == "start-services") await Task.Run(() => services.StartAsync(token), token);
+                    if (operation == "start-services") observation = await Task.Run(() => services.StartAsync(token), token);
                     else if (operation == "stop-services") await Task.Run(() => services.StopAsync(token), token);
                     else
                     {
                         var result = await Task.Run(() => controller.ExecuteAsync(operation, token), token);
-                        if (!result.Ok) error = result.Error?.Message ?? "The service operation failed.";
+                        if (!result.Ok) error = new ServiceReadinessException(result.Error?.Message ?? "The service operation failed.", new(result, null, null), []);
                     }
                 }
-                catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException) { error = ex.Message; }
+                catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException) { error = ex; }
             }
-            last = await Task.Run(() => controller.ExecuteAsync("status", token), token);
-            jobs = await Task.Run(() => services.ObserveJobsAsync(token), token);
-            remoteController = await Task.Run(() => services.ObserveRemoteControllerAsync(token), token);
-            if (operation == "start-services" && !Ready) error ??= "The services have not reached API readiness. Check the Services panel and retry.";
-            if (operation == "stop-services" && !Stopped) error ??= "Service shutdown could not be confirmed. Check the Services panel and retry.";
+            // Start already returned a confirmed snapshot. Do not replace its verdict
+            // with an extra, single short probe that can time out during normal work.
+            observation ??= await Task.Run(() => services.ObserveAsync(token), token);
+            last = observation.Main; jobs = observation.Jobs; remoteController = observation.RemoteController;
+            if (operation == "stop-services" && !Stopped)
+                error ??= new InvalidOperationException("Service shutdown could not be confirmed. See the observed SCM states in the report.");
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             jobs = null;
             remoteController = null;
-            if (mutation) error ??= ex.Message;
+            if (mutation) error = error is null ? ex : new AggregateException("The service action and its final status check failed.", error, ex);
         }
         finally
         {
@@ -123,15 +126,12 @@ internal sealed class TrayContext : ApplicationContext
             if (!token.IsCancellationRequested) Render();
         }
         if (error is not null && !token.IsCancellationRequested)
-            ServiceDialogs.Notice(form, "Service action failed", error);
+            ServiceDialogs.Failure(form, ServiceErrorReport.Create(operation, error, observation, startedAt));
         if (mutation && exitRequested && !token.IsCancellationRequested) ExitThread();
     }
 
-    private bool Ready => last is { Service.ScmState: "running", Capabilities: not null }
-        && last.Error?.Code is not ("identity_changed" or "incompatible_protocol") && jobs?.ApiReady == true
-        && remoteController is not null && (remoteController.Ready || (!remoteController.Included && remoteController.State is "stopped" or "not_installed"));
-    private bool Stopped => (last?.Service?.ScmState is "stopped" or "not_installed") && (jobs?.State is "stopped" or "not_installed")
-        && (remoteController?.State is "stopped" or "not_installed");
+    private bool Ready => new ServiceSnapshot(last, jobs, remoteController).Ready;
+    private bool Stopped => new ServiceSnapshot(last, jobs, remoteController).Stopped;
 
     private void Render()
     {

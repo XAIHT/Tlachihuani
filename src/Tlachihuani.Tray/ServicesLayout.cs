@@ -15,7 +15,7 @@ internal sealed partial class ServicesForm
         linkTab = new("xaiht.org", ButtonTone.Tab);
     private readonly Dictionary<string, StudioButton> buttons = new();
     private readonly Control runtime, access, link;
-    private StudioButton connect = null!, disconnect = null!;
+    private StudioButton connect = null!, disconnect = null!, websiteAccounts = null!;
 
     public ServicesForm(Icon icon) : base(icon, "Tlachihuani · Services", "Tlachihuani   /   Service control", "Services", new(778, 500), new(668, 466))
     {
@@ -61,7 +61,7 @@ internal sealed partial class ServicesForm
     }
     private StudioButton ActionButton(string caption, Func<Task> action, ButtonTone tone = ButtonTone.Secondary)
     {
-        var button = Command(caption, () => _ = Run(action), tone); buttons.Add(caption, button); return button;
+        var button = Command(caption, () => _ = Run(action, caption), tone); buttons.Add(caption, button); return button;
     }
     private static Control CommandRow(string title, Label detail, params Control[] actions)
     {
@@ -107,7 +107,12 @@ internal sealed partial class ServicesForm
         var page = Studio.Grid([-1], [68, 10, -1]);
         connect = Command("Connect…", ConnectLink, ButtonTone.Primary);
         disconnect = Command("Disconnect", DisconnectLink, ButtonTone.Danger);
-        page.Controls.Add(Studio.Card(CommandRow("xaiht.org link", linkState, connect, disconnect), new Padding(14, 8, 6, 8)), 0, 0);
+        websiteAccounts = Command("Accounts…", () =>
+        {
+            if (XaihtLink.Shared.Identity is not { } identity) return;
+            using var dialog = new XaihtAccountsForm(this, identity); dialog.ShowDialog(this);
+        });
+        page.Controls.Add(Studio.Card(CommandRow("xaiht.org link", linkState, connect, websiteAccounts, disconnect), new Padding(14, 8, 6, 8)), 0, 0);
         var details = Studio.Grid([118, -1], [26, 26, 26, -1]);
         void Detail(int row, string title, Label value)
         {
@@ -115,7 +120,7 @@ internal sealed partial class ServicesForm
         }
         Detail(0, "WEBSITE", linkServer); Detail(1, "LAST CONTACT", linkContact); Detail(2, "MESSAGES", linkMessages);
         var note = Studio.Label("XT asks xaiht.org for messages over HTTPS, so this computer opens no port and works on any network. "
-            + "Every message is written to Tlachihuani.log (See log).", Studio.Small, Studio.Muted);
+            + "Choose Accounts to allow prompts and answers for specific running Tlamatini accounts. Prompts and answers are not written to this log. Diagnostic messages remain inert.", Studio.Small, Studio.Muted);
         note.AutoEllipsis = false; note.TextAlign = ContentAlignment.TopLeft;
         details.Controls.Add(note, 0, 3); details.SetColumnSpan(note, 2);
         page.Controls.Add(Studio.Card(details, new Padding(14, 8, 14, 8)), 0, 2);
@@ -160,6 +165,7 @@ internal sealed partial class ServicesForm
         linkContact.Text = s.LastContact is { } contact ? $"{contact.LocalDateTime:HH:mm:ss}   ·   {s.Detail}" : s.Detail;
         linkMessages.Text = s.LastMessage is { } last ? $"{s.Received} received   ·   last at {last.LocalDateTime:HH:mm:ss}" : $"{s.Received} received since XT started";
         disconnect.Enabled = saved;
+        websiteAccounts.Enabled = s.State == "online" && XaihtLink.Shared.Identity is not null;
     }
     private void PaintState()
     {

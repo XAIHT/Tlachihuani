@@ -4,6 +4,23 @@ Created for Angela López Mendoza · XAIHT · 15 November 2026.
 
 This checklist covers the current English and Spanish Tlamatini sources, Tlachihuani RC/XT, the canonical Tlamatini-RC client and the hosted cloud/connector. The previous 127.0.0.1:12481 walkthrough covered the installed local path only. The development videos cover a separate hosted lab with deterministic main adapters. Neither substitutes for the complete campaign below.
 
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](xaiht-link.md) and [dated evidence](verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
+
 ## Current boundary, verified in source
 
 CloudConfiguration.Validate in src/Tlachihuani.RC.Cloud/CloudConfiguration.cs accepts only development-loopback and an HTTPS loopback IP. Program.cs accepts only --development. The public xaiht.org origin is currently rejected by implementation. Hosted full workspace and voice are also unavailable in this profile. Record these as unavailable/blocked, never passed. Do not remove the origin guards or expose the lab through an unrestricted proxy to make a deployment test pass.

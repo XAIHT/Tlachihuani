@@ -1,4 +1,5 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (operation payloads/progress/results contain private conversations; durable events retain lifecycle evidence)
 using System.Globalization;
 using System.Text.Json;
 
@@ -6,6 +7,8 @@ namespace Tlachihuani.RC;
 
 public sealed class Operations(StateStore store, TimeProvider clock)
 {
+    private static readonly JsonSerializerOptions promptUtf8 = new(RcProtocol.Json)
+    { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
     private int accepting = 1;
     // Accessed only inside store.Write's serialized mutation. This bounded UI
     // replay guard is deliberately transient: recovery ends running authority,
@@ -48,6 +51,22 @@ public sealed class Operations(StateStore store, TimeProvider clock)
             return Admit(s, principal.BindingId, principal.DeviceId, key, operation, payload, deadlineSeconds);
         });
     }
+    // Reconcile a redelivery after its website admission deadline without ever
+    // admitting new work or accepting a changed payload under an old request ID.
+    public OperationReceipt? FindExisting(Principal principal, string key, string operation, JsonElement payload, int deadlineSeconds = 300)
+    {
+        ValidateOperation(operation, payload);
+        Permit(principal, RcProtocol.Operations[operation]);
+        var digest = RcProtocol.Hash(operation + "\n" + Canonical(payload) + "\n" + deadlineSeconds);
+        return store.Read(s =>
+        {
+            VerifyPrincipal(s, principal);
+            var previous = s.Operations.Values.FirstOrDefault(o => o.BindingId == principal.BindingId && o.Key == key);
+            if (previous is not null && (previous.DeviceId != principal.DeviceId || previous.Digest != digest))
+                throw new RcFault("idempotency_conflict", "This request key already identifies different work.");
+            return previous;
+        });
+    }
     private OperationReceipt Admit(DurableState s, string binding, string device, string key, string operation, JsonElement payload, int deadlineSeconds)
     {
         var digest = RcProtocol.Hash(operation + "\n" + Canonical(payload) + "\n" + deadlineSeconds);
@@ -57,11 +76,13 @@ public sealed class Operations(StateStore store, TimeProvider clock)
             if (previous.Digest != digest) throw new RcFault("idempotency_conflict", "This request key already identifies different work.");
             return previous;
         }
+        OperationReceipt? queuedCancellation = null;
         if (operation is "conversation.cancel" or "conversation.permission")
         {
             var target = payload.GetProperty("operation_id").GetString()!;
             if (!s.Operations.TryGetValue(target, out var owned) || owned.BindingId != binding || owned.Kind != "conversation.submit")
                 throw new RcFault("not_found", "Conversation operation not found.", 404);
+            if (operation == "conversation.cancel" && owned.State == "accepted") queuedCancellation = owned;
             if (operation == "conversation.permission" && (!HasConversationAuthority(s, owned) || owned.PendingPermission is not JsonElement progress
                 || !progress.TryGetProperty("type", out var type) || type.GetString() != "permission"
                 || !progress.TryGetProperty("request_id", out var request) || request.GetString() != payload.GetProperty("request_id").GetString()))
@@ -69,12 +90,26 @@ public sealed class Operations(StateStore store, TimeProvider clock)
         }
         if (operation == "audio.transcribe")
             throw new RcFault("capability_unavailable", "Speech input is not available in this service version.", 409);
-        if (s.Operations.Count >= 10000 || s.Operations.Values.Count(o => o.BindingId == binding && o.State is "accepted" or "running") >= 32)
+        var isControl = operation is "conversation.cancel" or "conversation.permission";
+        var laneCount = s.Operations.Values.Count(o => o.BindingId == binding && (o.State is "accepted" or "running")
+            && (o.Kind is "conversation.cancel" or "conversation.permission") == isControl);
+        if (s.Operations.Count >= 10000 || laneCount >= (isControl ? 8 : 32))
             throw new RcFault("queue_limit", "The operation queue is full.", 429);
         var now = clock.GetUtcNow();
         var item = new OperationReceipt(RcProtocol.Id(), binding, device, key, digest, operation, payload.Clone(), now, now.AddSeconds(deadlineSeconds));
+        if (queuedCancellation is not null)
+        {
+            // The adapter cannot cancel a prompt it has never received. Cancel
+            // that queue entry and commit its idempotent control receipt together,
+            // before any dispatcher can select the prompt.
+            s.Operations[queuedCancellation.Id] = queuedCancellation with { State = "cancelled", Error = "user_cancelled",
+                Payload = JsonSerializer.SerializeToElement(new { }), Progress = null, PendingPermission = null };
+            item = item with { State = "succeeded", Payload = JsonSerializer.SerializeToElement(new { }),
+                Result = JsonSerializer.SerializeToElement(new { cancelled = true, operation_id = queuedCancellation.Id, state = "cancelled" }) };
+            StateStore.Event(s, clock, "operation.cancelled", binding, queuedCancellation.Id, "cancelled");
+        }
         s.Operations.Add(item.Id, item);
-        StateStore.Event(s, clock, "operation.accepted", binding, item.Id, "accepted");
+        StateStore.Event(s, clock, queuedCancellation is null ? "operation.accepted" : "operation.completed", binding, item.Id, item.State);
         return item;
     }
     public OperationReceipt Get(Principal principal, string id) => store.Read(s =>
@@ -350,7 +385,7 @@ public sealed class Operations(StateStore store, TimeProvider clock)
         {
             if (!payload.TryGetProperty("text", out var text) || text.ValueKind != JsonValueKind.String) throw new RcFault("invalid_request", "Conversation text is required.", 400);
             _ = RcProtocol.Text(text.GetString(), "conversation text", 16000);
-            if (JsonSerializer.SerializeToUtf8Bytes(text.GetString(), RcProtocol.Json).Length > 24000)
+            if (JsonSerializer.SerializeToUtf8Bytes(text.GetString(), promptUtf8).Length > 24000)
                 throw new RcFault("invalid_request", "Conversation text exceeds the native message limit.", 400);
             if (payload.TryGetProperty("options", out var options))
             {

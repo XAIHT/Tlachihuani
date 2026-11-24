@@ -1,7 +1,9 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (generic frame arguments can be sensitive; explicit tracePayload controls body logging)
 using System.Buffers.Binary;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Encodings.Web;
 
 namespace Tlachihuani.Contracts;
 
@@ -18,6 +20,9 @@ public static class Protocol
         MaxDepth = 16,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never
     };
+    // Native pipe JSON is not HTML. UTF-8 avoids expanding valid non-ASCII
+    // prompts into six-byte escape sequences inside the bounded frame.
+    private static readonly JsonSerializerOptions utf8Json = new(Json) { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
     public static void Validate(Request request)
     {
@@ -31,7 +36,7 @@ public static class Protocol
             throw new ProtocolException("invalid_request", "Event cursor or limit is outside its allowed range.");
     }
 
-    public static async Task<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken)
+    public static async Task<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken, bool tracePayload = true)
     {
         byte[] header = new byte[4];
         await stream.ReadExactlyAsync(header, cancellationToken);
@@ -40,7 +45,7 @@ public static class Protocol
             throw new ProtocolException("invalid_request", "Message length is outside the protocol limit.");
         byte[] body = new byte[length];
         await stream.ReadExactlyAsync(body, cancellationToken);
-        if (TraceLog.IsOn(TraceLevel.Trace))
+        if (tracePayload && TraceLog.IsOn(TraceLevel.Trace))
             TraceLog.T($"IPC ⇐ {typeof(T).Name} {length} bytes on {stream.GetType().Name}: {System.Text.Encoding.UTF8.GetString(body)}");
         try
         {
@@ -53,10 +58,10 @@ public static class Protocol
         }
     }
 
-    public static async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken)
+    public static async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken, bool tracePayload = true, bool compactUtf8 = false)
     {
-        byte[] body = JsonSerializer.SerializeToUtf8Bytes(value, Json);
-        if (TraceLog.IsOn(TraceLevel.Trace))
+        byte[] body = JsonSerializer.SerializeToUtf8Bytes(value, compactUtf8 ? utf8Json : Json);
+        if (tracePayload && TraceLog.IsOn(TraceLevel.Trace))
             TraceLog.T($"IPC ⇒ {typeof(T).Name} {body.Length} bytes on {stream.GetType().Name}: {System.Text.Encoding.UTF8.GetString(body)}");
         if (body.Length > MaxFrameBytes)
             throw new ProtocolException("invalid_request", "The response exceeds the protocol limit.");

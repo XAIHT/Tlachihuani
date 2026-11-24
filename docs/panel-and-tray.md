@@ -4,6 +4,23 @@ The original XT native tray/status foundation is implemented; the complete menu/
 
 The panel belongs inside Tlamatini under **Panels → Tlachihuani**. This document and [the static concept](design/panel-concept.html) describe a future dialog; they do not add a menu entry or control a real service.
 
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](xaiht-link.md) and [dated evidence](verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
+
 ## Visual direction
 
 Use Tlamatini's existing gray/slate surfaces, teal accent, Nunito typography, thin bright borders, 8 px card radius, and restrained shadows. Actual source tokens: surface `#4a4f5c`, header/footer `#444853`, accent `#55bbaa`, primary text `#f0f1f7`, body `#c1c5d0`. The implementation references `--tlm-dlg-*` rather than copying a second theme. Keep `dialog_theme.css` last.

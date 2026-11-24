@@ -4,6 +4,23 @@ Implementation update: Start/Stop/Restart and monitoring are implemented; force-
 
 All values here are proposed defaults. SCM observations and worker health are separate facts.
 
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](xaiht-link.md) and [dated evidence](verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
+
 ## States
 
 SCM state is one of `not_installed`, `stopped`, `start_pending`, `running`, `stop_pending`, `paused`, `pause_pending`, `continue_pending`, or `unknown`. Preserve native codes when an unexpected state is encountered; the initial product does not offer pause/resume.

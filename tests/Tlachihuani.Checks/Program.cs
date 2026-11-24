@@ -14,6 +14,9 @@ if (args is ["--rc-broker-checks", var brokerDirectory]) return RcBrokerChecks.R
 if (args is ["--downloads-access"]) return DownloadAccessChecks.Run();
 if (args is ["--log-viewer", var logDirectory]) return LogViewerChecks.Run(logDirectory);
 if (args is ["--log-viewer-preview", var logFile]) return LogViewerChecks.Preview(logFile);
+if (args is ["--service-readiness", var serviceEvidence]) return ServiceReadinessChecks.Run(serviceEvidence);
+if (args.Length > 0 && args[0] == "--xaiht-relay") return await XaihtRelayChecks.Run(args[1..]);
+if (args is ["--xaiht-accounts-dialog", var websiteDialogOutput]) return XaihtAccountsVisual.Run(websiteDialogOutput);
 
 var passed = 0;
 async Task Check(string name, Func<Task> body) { await body(); Console.WriteLine($"PASS {name}"); passed++; }
@@ -23,6 +26,7 @@ Request RequestFor(string operation) => new(1, 0, Guid.NewGuid(), operation);
 
 try
 {
+    await Check("Website command relay: real envelopes, lease snapshots and bounded transport", XaihtCommandChecks.Run);
     await Check("XT exit label follows service state and keeps the exit action", () =>
     {
         int exits = 0, remoteOpens = 0, serviceActions = 0;

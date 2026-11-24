@@ -4,6 +4,23 @@ Implementation update: [current status](implementation-status.md) and [packaging
 
 Design only. This preparation performs no registry, startup, SCM, ACL, firewall, security-setting or installed-application changes.
 
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](xaiht-link.md) and [dated evidence](verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
+
 ## Identities
 
 Run the service with a dedicated least-privilege virtual service account, proposed `NT SERVICE\Tlachihuani`, and an own-process SCM registration. Grant only required access to its own data/log directories. No LocalSystem or administrator token is justified by the initial heartbeat/status workload. Reassess if Angela defines a workload that needs additional resources.
@@ -16,7 +33,7 @@ Named-pipe DACLs explicitly allow the service identity, administrators and confi
 
 ## Force termination
 
-Normal controls remain unelevated when the operator has SCM rights. Force termination uses a short-lived, narrowly scoped administrator helper only after explicit host-side consent. The planned Tlamatini panel initiates the request and reports its outcome; a compatible host tray handles local consent/UAC. With no eligible interactive tray/session, return `host_consent_required` with guidance instead of attempting invisible elevation. Remote browsers cannot approve a Windows elevation dialog on somebody else's desktop.
+Normal controls remain unelevated when the operator has SCM rights. Force termination uses a short-lived, narrowly scoped administrator helper only after explicit host-side consent. The Tlamatini panel initiates the request and reports its outcome; a compatible host tray handles local consent/UAC. With no eligible interactive tray/session, return `host_consent_required` with guidance instead of attempting invisible elevation. Remote browsers cannot approve a Windows elevation dialog on somebody else's desktop.
 
 The helper accepts only a request ID/nonce through an ACL-protected, short-lived result channel. It independently resolves the fixed SCM service, verifies own-process type, installation-owned binary path, PID creation time, and expected instance captured for the confirmation. Open the process handle, recheck identity before termination, and wait for that exact handle to signal exit. PID reuse or identity mismatch cancels the operation. Windows SCM state must subsequently be STOPPED. No process-name sweep; no termination of unrelated agents, browsers, consoles, or Explorer.
 
@@ -36,6 +53,6 @@ Uninstall: request confirmation in the future uninstaller, stop only this servic
 
 Proposed log retention: 5 files × 10 MiB, plus bounded Windows Event Log startup/fatal/lifecycle entries. Limit event payload lengths and escape text before browser rendering. Keep installation paths and detailed errors behind staff/operator views. Never store Tlamatini passwords, browser cookies, API keys, chat messages, or full inherited environment blocks.
 
-XT writes `Tlachihuani.log` (256 MB per file, up to 40 files kept) in `%LOCALAPPDATA%\XAIHT\Tlachihuani` for each Windows user; Services → See log shows it. Since 0.38.0 each service also writes a trace log under `%ProgramData%\XAIHT\<service>\logs`, which setup makes writable by the service and readable by the operator; XT copies those lines into Tlachihuani.log, and keys, tokens and passwords are masked. Since 0.37.0 XT can be connected to xaiht.org: it makes outgoing HTTPS requests only, with no listening port or firewall rule, and keeps one computer key in `xaiht-link.json`, protected with Windows DPAPI for that user. xaiht.org stores only the key's SHA-256. Received messages are logged, never executed. See the [xaiht.org link](xaiht-link.md).
+XT writes `Tlachihuani.log` (256 MB per file, up to 40 files kept) in `%LOCALAPPDATA%\XAIHT\Tlachihuani` for each Windows user; Services → See log shows it. Since 0.38.0 each service also writes a trace log under `%ProgramData%\XAIHT\<service>\logs`, which setup makes writable by the service and readable by the operator; XT copies those lines into Tlachihuani.log, and keys, tokens and passwords are masked. Since 0.37.0 XT can be connected to xaiht.org: it makes outgoing HTTPS requests only, with no listening port or firewall rule, and keeps one computer key in `xaiht-link.json`, protected with Windows DPAPI for that user. xaiht.org stores only the key's SHA-256. Diagnostic messages are logged and never executed. The separate typed prompt channel additionally requires explicit local account approval; its durable grants and receipts are in the RC service's ProgramData state. Prompts, answers and RC native frame contents are not written to XT's log. The website is a trusted HTTPS intermediary, not an end-to-end or PQ transport. See the [xaiht.org link](xaiht-link.md).
 
 No network control endpoint, firewall opening, remote shell, automatic updater, credential store, or scheduled worker is part of the initial design. Add a capability only after its actual workload and permission needs are specified.

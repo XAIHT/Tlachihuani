@@ -48,7 +48,7 @@ public static class JobsEndpoint
         scm.ValidateJobsInstallation();
         var reply = await CallAsync(Pipe(install), scm.Query().Pid, JobsInstallation.Image, request, token);
         if (reply["code"] is JsonValue code && code.GetValue<int>() >= 400)
-            throw new InvalidOperationException((string?)reply["body"]?["error"] ?? "Jobs refused the request.");
+            throw new InvalidOperationException($"Jobs returned {code.GetValue<int>()}: " + ((string?)reply["body"]?["error"] ?? "Jobs refused the request."));
         return reply["body"]?.AsObject() ?? reply;
     }
 

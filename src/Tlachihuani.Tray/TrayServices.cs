@@ -8,109 +8,84 @@ using Tlachihuani.Windows;
 
 namespace Tlachihuani.Tray;
 
-internal sealed record JobsState(string State, bool ApiReady = false);
-internal sealed record RemoteControllerState(string State, bool Ready = false, bool Included = false, string? Error = null);
-
 internal sealed class TrayServices(Controller primary)
 {
-    internal async Task<RemoteControllerState> ObserveRemoteControllerAsync(CancellationToken token)
-    {
-        var scm = ScmBackend.ForRemoteController();
-        var state = scm.Query().State;
-        if (state == "not_installed") return new(state);
-        bool included = false;
-        try
-        {
-            scm.ValidateRemoteControllerInstallation();
-            included = RcInstallation.Configuration().IncludeInStartServices;
-            if (state != "running") return new(state, Included: included);
-            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
-            deadline.CancelAfter(TimeSpan.FromSeconds(3));
-            var status = await RcEndpoint.CallInstalledAsync(new() { ["op"] = "status" }, deadline.Token);
-            return new(state, (bool?)status["listener"] == true && (string?)status["health"] == "ready", included, (string?)status["error"]);
-        }
-        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
-        { return new(state, Included: included, Error: "health_unavailable"); }
-    }
     private readonly ScmBackend jobs = ScmBackend.ForJobs();
-    private static readonly HttpClient http = new(new HttpClientHandler { UseProxy = false, AllowAutoRedirect = false })
-    {
-        MaxResponseContentBufferSize = 4096
-    };
+    private static readonly HttpClient http = new(new HttpClientHandler { UseProxy = false, AllowAutoRedirect = false });
 
-    internal async Task<JobsState> ObserveJobsAsync(CancellationToken token)
+    internal Task<RemoteControllerState> ObserveRemoteControllerAsync(CancellationToken token) =>
+        ServiceProbes.RemoteAsync(() => ScmBackend.ForRemoteController().Query(), () =>
+        {
+            ScmBackend.ForRemoteController().ValidateRemoteControllerInstallation();
+            return RcInstallation.Configuration().IncludeInStartServices;
+        }, t => RcEndpoint.CallInstalledAsync(new() { ["op"] = "status" }, t), token);
+
+    internal Task<JobsState> ObserveJobsAsync(CancellationToken token) =>
+        ServiceProbes.JobsAsync(jobs.Query, JobsEndpoint.CallInstalledAsync, http, token);
+
+    internal async Task<ServiceSnapshot> ObserveAsync(CancellationToken token)
     {
-        var state = jobs.Query().State;
-        if (state != "running") return new(state);
-        using var probe = CancellationTokenSource.CreateLinkedTokenSource(token);
-        probe.CancelAfter(TimeSpan.FromSeconds(3));
-        try
-        {
-            var provider = await JobsEndpoint.CallInstalledAsync(new() { ["op"] = "status" }, probe.Token);
-            if ((bool?)provider["enabled"] != true || (bool?)provider["engine"] != true ||
-                (bool?)provider["web"] != true || (int?)provider["port"] != 12064) return new(state);
-            var bytes = await http.GetByteArrayAsync("http://127.0.0.1:12064/api/v1/health", probe.Token);
-            var health = JsonNode.Parse(bytes);
-            return new(state, (int?)health?["api_version"] == 1 && (string?)health?["engine"] == "ready");
-        }
-        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
-        {
-            return new(state);
-        }
+        var main = primary.ExecuteAsync("status", token);
+        var provider = ObserveJobsAsync(token);
+        var rc = ObserveRemoteControllerAsync(token);
+        await Task.WhenAll(main, provider, rc);
+        return new(await main, await provider, await rc);
     }
 
-    internal async Task StartAsync(CancellationToken token)
+    internal async Task<ServiceSnapshot> StartAsync(CancellationToken token)
     {
         await ChangePrimaryAsync("start", token);
-        jobs.ValidateJobsInstallation();
-        await new Lifecycle(jobs).ExecuteAsync("start", TimeSpan.FromSeconds(30), token);
-        using var ready = CancellationTokenSource.CreateLinkedTokenSource(token);
-        ready.CancelAfter(TimeSpan.FromSeconds(40));
         try
         {
-            // Explicit Start also re-enables a provider previously stopped in the Services panel.
-            await JobsEndpoint.CallInstalledAsync(new() { ["op"] = "start" }, ready.Token);
-            while (!(await ObserveJobsAsync(ready.Token)).ApiReady) await Task.Delay(400, ready.Token);
+            jobs.ValidateJobsInstallation();
+            await new Lifecycle(jobs).ExecuteAsync("start", TimeSpan.FromSeconds(30), token);
         }
-        catch (OperationCanceledException) when (!token.IsCancellationRequested)
+        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
+        { throw new InvalidOperationException("Tlachihuani.Jobs could not start: " + ex.Message, ex); }
+        using (var enable = CancellationTokenSource.CreateLinkedTokenSource(token))
         {
-            throw new TimeoutException("Jobs started, but Torrenter did not become ready on port 12064. Check the Services panel.");
+            enable.CancelAfter(TimeSpan.FromSeconds(40));
+            // Explicit Start re-enables a provider previously stopped in Services.
+            try { await JobsEndpoint.CallInstalledAsync(new() { ["op"] = "start" }, enable.Token); }
+            catch (OperationCanceledException ex) when (!token.IsCancellationRequested)
+            { throw new TimeoutException("Tlachihuani.Jobs did not confirm enabling Torrenter within 40 seconds.", ex); }
         }
-        if (ScmBackend.ForRemoteController().Query().State != "not_installed" && RcInstallation.Configuration().IncludeInStartServices)
+        try
         {
-            await RcLifecycle.ExecuteAsync("start", token);
-            using var rcReady = CancellationTokenSource.CreateLinkedTokenSource(token);
-            rcReady.CancelAfter(TimeSpan.FromSeconds(30));
-            while (!(await ObserveRemoteControllerAsync(rcReady.Token)).Ready) await Task.Delay(400, rcReady.Token);
+            if (ScmBackend.ForRemoteController().Query().State != "not_installed" && RcInstallation.Configuration().IncludeInStartServices)
+                await RcLifecycle.ExecuteAsync("start", token);
         }
+        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
+        { throw new InvalidOperationException("Remote-Controller could not start: " + ex.Message, ex); }
+        return await ServiceReadiness.WaitAsync(ObserveAsync, TimeSpan.FromSeconds(40), token);
     }
 
     private async Task ChangePrimaryAsync(string action, CancellationToken token)
     {
         var reply = await primary.ExecuteAsync(action, token);
-        if (!reply.Ok) throw new InvalidOperationException(reply.Error?.Message ?? $"Tlachihuani could not {action}.");
+        if (!reply.Ok) throw new ServiceReadinessException(reply.Error?.Message ?? $"Tlachihuani could not {action}.", new(reply, null, null), []);
     }
 
     internal async Task StopAsync(CancellationToken token)
     {
         // Jobs checkpoints active transfers, then closes the kill-on-close Windows Job Object
         // containing its worker and web facade. Always also try the other independent service.
-        var errors = new List<string>();
+        var errors = new List<Exception>();
         try
         {
             if (ScmBackend.ForRemoteController().Query().State is not ("stopped" or "not_installed"))
                 await RcLifecycle.ExecuteAsync("stop", token);
         }
         catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
-        { errors.Add($"Remote-Controller: {ex.Message}"); }
+        { errors.Add(new InvalidOperationException("Remote-Controller: " + ex.Message, ex)); }
         foreach (var name in new[] { JobsEndpoint.ServiceName, Contracts.Protocol.ServiceName })
         {
             token.ThrowIfCancellationRequested();
             try { await StopHostAsync(name == JobsEndpoint.ServiceName, token); }
             catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
-            { errors.Add($"{name}: {ex.Message}"); }
+            { errors.Add(new InvalidOperationException($"{name}: {ex.Message}", ex)); }
         }
-        if (errors.Count != 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+        if (errors.Count != 0) throw new AggregateException("Service shutdown failed. " + string.Join("; ", errors.Select(e => e.Message)), errors);
     }
 
     private async Task StopHostAsync(bool stopJobs, CancellationToken token)

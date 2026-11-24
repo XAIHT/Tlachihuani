@@ -1,4 +1,5 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (text validation and digest arguments can contain credentials or private prompts)
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -97,7 +98,9 @@ public sealed record RcConfiguration
 }
 
 public sealed record AccountBinding(string Id, string Edition, string AccountId, string DisplayName, string WindowsSid, string AdapterId, long Revision = 1, bool Enabled = true);
-public sealed record DeviceGrant(string Id, string BindingId, string Name, string PublicKey, string[] Scopes, DateTimeOffset EnrolledAt, bool Revoked = false, long Revision = 1);
+public sealed record DeviceGrant(string Id, string BindingId, string Name, string PublicKey, string[] Scopes, DateTimeOffset EnrolledAt, bool Revoked = false, long Revision = 1, string AuthenticationKind = "browser");
+public sealed record XaihtIdentity(string ConnectionId, string Origin, long ComputerId, long UserId);
+public sealed record XaihtGrant(string Id, XaihtIdentity Identity, string BindingId, string DeviceId);
 public sealed record Invitation(string Id, string TokenHash, string BindingId, string[] Scopes, DateTimeOffset ExpiresAt, bool Used = false);
 public sealed record Enrollment(string Id, string PollHash, string InvitationId, string Name, string PublicKey, string Fingerprint, DateTimeOffset ExpiresAt, string Status = "pending", string? DeviceId = null);
 public sealed record OperationReceipt(string Id, string BindingId, string DeviceId, string Key, string Digest, string Kind, JsonElement Payload, DateTimeOffset CreatedAt, DateTimeOffset Deadline, string State = "accepted", string? AdapterOperationId = null, JsonElement? Result = null, string? Error = null, JsonElement? Progress = null, JsonElement? PendingPermission = null);
@@ -110,6 +113,7 @@ public sealed record DurableState
     public long Cursor { get; set; }
     public Dictionary<string, AccountBinding> Bindings { get; init; } = new(StringComparer.Ordinal);
     public Dictionary<string, DeviceGrant> Devices { get; init; } = new(StringComparer.Ordinal);
+    public Dictionary<string, XaihtGrant> XaihtGrants { get; init; } = new(StringComparer.Ordinal);
     public Dictionary<string, Invitation> Invitations { get; init; } = new(StringComparer.Ordinal);
     public Dictionary<string, Enrollment> Enrollments { get; init; } = new(StringComparer.Ordinal);
     public Dictionary<string, OperationReceipt> Operations { get; init; } = new(StringComparer.Ordinal);

@@ -16,7 +16,7 @@ internal sealed partial class ServicesForm : StudioForm
     private bool enabled, engine, web, catalogAvailable;
     private string host = "unknown";
 
-    private async Task Run(Func<Task>? action = null)
+    private async Task Run(Func<Task>? action = null, string actionName = "Refresh Services")
     {
         if (changing || closing.IsCancellationRequested) return;
         var token = closing.Token;
@@ -26,16 +26,22 @@ internal sealed partial class ServicesForm : StudioForm
             changing = true; UpdateActions();
             try { await gate.WaitAsync(token); } catch (OperationCanceledException) { return; }
         }
+        var startedAt = DateTimeOffset.Now;
+        bool actionCompleted = false;
         try
         {
-            if (action is not null) await action();
+            if (action is not null) { await action(); actionCompleted = true; }
             if (!token.IsCancellationRequested) await RefreshState();
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             if (!token.IsCancellationRequested)
             {
-                if (action is not null) ServiceDialogs.Notice(this, "Service action failed", ex.Message);
+                if (action is not null) ServiceDialogs.Failure(this, ServiceErrorReport.Create(actionName, ex,
+                    startedAt: startedAt, context: $"Action completed={actionCompleted}; last observed Jobs SCM={host}; "
+                        + $"catalog available={catalogAvailable}; enabled={enabled}; engine={engine}; web={web}. "
+                        + "These are the last panel observations and may be stale. "
+                        + (actionCompleted ? "The action completed; the subsequent status refresh failed. Do not repeat the action based on this refresh failure." : "The action did not return successfully.")));
                 else { enabled = engine = web = catalogAvailable = false; PaintState(); impactLine.Text = "Service status could not be refreshed."; }
             }
         }

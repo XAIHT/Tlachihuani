@@ -40,6 +40,18 @@
 
 If XT is missing after setup, open **Tlachihuani XT** from Start or press **Win+R** and run `"C:\Program Files\XAIHT\Tlachihuani\Tray\Tlachihuani.Tray.exe" --show`. The overview can show **Stopped** on first launch. Right-click the gray XT icon beside the clock (check the hidden icons), then choose **Start Services**. The [local health endpoint](http://127.0.0.1:12064/api/v1/health) should return `{"api_version":1,"engine":"ready"}`.
 
+## Send a real prompt from your phone
+
+Open **xaiht.org → Tlamatini-RC**, choose your computer, then select the ready
+Tlamatini account approved in **XT → Services → xaiht.org → Accounts…**. Prompts
+and answers use the existing outgoing HTTPS connection. Start Tlamatini and
+Remote-Controller on the PC first. Refresh keeps the existing conversation.
+
+Ask Execs requests approval for selected protected operations, not every tool;
+Monitor Netstat is a read-only exception. See [setup and privacy](docs/xaiht-link.md)
+and the [actual phone acceptance record](docs/verification/2026-11-23-hosted-prompts.md).
+The website relay is not end-to-end or post-quantum encrypted.
+
 ## First download
 
 1. **Open your workspace.** Use the Tlamatini menu above, or choose **Open workspace** in XT. XT always shows the Tlamatini login page first, so the queue that opens belongs to the account you sign in with, even if the browser was signed in with another one. If both Tlamatini editions are available, choose the edition, then sign in.
@@ -118,6 +130,7 @@ and is included in Stop Services. Torrenter remains its own Jobs plane.
 | Stop background work | **XT → Stop Services** | The services and their workers stop. The gray XT icon stays available to start them again. |
 | Read XT's log | **XT → Show panel → Services… → See log** | Tlachihuani.log opens inside XT and follows new lines, including messages from xaiht.org. |
 | Receive messages from xaiht.org | **Services… → xaiht.org → Connect…** | Paste the key from xaiht.org → Tlamatini-RC. See the [xaiht.org link guide](docs/xaiht-link.md). |
+| Chat with running Tlamatini from a phone | **Services… → xaiht.org → Accounts…** | Approve the exact English or Spanish account, then select it on the website. Real answers, cancellation and execution approvals use the existing chat engine. See [account setup](docs/xaiht-link.md#allow-an-account-and-send-a-real-prompt). |
 | Close only the tray | **XT → Exit tray** | The icon disappears. If a service is running, the menu reads **Exit tray (service keeps running)**. |
 
 > [!NOTE]
@@ -189,7 +202,7 @@ These lower-level commands are for component development. **Check** exercises th
 | [Panel and tray](docs/panel-and-tray.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |
 | [Windows privileges and local IPC](docs/security-and-installation.md) | [Implementation status and verification evidence](docs/implementation-status.md) |
 | [Remote-Controller (Tlamatini-RC)](docs/remote-controller.md) | [Hosted RC development lab](docs/hosted-development.md) |
-| [xaiht.org link and Tlachihuani.log](docs/xaiht-link.md) | [xaiht.org link verification](docs/verification/2026-11-19-xaiht-link.md) |
+| [xaiht.org link and Tlachihuani.log](docs/xaiht-link.md) | [Real prompt verification](docs/verification/2026-11-23-hosted-prompts.md) · [Initial link verification](docs/verification/2026-11-19-xaiht-link.md) |
 | [Remote-control predeployment checklist](docs/remote-control-predeployment-checklist.md) | [Workspace sign-in verification](docs/verification/2026-11-17-workspace-signin.md) |
 
 <details>
@@ -219,6 +232,12 @@ For the next development session, read [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUD
 </p>
 
 ## Hosted Tlamatini-RC development
+
+The website's **outgoing HTTPS prompt channel** is separate from the development
+lab below. Updated XT and Remote-Controller sources deliver typed prompts to a
+locally approved, already running Tlamatini account and return real answers.
+Diagnostic messages remain inert. The website is trusted with plaintext; this
+channel does not claim PQ or end-to-end encryption. See the [connection guide](docs/xaiht-link.md).
 
 The hosted client, cloud relay and service-owned outbound connector have an
 isolated HTTPS development profile with English and Spanish interfaces. Use the

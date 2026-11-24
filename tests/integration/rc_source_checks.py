@@ -38,9 +38,29 @@ for root in roots:
     print("PASS source carriage and syntax:", root, flush=True)
 
 for name in ["remote_controller_runtime.py", "remote_controller_guard.py",
-             "migrations/0224_remote_controller.py", "templates/agent/remote_controller.html",
+             "templates/agent/remote_controller.html",
              "static/agent/css/remote_controller.css"]:
     assert (roots[0] / "Tlamatini/agent" / name).read_bytes() == (roots[1] / "Tlamatini/agent" / name).read_bytes(), name
+
+# The Spanish catalog has additional migrations, so its real predecessor has a
+# different number. Compare the complete executable migration AST after checking
+# and normalizing only that intentional dependency. Never demand a false English
+# dependency or rewrite the valid Spanish migration graph to make a test pass.
+migration_trees = []
+for root, predecessor in zip(roots, ("0223_create_superuser_console_handoff", "0227_create_superuser_console_handoff")):
+    migration_dir = root / "Tlamatini/agent/migrations"
+    assert (migration_dir / (predecessor + ".py")).is_file(), predecessor
+    tree = ast.parse((migration_dir / "0224_remote_controller.py").read_text(encoding="utf-8-sig"))
+    migration = next(node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == "Migration")
+    dependencies = next(node.value for node in migration.body if isinstance(node, ast.Assign)
+                        and any(isinstance(target, ast.Name) and target.id == "dependencies" for target in node.targets))
+    matches = [node for node in ast.walk(dependencies) if isinstance(node, ast.Tuple)
+               and len(node.elts) == 2 and all(isinstance(item, ast.Constant) for item in node.elts)
+               and [item.value for item in node.elts] == ["agent", predecessor]]
+    assert len(matches) == 1, (str(root), "Remote-Controller must depend on the actual edition predecessor")
+    matches[0].elts[1].value = "edition_create_superuser_console_handoff"
+    migration_trees.append(ast.dump(tree, include_attributes=False))
+assert migration_trees[0] == migration_trees[1], "Remote-Controller migration schema or behavior diverges"
 english = (roots[0] / "Tlamatini/agent/remote_controller_bridge.py").read_text(encoding="utf-8")
 spanish = (roots[1] / "Tlamatini/agent/remote_controller_bridge.py").read_text(encoding="utf-8")
 assert english.replace('EDITION = "english"', 'EDITION = "spanish"') == spanish

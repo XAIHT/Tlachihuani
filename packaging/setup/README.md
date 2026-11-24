@@ -4,6 +4,23 @@ Latest version: **[0.38.0](../../docs/releases/v0.38.0.md)**.
 
 The two x64 Windows wizards use Tlamatini's dark setup palette, Segoe UI and the original XT icon. Their title and version label use the compiled assembly version sourced from the project's `Directory.Build.props`. Installer.exe contains a compressed Windows Installer package. Uninstaller.exe targets the corresponding registered product. Neither needs the source tree at runtime.
 
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](../../docs/xaiht-link.md) and [dated evidence](../../docs/verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
+
 ## Install and operate
 
 Use Windows 11 x64. Extract the matching `Tlachihuani-0.38.0-windows-x64.zip` with **Extract All** and read `START-HERE.html`. This package carries private .NET 10 and CPython/libtorrent runtimes; clients do not need to install a runtime or SDK. Sign in as the intended operator. Open **Installer.exe**, choose **Review**, confirm version **0.38.0**, the operator and destination, and select **Install**. Approve UAC. If a different administrator supplies credentials, the operator shown in the original review remains the delegated operator.

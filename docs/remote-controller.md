@@ -4,9 +4,11 @@ Latest version: **[0.38.0](releases/v0.38.0.md)**.
 
 Created for Angela López Mendoza · XAIHT.
 
-> **xaiht.org messages (0.37.0).** XT itself, not this service, receives the
-> messages sent from the Tlamatini-RC page on xaiht.org and writes them to
-> Tlachihuani.log. See the [xaiht.org link](xaiht-link.md).
+> **xaiht.org prompt channel.** XT receives typed commands through its existing
+> outgoing HTTPS link and passes only explicitly approved account operations to
+> this service. It returns the real adapter's progress, approvals and answers.
+> Diagnostic messages remain inert and log-only. See the [setup and trust
+> boundary](xaiht-link.md#allow-an-account-and-send-a-real-prompt).
 
 Remote-Controller is a separate Windows service plane. Its fixed SCM name is
 `Tlachihuani.RemoteController`, display name is **Remote-Controller**, and executable
@@ -14,6 +16,23 @@ is `RCServer/Tlachihuani.RC.Server.exe`. The service owns the live Tlamatini-RC 
 client, HTTP/WebSocket endpoints, enrollment, device grants, sessions, durable
 operation receipts, events and schedules in one host process. Node.js is not a
 product prerequisite. The existing Node preview remains a design demonstration.
+
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](xaiht-link.md) and [dated evidence](verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.
 
 ## Current implementation boundary
 
@@ -33,9 +52,10 @@ end-to-end acceptance remain separate gates.
 The HTTP/browser harnesses use explicitly labelled QA accounts and adapter results;
 their success alone does not certify a production model conversation or app launch.
 
-Production remote transport, independently trusted client distribution and speech
-capture/transcription remain unavailable. The complete approved remote design is
-not yet production-complete. See the [dated verification](verification/2026-11-13-remote-controller.md)
+The direct remote/PQ transport, independently trusted client distribution and speech
+capture/transcription remain unavailable. The additional website relay trusts
+xaiht.org with plaintext and is ordinary HTTPS, not the approved future PQ/E2EE
+design. See the [dated verification](verification/2026-11-13-remote-controller.md)
 for tested behavior and the remaining gates.
 
 ## Start and stop

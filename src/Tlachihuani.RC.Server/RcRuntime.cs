@@ -1,4 +1,5 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (native adapter request/result arguments contain private conversations)
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Collections.Concurrent;
@@ -6,12 +7,13 @@ using Tlachihuani.Windows;
 
 namespace Tlachihuani.RC.Server;
 
-internal sealed class RcRuntime : IDisposable
+internal sealed partial class RcRuntime : IDisposable
 {
     internal readonly RcHostSettings Settings;
     internal readonly StateStore Store;
     internal readonly Access Access;
     internal readonly Operations Operations;
+    internal readonly XaihtAccess Xaiht;
     internal readonly HostedConnector Hosted;
     internal readonly TimeProvider Clock = TimeProvider.System;
     internal readonly string InstanceId = RcProtocol.Id();
@@ -29,6 +31,7 @@ internal sealed class RcRuntime : IDisposable
         Store = new(Path.Combine(settings.Root, "state"));
         Access = new(Store, settings.Configuration, Clock);
         Operations = new(Store, Clock);
+        Xaiht = new(Store, Clock);
         Operations.Recover();
         Hosted = new(this);
     }
@@ -61,6 +64,12 @@ internal sealed class RcRuntime : IDisposable
             "hosted-disconnect" => Hosted.Disconnect(),
             "development-stop" when !Settings.Installed => StopDevelopment(),
             "accounts" => Accounts(sid),
+            "xaiht-accounts" => XaihtAccounts(req, sid),
+            "xaiht-set-accounts" => XaihtSetAccounts(req, sid),
+            "xaiht-revoke-connection" => XaihtRevoke(Text("connection_id"), sid),
+            "xaiht-command" => XaihtCommand(req, sid),
+            "xaiht-operation" => XaihtOperation(req, sid),
+            "xaiht-content-authorize" => XaihtContent(req, sid),
             "devices" => Store.Read(s => new { devices = s.Devices.Values.Where(d => s.Bindings[d.BindingId].WindowsSid == sid).Select(d => new { d.Id, d.BindingId, d.Name, d.Scopes, d.EnrolledAt, d.Revoked, d.Revision, account_name = s.Bindings[d.BindingId].DisplayName, edition = s.Bindings[d.BindingId].Edition }).ToArray() }),
             "pending-enrollments" => Store.Read(s => new { enrollments = s.Enrollments.Values.Where(e => e.Status == "pending" && e.ExpiresAt > Clock.GetUtcNow() && s.Bindings[s.Invitations[e.InvitationId].BindingId].WindowsSid == sid).Select(e => new { e.Id, e.Name, e.Fingerprint, e.ExpiresAt, binding_id = s.Invitations[e.InvitationId].BindingId, scopes = s.Invitations[e.InvitationId].Scopes }).ToArray() }),
             "invite" => Access.CreateInvitation(Text("binding_id"), req["scopes"]?.Deserialize<string[]>(RcProtocol.Json) ?? [], sid),

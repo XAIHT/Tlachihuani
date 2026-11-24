@@ -193,13 +193,20 @@ internal sealed class RemoteControllerForm : StudioForm
         revoke.Enabled = idle && ready && devices.SelectedItem is Item item && (bool?)item.Row["revoked"] != true;
         permissions.Enabled = revoke.Enabled && devices.SelectedItem is Item device && device.Row["revision"] is not null;
     }
-    private async Task Mutate(Func<Task> action)
+    private async Task Mutate(Func<Task> action, string? actionName = null)
     {
         if (busy || closing.IsCancellationRequested) return;
         busy = true; UpdateActions();
+        var startedAt = DateTimeOffset.Now;
         try { await gate.WaitAsync(closing.Token); try { await action(); } finally { gate.Release(); } }
         catch (OperationCanceledException) when (closing.IsCancellationRequested) { }
-        catch (Exception ex) when (!closing.IsCancellationRequested && ex is not OutOfMemoryException) { ServiceDialogs.Notice(this, "Remote-Controller", ex.Message); Record("Action failed: " + ex.GetType().Name); }
+        catch (Exception ex) when (!closing.IsCancellationRequested && ex is not OutOfMemoryException)
+        {
+            ServiceDialogs.Failure(this, ServiceErrorReport.Create("Remote-Controller / " + (actionName ?? action.Method.Name), ex,
+                startedAt: startedAt, context: "Last observed SCM=" + observed + "; listener status="
+                    + (status is null ? "unknown" : Tlachihuani.Contracts.TraceLog.Json(status)) + ". This observation may be stale."));
+            Record("Action failed: " + ex.GetType().Name);
+        }
         finally { busy = false; if (!closing.IsCancellationRequested) await RefreshAsync(); }
     }
     private Task Change(string action) => Mutate(async () =>
@@ -207,7 +214,7 @@ internal sealed class RemoteControllerForm : StudioForm
         if (action != "start" && !ServiceDialogs.Confirm(this, action == "stop" ? "Stop Remote-Controller?" : "Restart Remote-Controller?", impactLine.Text + "\nRemote clients will disconnect and RC schedules will pause. Tlamatini and Torrenter keep running.", action == "stop" ? "Stop server" : "Restart server")) return;
         await RcLifecycle.ExecuteAsync(action, closing.Token);
         Record("Windows confirmed RC " + action + ".");
-    });
+    }, action);
     private void OpenClient()
     {
         var value = (string?)status?["origin"];

@@ -1,4 +1,5 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (native frames contain private prompts, answers and response tickets)
 using System.Security.Principal;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -46,8 +47,8 @@ public static class RcEndpoint
     {
         using var pipe = await LocalPipe.ConnectAsync(pipeName, token);
         using var server = LocalPipe.VerifyServer(pipe, pid, image);
-        await Protocol.WriteAsync(pipe, request, token);
-        var reply = await Protocol.ReadAsync<JsonObject>(pipe, token);
+        await Protocol.WriteAsync(pipe, request, token, tracePayload: false, compactUtf8: true);
+        var reply = await Protocol.ReadAsync<JsonObject>(pipe, token, tracePayload: false);
         await pipe.WriteAsync(new byte[] { 6 }, token);
         if (reply["error"] is JsonObject error)
             throw new RcFault((string?)error["code"] ?? "control_failed", (string?)error["message"] ?? "RC refused the request.", (int?)error["status"] ?? 409);

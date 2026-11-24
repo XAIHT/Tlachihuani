@@ -6,6 +6,7 @@
     <ApplicationIcon>../../assets/branding/XT.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Tlachihuani.Checks" />
     <ProjectReference Include="../Tlachihuani.Windows/Tlachihuani.Windows.csproj" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.12" />
     <Content Include="../../workers/torrent/*.py" Link="worker/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />

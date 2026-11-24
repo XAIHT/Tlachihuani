@@ -1,13 +1,36 @@
-# xaiht.org link and Tlachihuani.log
+# xaiht.org link, remote prompts and Tlachihuani.log
 
 Latest version: **[0.38.0](releases/v0.38.0.md)**. Requested by Angela López Mendoza
 on 19 November 2026.
 
-A signed-in user of **xaiht.org** opens **Tlamatini-RC**, writes a message and
-presses **SEND**. XT on her computer receives it as JSON and writes it to
-**Tlachihuani.log**, which **Services → See log** shows. The page reports when the
-message is written. In this version a message is only logged: Tlamatini does not
-act on it, and nothing in it is executed.
+A signed-in user of **xaiht.org** opens **Tlamatini-RC**, selects her computer
+and an explicitly approved Tlamatini account, then sends a prompt. XT relays
+typed JSON commands to Remote-Controller, which dispatches them to that account's
+existing local chat engine. Answers, execution approval requests and cancellation
+travel back through the same outgoing HTTPS connection.
+
+Diagnostic messages remain a separate, inert log-only feature. A diagnostic
+message marked `type: "command"` is never treated as an executable prompt.
+This source change requires an updated website, XT and Remote-Controller binary;
+editing source alone does not upgrade already running installations.
+
+## Ask Execs: protected actions, not every tool
+
+The source label is **Ask before protected actions**; the earlier deployed page
+may still say **Ask before executing tools**. Both send the same boolean option.
+With Multi-Turn enabled, Tlamatini applies its existing selective gate. Monitor
+Netstat and direct Netstat do not require approval. Desktop/hardware and messaging
+also retain their deliberate exceptions; do not promise a dialog for every action.
+
+An actual installed English-account phone request using Executer displayed its
+approval dialog. Angela stopped testing before a denial/no-execution or cancellation
+result was established. The Netstat request carried Ask Execs true and registered
+the broker; it was an exemption, not a dropped option. The corrected label passed
+focused source checks and its cloud candidate built, but it was not deployed.
+See [the evidence boundary](verification/2026-11-23-hosted-prompts.md).
+
+XT does not log prompt/answer bodies; the website stores those bodies and local
+Tlamatini retains its normal history/logs. HTTPS is not end-to-end/PQ encryption.
 
 ## How xaiht.org reaches the computer
 
@@ -21,6 +44,12 @@ outgoing HTTPS (long polling):
 3. XT writes each message to Tlachihuani.log, then sends
    `POST https://xaiht.org/api/rc/ack` with the message ids. The page then shows
    **Written to Tlachihuani.log**.
+
+For real prompts, XT advertises `X-Tlachihuani-Command-Protocol: 1` and the poll
+response additionally contains `commands`. Older XT versions continue receiving
+diagnostic messages only. Each command delivery has a nonce and a 60-second
+lease. XT posts ordered snapshots to `/api/rc/result` while Remote-Controller
+processes the prompt. The website follows those snapshots until completion.
 
 Because only outgoing HTTPS is used, the same path works on a home or office
 LAN, Wi-Fi, a hotel network, a phone's shared connection or a dial-up line, and
@@ -45,6 +74,66 @@ starts or reconnects answers at once, so XT and the page show Online together.
 **Disconnect** in the same tab stops asking and deletes the saved key. Use
 **Remove** on the page to make a key stop working at once, for example for a
 lost computer. A new key needs a new **Connect…**.
+Removing the website computer or disconnecting its transport does not undo work
+already dispatched to Tlamatini. Use **Cancel** while still connected, or revoke
+the local account grant in **Accounts…** to withdraw that grant's authority.
+
+## Allow an account and send a real prompt
+
+1. Start **Remote-Controller** in XT. Start the intended Tlamatini edition and
+   sign in to the account you want to use, such as **angela**.
+2. In Tlamatini open **Panels → Tlachihuani · Remote-Controller** and enable
+   that account using its existing account-consent screen.
+3. In **XT → Services → xaiht.org → Accounts…**, check that exact account and
+   choose **Save account access**. English and Spanish accounts have separate
+   immutable bindings, even when their display names match. Nothing is selected
+   automatically. This approval grants chat and monitoring only.
+4. On the phone, refresh the account list, choose the computer and account, then
+   send the prompt. The application must remain running and connected.
+5. Review any execution request before choosing **Proceed** or **Deny**. A normal
+   status update does not dismiss a still-pending request. **Cancel** requests
+   cancellation through the existing Tlamatini adapter.
+
+Uncheck an account in **Accounts…** to revoke website access. This cancels queued
+work and withdraws authority from work already running. Disconnecting the website
+link stops transport and forgets its key; reconnecting with a different key requires
+fresh account approval. Remote launch, remote shutdown, audio and arbitrary shell
+commands are not added to this website command interface.
+
+## Reliable command and answer delivery
+
+- The executable schema is `xaiht.tlamatini-rc.command/1`; it carries a request
+  ID, computer identity, website user, expiry, operation, binding and payload.
+  The website allows only typed account, status, conversation, permission,
+  cancellation, history, operation lookup and full-response operations.
+- Each native request uses a durable idempotency key derived from its approved
+  connection and request ID. A lost acknowledgement or redelivery finds the
+  existing operation. A changed payload with the same ID is rejected. Expired
+  requests cannot start new work; a known request can still be reconciled.
+- A local pipe interruption keeps the website delivery alive while XT queries
+  the same operation again. A service restart can report `outcome_unknown`; it
+  does not replay a prompt whose execution may already have begun.
+- Native frames remain bounded at 64 KiB and use UTF-8 without expanding accented
+  or non-Latin text into unnecessary escapes. Prompt text is limited to 16,000
+  characters and 24,000 bytes for its JSON-encoded UTF-8 string.
+- Full answers use the existing account-bound response ticket. XT fetches only
+  the registered loopback adapter endpoint, checks authorization again, and returns
+  chunks of at most 24 KiB with byte offsets, total length and SHA-256. The client
+  verifies the complete JSON, bounded to 8 MiB. No arbitrary URL is accepted.
+  XT holds the first answer JSON in a bounded memory snapshot so regenerated
+  signed file links cannot change the hash halfway through delivery. The cache
+  allows four answers / 32 MiB, expires idle snapshots after two minutes (and
+  all snapshots after thirty), and is cleared on disconnect. Every chunk still
+  validates the actual signed ticket with Tlamatini and rechecks the native grant;
+  missing snapshots require restarting from byte zero rather than mixing content.
+- Controls have their own bounded capacity: a full prompt queue cannot starve
+  Cancel or an execution decision. Account/status discovery also retains a small
+  separate lane, so refreshing the phone page does not hide the way to cancel.
+  Cancelling a prompt that has not reached Tlamatini durably cancels its queue
+  entry immediately, even if the application has since disconnected.
+- A delivery nonce and increasing sequence prevent stale or reordered snapshots
+  from replacing a newer answer. Prompt bodies, answers and native RC frame
+  contents are excluded from the XT diagnostic log, including trace mode.
 
 ## Send a message
 
@@ -119,6 +208,15 @@ boundary before expecting these controls in an older installed binary.
 - Each xaiht.org user sees and sends only to the computers they added.
 - A firewall in front of the website that answers **403** is reported as such;
   only xaiht.org's own **401** is reported as a key that was not accepted.
+- Website access additionally requires the local operator's approval for the
+  exact origin, connection key fingerprint, computer ID, website user ID and
+  immutable Tlamatini binding. Its dedicated grant cannot establish a local
+  browser session or acquire launch, stop or administrative permissions.
+- The hosted website is trusted with prompt and answer plaintext. This is
+  ordinary authenticated HTTPS, **not end-to-end or post-quantum encryption**.
+  The separately designed PQ transport is not claimed by this implementation.
+- Redirects are disabled when XT sends its computer key or fetches local answer
+  content. No port forwarding or external listener is added to the PC.
 
 ## Where the code lives
 
@@ -128,6 +226,11 @@ boundary before expecting these controls in an older installed binary.
   [ServicesLayout.cs](../src/Tlachihuani.Tray/ServicesLayout.cs) and the Connect
   dialog in [ServiceDialogs.cs](../src/Tlachihuani.Tray/ServiceDialogs.cs). The
   link starts with XT in [TrayContext.cs](../src/Tlachihuani.Tray/TrayContext.cs).
+- **Typed command relay and local approval:**
+  [XaihtCommands.cs](../src/Tlachihuani.Tray/XaihtCommands.cs),
+  [XaihtAccountsForm.cs](../src/Tlachihuani.Tray/XaihtAccountsForm.cs),
+  [XaihtNative.cs](../src/Tlachihuani.RC.Server/XaihtNative.cs) and
+  [XaihtAccess.cs](../src/Tlachihuani.RC/XaihtAccess.cs).
 - **xaiht.org** (the XAIHT `web-app` repository): `api/rc/` (poll and receipt
   routes, keys, storage), `api/rc-router.ts` (the page's operations),
   `contracts/rc.ts` (the JSON message), `src/pages/TlamatiniRC.tsx` and the
@@ -149,7 +252,8 @@ boundary before expecting these controls in an older installed binary.
 
 - XT must be running in the user's Windows session. A sleeping or switched-off
   computer is offline; nothing here wakes it.
-- Messages are logged only. Acting on them in Tlamatini is later work.
+- Diagnostic messages are logged only. Real prompts use the separate approved
+  command channel and require both Remote-Controller and Tlamatini to be running.
 - The [19 November evidence](verification/2026-11-19-xaiht-link.md) used a local
   copy of the page with a memory store; the first test against xaiht.org's Cloud
   SQL database is Angela's production test.

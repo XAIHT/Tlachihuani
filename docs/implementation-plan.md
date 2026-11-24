@@ -15,3 +15,20 @@ The first implementation covers the code foundation of phases 1–3 and initial 
 Begin with a small genuine vertical slice: service state + health + tray display + Start/Stop. Do not write mock code that reports running before SCM and health observations exist. Keep force-stop unavailable until ownership/consent is implemented.
 
 No GitHub automation or release publishing belongs in these phases unless Angela later requests it. She will create the repository personally. No `dotnet new`, package restore, build, installation or test command is claimed to have run during the design-only preparation.
+
+## Hosted prompt integration · 23 November review
+
+The website path now carries real prompts and answers to an explicitly approved
+running Tlamatini account through XT's outgoing HTTPS connection and the local
+Remote-Controller adapter. It does not open an inbound port or add website launch,
+shutdown or phone-audio controls. Diagnostics remain inert and separate from typed
+commands. Retries retain identity, receipts survive reload, and full answers use
+validated account-bound chunks. Ask Execs follows the existing selective policy;
+Netstat is exempt, whereas the tested Executer action displayed approval.
+
+Physical-phone English prompt/answer, reload and approval display were observed.
+Real denial/no-execution and cancellation were not completed before tests stopped.
+The wording-only website candidate was built but not promoted. Read the
+[current integration guide](xaiht-link.md) and [dated evidence](verification/2026-11-23-hosted-prompts.md) before making
+installation or release-acceptance claims. This pass changes documentation only;
+existing version identifiers and installed services remain unchanged.

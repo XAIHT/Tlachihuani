@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
-    <Version>0.38.0</Version>
+    <Version>0.39.0</Version>
     <Authors>Angela López Mendoza; XAIHT</Authors>
     <Company>XAIHT</Company>
     <Copyright>Copyright © XAIHT</Copyright>

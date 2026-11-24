@@ -1,4 +1,5 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
+// tlachihuani:trace-off (command batches contain private conversations; explicit link and diagnostic-message logging remains)
 using System.Net;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -8,6 +9,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using Tlachihuani.RC;
 
 namespace Tlachihuani.Tray;
 
@@ -77,18 +79,23 @@ internal sealed class XaihtLink
     private readonly Queue<long> loggedOrder = new();
     private CancellationTokenSource restart = new();
     private XaihtLinkStatus status = new("off", "Not connected to xaiht.org.", null, null, null, null, 0);
+    private XaihtIdentity? identity;
+    private readonly XaihtCommands commands = new();
 
     internal XaihtLinkStatus Status { get { lock (gate) return status; } }
+    internal XaihtIdentity? Identity { get { lock (gate) return identity; } }
 
     // Settings changed (Connect or Disconnect): drop the current request and start again.
     internal void Reconfigure()
     {
-        lock (gate) { restart.Cancel(); }
+        lock (gate) { identity = null; restart.Cancel(); }
+        commands.ClearSnapshots();
     }
 
     internal async Task RunAsync(CancellationToken closing)
     {
-        using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(WaitSeconds + 20) };
+        using var cleanup = closing.Register(commands.ClearSnapshots);
+        using var http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(WaitSeconds + 20) };
         http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tlachihuani", version));
         var backoff = TimeSpan.FromSeconds(2);
         while (!closing.IsCancellationRequested)
@@ -123,7 +130,7 @@ internal sealed class XaihtLink
             if (Status.State is "off" or "error") Set("connecting", "Connecting to " + settings.Server + "…", settings.Server, null);
             try
             {
-                await PollOnce(http, settings, both.Token);
+                await PollOnce(http, settings, both.Token, changed, closing);
                 backoff = TimeSpan.FromSeconds(2);
             }
             catch (OperationCanceledException) when (changed.IsCancellationRequested || closing.IsCancellationRequested) { }
@@ -133,7 +140,7 @@ internal sealed class XaihtLink
                 pass.Dispose();
                 if (!await Pause(TimeSpan.FromSeconds(60), both.Token, closing)) return;
             }
-            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or InvalidDataException or IOException)
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or InvalidDataException or IOException or RcFault or InvalidOperationException or ArgumentException)
             {
                 var reason = ex is TaskCanceledException ? "xaiht.org did not answer in time." : ex.Message;
                 Set("offline", "Cannot reach " + settings.Server + ": " + reason, settings.Server, Status.Computer);
@@ -152,14 +159,18 @@ internal sealed class XaihtLink
         return !closing.IsCancellationRequested;
     }
 
-    private async Task PollOnce(HttpClient http, XaihtLinkSettings settings, CancellationToken token)
+    private async Task PollOnce(HttpClient http, XaihtLinkSettings settings, CancellationToken token, CancellationToken changed, CancellationToken closing)
     {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
+        deadline.CancelAfter(TimeSpan.FromSeconds(WaitSeconds + 20));
+        token = deadline.Token;
         // The first request after starting or reconnecting answers at once, so XT
         // shows Online as soon as xaiht.org does; the following ones wait.
         int wait = Status.State == "online" && Status.Server == settings.Server ? WaitSeconds : 0;
         using var request = new HttpRequestMessage(HttpMethod.Get, $"{settings.Server}/api/rc/poll?wait={wait}");
         Authorize(request, settings);
-        using var response = await http.SendAsync(request, token);
+        request.Headers.TryAddWithoutValidation("X-Tlachihuani-Command-Protocol", "1");
+        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
         // Only xaiht.org's own 401 means the key is wrong; a 403 usually comes from
         // a firewall in front of the website (for example a bot check).
         if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -167,9 +178,15 @@ internal sealed class XaihtLink
         if (response.StatusCode == HttpStatusCode.Forbidden)
             throw new HttpRequestException("xaiht.org answered 403 Forbidden; a firewall in front of the website may be blocking XT.");
         if (!response.IsSuccessStatusCode) throw new HttpRequestException($"xaiht.org answered {(int)response.StatusCode} {response.ReasonPhrase}.");
-        var body = JsonNode.Parse(await response.Content.ReadAsStringAsync(token)) as JsonObject ?? throw new InvalidDataException("xaiht.org sent an unexpected answer.");
+        var body = JsonNode.Parse(await XaihtCommands.ReadBounded(response.Content, 512 * 1024, token)) as JsonObject ?? throw new InvalidDataException("xaiht.org sent an unexpected answer.");
         var computer = (string?)body["computer"]?["name"];
         Set("online", "Connected. xaiht.org shows this computer as online.", settings.Server, computer);
+        if ((long?)body["computer"]?["id"] is long computerId && (long?)body["computer"]?["user_id"] is long userId)
+        {
+            var current = XaihtAccess.Validate(new XaihtIdentity(RcProtocol.Hash(settings.Server + "\n" + settings.Key), settings.Server, computerId, userId));
+            lock (gate) identity = current;
+            commands.Receive(http, settings, current, body["commands"] as JsonArray, changed, closing);
+        }
         var ids = new List<long>();
         foreach (var item in body["messages"]?.AsArray() ?? [])
         {
@@ -191,7 +208,7 @@ internal sealed class XaihtLink
         Authorize(request, settings);
         var body = new JsonObject { ["ids"] = new JsonArray(ids.Select(id => (JsonNode)id).ToArray()), ["written_to"] = "Tlachihuani.log" };
         request.Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
-        using var response = await http.SendAsync(request, token);
+        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
         if (!response.IsSuccessStatusCode)
             TlachihuaniLog.Warn("xaiht.org", $"The receipt for message {string.Join(", ", ids)} was not accepted ({(int)response.StatusCode}); xaiht.org will send it again.");
     }

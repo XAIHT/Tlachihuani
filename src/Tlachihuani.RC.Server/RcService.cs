@@ -80,7 +80,7 @@ internal sealed class RcService(RcRuntime runtime, ILogger<RcService> log) : Bac
             deadline.CancelAfter(TimeSpan.FromSeconds(8));
             try
             {
-                var req = await Protocol.ReadAsync<JsonObject>(pipe, deadline.Token);
+                var req = await Protocol.ReadAsync<JsonObject>(pipe, deadline.Token, tracePayload: false);
                 pass.Rename("RC request " + (string?)req["op"]);
                 string? sid = null;
                 pipe.RunAsClient(() => { using var identity = WindowsIdentity.GetCurrent(true); sid = identity?.User?.Value; });
@@ -88,7 +88,7 @@ internal sealed class RcService(RcRuntime runtime, ILogger<RcService> log) : Bac
                 try { reply = runtime.Native(req, sid ?? ""); }
                 catch (Exception ex) when (ex is RcFault or System.Text.Json.JsonException or InvalidOperationException or ArgumentException)
                 { reply = new() { ["error"] = new JsonObject { ["code"] = ex is RcFault f ? f.Code : "invalid_request", ["message"] = ex is RcFault ? ex.Message : "Invalid RC control message.", ["status"] = ex is RcFault r ? r.Status : 400 } }; }
-                await Protocol.WriteAsync(pipe, reply, deadline.Token);
+                await Protocol.WriteAsync(pipe, reply, deadline.Token, tracePayload: false, compactUtf8: true);
                 await pipe.ReadExactlyAsync(new byte[1], deadline.Token);
             }
             catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)

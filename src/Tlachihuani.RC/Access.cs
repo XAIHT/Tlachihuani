@@ -149,6 +149,7 @@ public sealed class Access(StateStore store, RcConfiguration config, TimeProvide
     public ChallengeResult CreateChallenge(string deviceId)
     {
         var device = store.Read(s => Device(s, deviceId));
+        if (device.AuthenticationKind != "browser") throw new RcFault("authentication_failed", "This grant is available only through its locally approved website connection.", 403);
         lock (gate)
         {
             Prune();
@@ -170,6 +171,7 @@ public sealed class Access(StateStore store, RcConfiguration config, TimeProvide
             if (!challenges.Remove(challengeId, out var challenge) || challenge.DeviceId != deviceId || challenge.Expires <= clock.GetUtcNow())
                 throw new RcFault("authentication_failed", "Authentication challenge is invalid or expired.", 401);
             var device = store.Read(s => Device(s, deviceId));
+            if (device.AuthenticationKind != "browser") throw new RcFault("authentication_failed", "This grant cannot establish a browser session.", 403);
             bool valid;
             try
             {
@@ -213,6 +215,8 @@ public sealed class Access(StateStore store, RcConfiguration config, TimeProvide
                 var device = Device(s, deviceId);
                 if (Binding(s, device.BindingId).WindowsSid != windowsSid)
                     throw new RcFault("forbidden", "Wrong local account.", 403);
+                if (device.AuthenticationKind == "xaiht")
+                    throw new RcFault("forbidden", "Manage website account access in Services → xaiht.org → Accounts.", 403);
                 if (revision != device.Revision)
                     throw new RcFault("revision_conflict", "Device permissions changed. Refresh and review them again.");
                 if (device.Scopes.SequenceEqual(scopes, StringComparer.Ordinal)) return device;

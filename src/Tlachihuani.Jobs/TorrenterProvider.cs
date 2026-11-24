@@ -82,6 +82,14 @@ internal sealed class TorrenterProvider(JobsSettings settings, ILogger log) : IJ
     public async Task<JsonObject> CommandAsync(JsonObject req, string sid, CancellationToken token)
     {
         var op = (string?)req["op"];
+        // Readiness must not queue behind a transfer inventory or lifecycle operation.
+        // These are observations only; the caller still checks the real HTTP health API.
+        if (op == "status" && (bool?)req["include_impact"] == false)
+        {
+            token.ThrowIfCancellationRequested();
+            return new() { ["provider"] = Id, ["enabled"] = enabled, ["engine"] = worker.Running,
+                ["web"] = webReady, ["port"] = settings.Port };
+        }
         await lifecycle.WaitAsync(token);
         JsonObject reply;
         try
