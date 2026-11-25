@@ -18,6 +18,7 @@ bump does not authorize builds, tags, commits or publication.
 - Do not register a workflow agent, tool, skill, MCP, database row, or prompt example merely to expose a service-control panel.
 - The service accepts a closed, typed operation set. No arbitrary command, executable path, service name, or PID supplied by a browser may be executed or killed.
 - Use owned process handles and verified identities for termination; never kill by image name or a stale PID.
+- Flow Pills (XT's `--flow-pills` window) runs only the agents, Python and models of the Tlamatini installation it finds, and ends processes only through each run's own job. Read [Flow Pills](docs/flow-pills.md) before changing it.
 - Do not add dependencies until needed. Pin and review them during implementation, not by copying Tlamatini's large dependency set.
 - Angela disabled Snyk on 2026-10-11. Do not invoke Snyk tools, skills, hooks, or scans. Use the pinned package lock files and NuGet audit for dependency checks.
 

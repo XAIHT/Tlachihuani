@@ -17,6 +17,12 @@
           "Tlachihuani.Contracts": "[0.40.0, )"
         }
       },
+      "tlachihuani.flowpills": {
+        "type": "Project",
+        "dependencies": {
+          "Tlachihuani.Windows": "[0.40.0, )"
+        }
+      },
       "tlachihuani.rc": {
         "type": "Project",
         "dependencies": {

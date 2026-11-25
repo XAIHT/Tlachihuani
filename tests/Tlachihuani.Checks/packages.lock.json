@@ -310,6 +310,12 @@
           "Tlachihuani.Contracts": "[0.40.0, )"
         }
       },
+      "tlachihuani.flowpills": {
+        "type": "Project",
+        "dependencies": {
+          "Tlachihuani.Windows": "[0.40.0, )"
+        }
+      },
       "tlachihuani.jobs": {
         "type": "Project",
         "dependencies": {
@@ -326,7 +332,8 @@
       "tlachihuani.tray": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Client": "[0.40.0, )"
+          "Tlachihuani.Client": "[0.40.0, )",
+          "Tlachihuani.FlowPills": "[0.40.0, )"
         }
       },
       "tlachihuani.windows": {

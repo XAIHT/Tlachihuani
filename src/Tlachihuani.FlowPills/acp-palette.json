@@ -1,0 +1,1773 @@
+{
+  "source": "Tlamatini agentic_control_panel.css + acp-canvas-core.js",
+  "classMap": {
+    "ender": "ender-agent",
+    "starter": "starter-agent",
+    "or": "or-agent",
+    "and": "and-agent",
+    "croner": "croner-agent",
+    "mover": "mover-agent",
+    "cleaner": "cleaner-agent",
+    "sleeper": "sleeper-agent",
+    "shoter": "shoter-agent",
+    "camcorder": "camcorder-agent",
+    "globber": "globber-agent",
+    "grepper": "grepper-agent",
+    "editor": "editor-agent",
+    "recorder": "recorder-agent",
+    "whisperer": "whisperer-agent",
+    "audioplayer": "audioplayer-agent",
+    "videoplayer": "videoplayer-agent",
+    "talker": "talker-agent",
+    "keyboarder": "keyboarder-agent",
+    "recmailer": "recmailer-agent",
+    "notifier": "notifier-agent",
+    "deleter": "deleter-agent",
+    "executer": "executer-agent",
+    "stopper": "stopper-agent",
+    "whatsapper": "whatsapper-agent",
+    "telegrammer": "telegrammer-agent",
+    "teletlamatini": "teletlamatini-agent",
+    "acpxer": "acpxer-agent",
+    "pythonxer": "pythonxer-agent",
+    "asker": "asker-agent",
+    "forker": "forker-agent",
+    "counter": "counter-agent",
+    "raiser": "raiser-agent",
+    "emailer": "emailer-agent",
+    "mongoxer": "mongoxer-agent",
+    "monitor-log": "monitor-log-agent",
+    "monitor-netstat": "monitor-netstat-agent",
+    "ssher": "ssher-agent",
+    "scper": "scper-agent",
+    "sqler": "sqler-agent",
+    "prompter": "prompter-agent",
+    "flowcreator": "flowcreator-agent",
+    "gitter": "gitter-agent",
+    "discoverer": "discoverer-agent",
+    "nmapper": "nmapper-agent",
+    "pptxer": "pptxer-agent",
+    "pdfer": "pdfer-agent",
+    "terminater": "terminater-agent",
+    "torrenter": "torrenter-agent",
+    "latexer": "latexer-agent",
+    "dockerer": "dockerer-agent",
+    "mcp-doctor": "mcpdoctor-agent",
+    "instant-messaging-doctor": "instantmessagingdoctor-agent",
+    "pser": "pser-agent",
+    "kuberneter": "kuberneter-agent",
+    "apirer": "apirer-agent",
+    "unrealer": "unrealer-agent",
+    "blenderer": "blenderer-agent",
+    "playwrighter": "playwrighter-agent",
+    "reviewer": "reviewer-agent",
+    "analyzer": "analyzer-agent",
+    "jenkinser": "jenkinser-agent",
+    "crawler": "crawler-agent",
+    "summarizer": "summarizer-agent",
+    "flowhypervisor": "flowhypervisor-agent",
+    "mouser": "mouser-agent",
+    "windower": "windower-agent",
+    "kalier": "kalier-agent",
+    "stm32er": "stm32er-agent",
+    "esp32er": "esp32er-agent",
+    "esphomer": "esphomer-agent",
+    "arduiner": "arduiner-agent",
+    "file-interpreter": "file-interpreter-agent",
+    "image-interpreter": "image-interpreter-agent",
+    "video-analyzer": "video-analyzer-agent",
+    "netspeed-calculator": "netspeed-calculator-agent",
+    "file-creator": "filecreator-agent",
+    "file-extractor": "fileextractor-agent",
+    "kyber-keygen": "kyberkeygen-agent",
+    "kyber-cipher": "kybercipher-agent",
+    "kyber-decipher": "kyberdecipher-agent",
+    "parametrizer": "parametrizer-agent",
+    "flowbacker": "flowbacker-agent",
+    "barrier": "barrier-agent",
+    "j-decompiler": "jdecompiler-agent",
+    "de-compresser": "decompresser-agent",
+    "googler": "googler-agent",
+    "skill": "skill-agent",
+    "acpx": "acpx-agent"
+  },
+  "classes": {
+    "acpx-agent": {
+      "fill": "#BF360C",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#BF360C",
+          0.0
+        ],
+        [
+          "#E64A19",
+          0.33
+        ],
+        [
+          "#6A1B9A",
+          0.66
+        ],
+        [
+          "#212121",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "acpxer-agent": {
+      "fill": "#0B1F3A",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0B1F3A",
+          0.0
+        ],
+        [
+          "#5A1FB8",
+          0.33
+        ],
+        [
+          "#EC4899",
+          0.66
+        ],
+        [
+          "#22D3EE",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "analyzer-agent": {
+      "fill": "#7F1D1D",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#7F1D1D",
+          0.0
+        ],
+        [
+          "#DC2626",
+          0.33
+        ],
+        [
+          "#F59E0B",
+          0.66
+        ],
+        [
+          "#FACC15",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "and-agent": {
+      "fill": "#06B6D4",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#06B6D4",
+          0.0
+        ],
+        [
+          "#0891B2",
+          1.0
+        ]
+      ]
+    },
+    "apirer-agent": {
+      "fill": "#3B0764",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#3B0764",
+          0.0
+        ],
+        [
+          "#86EFAC",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "arduiner-agent": {
+      "fill": "#00363A",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#00363A",
+          0.0
+        ],
+        [
+          "#008184",
+          0.33
+        ],
+        [
+          "#00C4CC",
+          0.66
+        ],
+        [
+          "#C8F2F0",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "asker-agent": {
+      "fill": "#EF4444",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#EF4444",
+          0.0
+        ],
+        [
+          "#3B82F6",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "audioplayer-agent": {
+      "fill": "#6411AD",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1B1035",
+          0.0
+        ],
+        [
+          "#6411AD",
+          0.33
+        ],
+        [
+          "#E01E84",
+          0.66
+        ],
+        [
+          "#FFB700",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "barrier-agent": {
+      "fill": "#E84393",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#E84393",
+          0.0
+        ],
+        [
+          "#00B894",
+          0.5
+        ],
+        [
+          "#FDCB6E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "blenderer-agent": {
+      "fill": "#15334F",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#15334F",
+          0.0
+        ],
+        [
+          "#2A6FB3",
+          0.33
+        ],
+        [
+          "#EA7600",
+          0.66
+        ],
+        [
+          "#F7B733",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "camcorder-agent": {
+      "fill": "#C1121F",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1A1A2E",
+          0.0
+        ],
+        [
+          "#C1121F",
+          0.33
+        ],
+        [
+          "#F08700",
+          0.66
+        ],
+        [
+          "#FFD60A",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "cleaner-agent": {
+      "fill": "#00008B",
+      "text": "#FFFFFF"
+    },
+    "counter-agent": {
+      "fill": "#FF8F00",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FF8F00",
+          0.0
+        ],
+        [
+          "#00695C",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "crawler-agent": {
+      "fill": "#00BCD4",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#00BCD4",
+          0.0
+        ],
+        [
+          "#E91E63",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "croner-agent": {
+      "fill": "#F87171",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#F87171",
+          0.0
+        ],
+        [
+          "#EF4444",
+          1.0
+        ]
+      ]
+    },
+    "decompresser-agent": {
+      "fill": "#1F2A56",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1F2A56",
+          0.0
+        ],
+        [
+          "#B07A2B",
+          0.33
+        ],
+        [
+          "#D7263D",
+          0.66
+        ],
+        [
+          "#7CF6B5",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "deleter-agent": {
+      "fill": "#DC2626",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#EF4444",
+          0.0
+        ],
+        [
+          "#B91C1C",
+          1.0
+        ]
+      ]
+    },
+    "discoverer-agent": {
+      "fill": "#2E1065",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#2E1065",
+          0.0
+        ],
+        [
+          "#7C3AED",
+          0.33
+        ],
+        [
+          "#C026D3",
+          0.66
+        ],
+        [
+          "#F0ABFC",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "dockerer-agent": {
+      "fill": "#2496ED",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#2496ED",
+          0.0
+        ],
+        [
+          "#FFFFFF",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "editor-agent": {
+      "fill": "#10B981",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#022C22",
+          0.0
+        ],
+        [
+          "#064E3B",
+          0.33
+        ],
+        [
+          "#10B981",
+          0.66
+        ],
+        [
+          "#6EE7B7",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "emailer-agent": {
+      "fill": "#5C6BC0",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#5C6BC0",
+          0.0
+        ],
+        [
+          "#3949AB",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "ender-agent": {
+      "fill": "#8B5CF6",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#8B5CF6",
+          0.0
+        ],
+        [
+          "#7C3AED",
+          1.0
+        ]
+      ]
+    },
+    "esp32er-agent": {
+      "fill": "#1A1A1A",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1A1A1A",
+          0.0
+        ],
+        [
+          "#E7352C",
+          0.33
+        ],
+        [
+          "#FF8A3D",
+          0.66
+        ],
+        [
+          "#FFE2C2",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "esphomer-agent": {
+      "fill": "#06281C",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#06281C",
+          0.0
+        ],
+        [
+          "#0E8A4F",
+          0.33
+        ],
+        [
+          "#36D399",
+          0.66
+        ],
+        [
+          "#D7FBE8",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "executer-agent": {
+      "fill": "#FACC15",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FDE047",
+          0.0
+        ],
+        [
+          "#EAB308",
+          1.0
+        ]
+      ]
+    },
+    "file-interpreter-agent": {
+      "fill": "#FF9A00",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FF9A00",
+          0.0
+        ],
+        [
+          "#1B1464",
+          0.5
+        ],
+        [
+          "#00FFC8",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "filecreator-agent": {
+      "fill": "#00897B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#00897B",
+          0.0
+        ],
+        [
+          "#FF7043",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "fileextractor-agent": {
+      "fill": "#3F51B5",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#3F51B5",
+          0.0
+        ],
+        [
+          "#FFB300",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "flowbacker-agent": {
+      "fill": "#0F4C5C",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0F4C5C",
+          0.0
+        ],
+        [
+          "#E36414",
+          0.5
+        ],
+        [
+          "#FB8B24",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "flowcreator-agent": {
+      "fill": "#1565C0",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1565C0",
+          0.0
+        ],
+        [
+          "#C62828",
+          0.5
+        ],
+        [
+          "#2E7D32",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "flowhypervisor-agent": {
+      "fill": "#E91E63",
+      "text": "#FFFFFF"
+    },
+    "forker-agent": {
+      "fill": "#333333",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#000000",
+          0.0
+        ],
+        [
+          "#FFFFFF",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "gitter-agent": {
+      "fill": "#333333",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FFFFFF",
+          0.0
+        ],
+        [
+          "#000000",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "globber-agent": {
+      "fill": "#8B5CF6",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1E0A3C",
+          0.0
+        ],
+        [
+          "#4C1D95",
+          0.33
+        ],
+        [
+          "#8B5CF6",
+          0.66
+        ],
+        [
+          "#C4B5FD",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "googler-agent": {
+      "fill": "#D32F2F",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#D32F2F",
+          0.0
+        ],
+        [
+          "#F9A825",
+          0.33
+        ],
+        [
+          "#388E3C",
+          0.66
+        ],
+        [
+          "#1565C0",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "grepper-agent": {
+      "fill": "#3B82F6",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0B1D3A",
+          0.0
+        ],
+        [
+          "#1E3A8A",
+          0.33
+        ],
+        [
+          "#3B82F6",
+          0.66
+        ],
+        [
+          "#93C5FD",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "image-interpreter-agent": {
+      "fill": "#C2185B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#C2185B",
+          0.0
+        ],
+        [
+          "#FFC107",
+          0.5
+        ],
+        [
+          "#009688",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "instantmessagingdoctor-agent": {
+      "fill": "#12343B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#12343B",
+          0.0
+        ],
+        [
+          "#2A9D8F",
+          0.34
+        ],
+        [
+          "#E76F51",
+          0.68
+        ],
+        [
+          "#F4D35E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "jdecompiler-agent": {
+      "fill": "#2C3E50",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#2C3E50",
+          0.0
+        ],
+        [
+          "#E74C3C",
+          0.5
+        ],
+        [
+          "#27AE60",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "jenkinser-agent": {
+      "fill": "#FFFFFF",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FFFFFF",
+          0.0
+        ],
+        [
+          "#1E88E5",
+          1.0
+        ]
+      ],
+      "text": "#1565C0"
+    },
+    "kalier-agent": {
+      "fill": "#000000",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#000000",
+          0.0
+        ],
+        [
+          "#00471B",
+          0.33
+        ],
+        [
+          "#00892A",
+          0.66
+        ],
+        [
+          "#39FF14",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "keyboarder-agent": {
+      "fill": "#F44336",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#F44336",
+          0.0
+        ],
+        [
+          "#FF9800",
+          0.33
+        ],
+        [
+          "#FFEB3B",
+          0.66
+        ],
+        [
+          "#4CAF50",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "kuberneter-agent": {
+      "fill": "#000000",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#000000",
+          0.0
+        ],
+        [
+          "#00008B",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "kybercipher-agent": {
+      "fill": "#D35400",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#D35400",
+          0.0
+        ],
+        [
+          "#1ABC9C",
+          0.5
+        ],
+        [
+          "#8E44AD",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "kyberdecipher-agent": {
+      "fill": "#4A90D9",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#4A90D9",
+          0.0
+        ],
+        [
+          "#D94F7A",
+          0.5
+        ],
+        [
+          "#82C91E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "kyberkeygen-agent": {
+      "fill": "#7B2FBE",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#7B2FBE",
+          0.0
+        ],
+        [
+          "#00BFA5",
+          0.5
+        ],
+        [
+          "#FFD740",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "latexer-agent": {
+      "fill": "#14213D",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#14213D",
+          0.0
+        ],
+        [
+          "#7F5539",
+          0.33
+        ],
+        [
+          "#C9973F",
+          0.66
+        ],
+        [
+          "#F0E3C2",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "mcpdoctor-agent": {
+      "fill": "#0F3D3E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0F3D3E",
+          0.0
+        ],
+        [
+          "#1E7B73",
+          0.33
+        ],
+        [
+          "#E0A83A",
+          0.66
+        ],
+        [
+          "#FFF2C6",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "mongoxer-agent": {
+      "fill": "#558B2F",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#558B2F",
+          0.0
+        ],
+        [
+          "#33691E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "monitor-log-agent": {
+      "fill": "#FF6F00",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FF6F00",
+          0.0
+        ],
+        [
+          "#E65100",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "monitor-netstat-agent": {
+      "fill": "#00897B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#00897B",
+          0.0
+        ],
+        [
+          "#00695C",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "mouser-agent": {
+      "fill": "#FF1744",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FF1744",
+          0.0
+        ],
+        [
+          "#651FFF",
+          0.5
+        ],
+        [
+          "#00E676",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "mover-agent": {
+      "fill": "#795548",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#8D6E63",
+          0.0
+        ],
+        [
+          "#5D4037",
+          1.0
+        ]
+      ]
+    },
+    "netspeed-calculator-agent": {
+      "fill": "#041E2B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#041E2B",
+          0.0
+        ],
+        [
+          "#0E6BA8",
+          0.33
+        ],
+        [
+          "#21D4B4",
+          0.66
+        ],
+        [
+          "#F9C80E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "nmapper-agent": {
+      "fill": "#1A0A00",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1A0A00",
+          0.0
+        ],
+        [
+          "#B45309",
+          0.33
+        ],
+        [
+          "#F97316",
+          0.66
+        ],
+        [
+          "#FDE68A",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "notifier-agent": {
+      "fill": "#F472B6",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#F472B6",
+          0.0
+        ],
+        [
+          "#DB2777",
+          1.0
+        ]
+      ]
+    },
+    "or-agent": {
+      "fill": "#F59E0B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#F59E0B",
+          0.0
+        ],
+        [
+          "#D97706",
+          1.0
+        ]
+      ]
+    },
+    "parametrizer-agent": {
+      "fill": "#311B92",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#311B92",
+          0.0
+        ],
+        [
+          "#AA00FF",
+          0.33
+        ],
+        [
+          "#FF6D00",
+          0.66
+        ],
+        [
+          "#00E5FF",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "pdfer-agent": {
+      "fill": "#2B0A0A",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#2B0A0A",
+          0.0
+        ],
+        [
+          "#C1272D",
+          0.33
+        ],
+        [
+          "#E8A33D",
+          0.66
+        ],
+        [
+          "#FDF6E3",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "playwrighter-agent": {
+      "fill": "#3D1766",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#3D1766",
+          0.0
+        ],
+        [
+          "#D90368",
+          0.33
+        ],
+        [
+          "#0FA3B1",
+          0.66
+        ],
+        [
+          "#6EE7B7",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "pptxer-agent": {
+      "fill": "#1A0B2E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1A0B2E",
+          0.0
+        ],
+        [
+          "#6D28D9",
+          0.33
+        ],
+        [
+          "#FF6B35",
+          0.66
+        ],
+        [
+          "#FFD93D",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "prompter-agent": {
+      "fill": "#795548",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#795548",
+          0.0
+        ],
+        [
+          "#1A237E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "pser-agent": {
+      "fill": "#E91E63",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#E91E63",
+          0.0
+        ],
+        [
+          "#4CAF50",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "pythonxer-agent": {
+      "fill": "#306998",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#306998",
+          0.0
+        ],
+        [
+          "#FFD43B",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "raiser-agent": {
+      "fill": "#AD1457",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#AD1457",
+          0.0
+        ],
+        [
+          "#880E4F",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "recmailer-agent": {
+      "fill": "#38BDF8",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#38BDF8",
+          0.0
+        ],
+        [
+          "#0284C7",
+          1.0
+        ]
+      ]
+    },
+    "recorder-agent": {
+      "fill": "#0A9396",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#001219",
+          0.0
+        ],
+        [
+          "#005F73",
+          0.33
+        ],
+        [
+          "#0A9396",
+          0.66
+        ],
+        [
+          "#94D2BD",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "reviewer-agent": {
+      "fill": "#0E7490",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0E7490",
+          0.0
+        ],
+        [
+          "#2563EB",
+          0.33
+        ],
+        [
+          "#4F46E5",
+          0.66
+        ],
+        [
+          "#7C3AED",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "scper-agent": {
+      "fill": "#424242",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#424242",
+          0.0
+        ],
+        [
+          "#E53935",
+          1.0
+        ]
+      ]
+    },
+    "shoter-agent": {
+      "fill": "#06B6D4",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#06B6D4",
+          0.0
+        ],
+        [
+          "#D946EF",
+          1.0
+        ]
+      ]
+    },
+    "skill-agent": {
+      "fill": "#4527A0",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#4527A0",
+          0.0
+        ],
+        [
+          "#6A1B9A",
+          0.33
+        ],
+        [
+          "#00838F",
+          0.66
+        ],
+        [
+          "#00BFA5",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "sleeper-agent": {
+      "fill": "#607D8B",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#78909C",
+          0.0
+        ],
+        [
+          "#455A64",
+          1.0
+        ]
+      ]
+    },
+    "source-agent": {
+      "fill": "#17A2B8",
+      "text": "#FFFFFF"
+    },
+    "sqler-agent": {
+      "fill": "#F97316",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#F97316",
+          0.0
+        ],
+        [
+          "#10B981",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "ssher-agent": {
+      "fill": "#1A237E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1A237E",
+          0.0
+        ],
+        [
+          "#E53935",
+          1.0
+        ]
+      ]
+    },
+    "starter-agent": {
+      "fill": "#10B981",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#10B981",
+          0.0
+        ],
+        [
+          "#059669",
+          1.0
+        ]
+      ]
+    },
+    "stm32er-agent": {
+      "fill": "#0A0E17",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0A0E17",
+          0.0
+        ],
+        [
+          "#1E63FF",
+          0.33
+        ],
+        [
+          "#8A97A8",
+          0.66
+        ],
+        [
+          "#EEF3FB",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "stopper-agent": {
+      "fill": "#6B7280",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#9CA3AF",
+          0.0
+        ],
+        [
+          "#4B5563",
+          1.0
+        ]
+      ]
+    },
+    "summarizer-agent": {
+      "fill": "#FFD600",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#FFD600",
+          0.0
+        ],
+        [
+          "#E91E63",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "talker-agent": {
+      "fill": "#C1462E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#5B1D2E",
+          0.0
+        ],
+        [
+          "#C1462E",
+          0.33
+        ],
+        [
+          "#F2A35E",
+          0.66
+        ],
+        [
+          "#FFE3A3",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "target-agent": {
+      "fill": "#28A745",
+      "text": "#FFFFFF"
+    },
+    "telegrammer-agent": {
+      "fill": "#1A237E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#1A237E",
+          0.0
+        ],
+        [
+          "#10B981",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "teletlamatini-agent": {
+      "fill": "#0088CC",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0088CC",
+          0.0
+        ],
+        [
+          "#29B6F6",
+          0.33
+        ],
+        [
+          "#FFA000",
+          0.66
+        ],
+        [
+          "#C2185B",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "terminater-agent": {
+      "fill": "#07130E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#07130E",
+          0.0
+        ],
+        [
+          "#0B7A4B",
+          0.33
+        ],
+        [
+          "#3DFF8F",
+          0.66
+        ],
+        [
+          "#D9FFEA",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "torrenter-agent": {
+      "fill": "#07130E",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#07130E",
+          0.0
+        ],
+        [
+          "#0B7A4B",
+          0.33
+        ],
+        [
+          "#3DFF8F",
+          0.66
+        ],
+        [
+          "#D9FFEA",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "unrealer-agent": {
+      "fill": "#0B1220",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0B1220",
+          0.0
+        ],
+        [
+          "#1F3A8A",
+          0.33
+        ],
+        [
+          "#10B981",
+          0.66
+        ],
+        [
+          "#22D3EE",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "video-analyzer-agent": {
+      "fill": "#12043A",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#12043A",
+          0.0
+        ],
+        [
+          "#7B2FF7",
+          0.33
+        ],
+        [
+          "#00E5FF",
+          0.66
+        ],
+        [
+          "#39FF14",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "videoplayer-agent": {
+      "fill": "#1F3A93",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0A0A1A",
+          0.0
+        ],
+        [
+          "#1F3A93",
+          0.33
+        ],
+        [
+          "#E94560",
+          0.66
+        ],
+        [
+          "#F5D76E",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "whatsapper-agent": {
+      "fill": "#006400",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#006400",
+          0.0
+        ],
+        [
+          "#008000",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "whisperer-agent": {
+      "fill": "#1747C4",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0A1A3F",
+          0.0
+        ],
+        [
+          "#1747C4",
+          0.33
+        ],
+        [
+          "#18B6C9",
+          0.66
+        ],
+        [
+          "#AEF0E6",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    },
+    "windower-agent": {
+      "fill": "#0F2C4D",
+      "angle": 135.0,
+      "stops": [
+        [
+          "#0F2C4D",
+          0.0
+        ],
+        [
+          "#1E6FB8",
+          0.33
+        ],
+        [
+          "#4FC3F7",
+          0.66
+        ],
+        [
+          "#E1F5FE",
+          1.0
+        ]
+      ],
+      "text": "#FFFFFF"
+    }
+  },
+  "neverStartOthers": [
+    "cleaner",
+    "emailer",
+    "monitor-log",
+    "monitor-netstat",
+    "recmailer",
+    "stopper",
+    "flowcreator",
+    "flowhypervisor"
+  ],
+  "withoutInputs": [
+    "starter",
+    "flowcreator",
+    "flowhypervisor"
+  ],
+  "twoInputs": [
+    "or",
+    "and"
+  ]
+}

@@ -8,7 +8,7 @@ internal static class Program
     {
         Tlachihuani.Windows.LogPaths.UseUserLog(args.FirstOrDefault() switch
         {
-            "--rc-stop-console" => "xt-rc-stop", "--remote-controller" => "xt-rc-panel", _ => "xt"
+            "--rc-stop-console" => "xt-rc-stop", "--remote-controller" => "xt-rc-panel", "--flow-pills" => "xt-flow-pills", _ => "xt"
         });
         if (args is ["--rc-stop-console", var edition, var pid, var created])
         {
@@ -16,6 +16,11 @@ internal static class Program
             return;
         }
         ApplicationConfiguration.Initialize();
+        if (args.Length > 0 && args[0] == "--flow-pills")
+        {
+            Environment.ExitCode = FlowPillsHost.Run(args[1..]);
+            return;
+        }
         if (args is ["--remote-controller"])
         {
             using var showPanel = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\XAIHT.Tlachihuani.RC.Show.v1");

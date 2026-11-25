@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Flow Pills service engine: loads .flw agent flows and .fpmt flow pills made by
+       Tlamatini, runs each one on a thread and in a process job of its own, and tails
+       every log. The window lives in Tlachihuani.Tray (XT's flow-pills mode). -->
+  <ItemGroup>
+    <ProjectReference Include="../Tlachihuani.Windows/Tlachihuani.Windows.csproj" />
+    <EmbeddedResource Include="acp-palette.json" LogicalName="Tlachihuani.FlowPills.acp-palette.json" />
+    <Content Include="../../workers/flowpills/*.py" Link="flowpills/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <InternalsVisibleTo Include="Tlachihuani.Tray" />
+    <InternalsVisibleTo Include="Tlachihuani.Checks" />
+  </ItemGroup>
+</Project>

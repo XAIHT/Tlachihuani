@@ -50,6 +50,7 @@ each under its own virtual account `NT SERVICE\<service name>`.
 | `Tlachihuani.Jobs` | Provider host: Torrenter worker and the account-scoped REST/web facade on `127.0.0.1:12064` | [Torrenter](torrenter.md) |
 | `Tlachihuani.RemoteController` (`RCServer/Tlachihuani.RC.Server.exe`) | Tlamatini-RC web client, enrollment, device grants, sessions, receipts, events and schedules; local-only on `127.0.0.1:12481` by default | [Remote-Controller](remote-controller.md) |
 | `Tlachihuani.Tray` (XT) | Session tray, Services and Remote-Controller panels, the interactive-session application-launch broker used by RC, Tlachihuani.log with See log, and the xaiht.org link | [Panel and tray](panel-and-tray.md), [xaiht.org link](xaiht-link.md) |
+| `Tlachihuani.Tray --flow-pills` (Flow Pills) | A separate per-user window, not a service: opens, draws and runs Tlamatini's `.flw` flows and `.fpmt` flow pills, each run on its own thread and in its own Windows job | [Flow Pills](flow-pills.md) |
 
 Since 0.37.0 XT also receives messages from the **Tlamatini-RC** page on
 xaiht.org (the XAIHT `web-app`). XT asks `https://xaiht.org/api/rc/poll` with its
@@ -88,6 +89,7 @@ Follow [Microsoft's Worker Service guide](https://learn.microsoft.com/en-us/dotn
 | `src/Tlachihuani.Tray` | One XT icon per participating Windows session, status/menu, open Tlamatini |
 | `src/Tlachihuani.Elevated` | Fixed-service force-stop and other explicitly scoped administrative operations |
 | `src/Tlachihuani.Jobs` | Implemented: provider registry, Torrenter worker lifetime, REST/web facade and launcher page on port 12064 |
+| `src/Tlachihuani.FlowPills` | Implemented: flow documents, the run registry and admission limits, `.flw` runs with Tlamatini's agents in owned jobs (compiled by `workers/flowpills`), `.fpmt` runs with Tlamatini's models, independent log tails |
 | `src/Tlachihuani.RC` | Implemented: Remote-Controller contracts, access/permissions, durable operations and state store |
 | `src/Tlachihuani.RC.Server` | Implemented: Remote-Controller service, web client assets, mobile workspace and outbound hosted connector |
 | `src/Tlachihuani.RC.Cloud` | Implemented for development only: hosted BFF, OIDC sign-in, computer directory and bounded relay |

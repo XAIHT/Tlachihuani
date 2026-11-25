@@ -67,6 +67,18 @@ to blocked eligible work (180-second stall, minimum 60-second retry). Publicatio
 waits for the disk-complete pause alert. Source and installed acceptance are
 separate evidence; see the linked verification record.
 
+## Flow Pills · 25 November 2026
+
+**XT → Flow Pills…** (`Tlachihuani.Tray.exe --flow-pills [files]`) is a separate per-user
+window, not a Session 0 service. It opens, draws and runs Tlamatini's `.flw` flows and
+`.fpmt` flow pills, up to 256 at once by default, each on its own thread and in its own
+kill-on-close Windows job, with every log tailed independently. Opening never runs a flow.
+Runs use only the agent templates, Python and `config.json` of the Tlamatini that publishes
+itself in `HKCU\Software\XAIHT\Tlamatini`. End processes only through the run's job; wait
+for `FlowRegistry.Idle` before closing. Keep the compiler and the pill validator in step with
+Tlamatini. Read [Flow Pills](docs/flow-pills.md) for behavior, limits and dated evidence;
+it is source-verified only, not installed.
+
 ## Original service design decisions
 
 - SCM service name and display name: `Tlachihuani`; own-process Windows service.

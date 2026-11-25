@@ -36,7 +36,7 @@ internal sealed class TrayContext : ApplicationContext
         activation = new WindowActivation(form, showSignal);
         form.Requested += operation => _ = RunAsync(operation);
         form.ExitRequested += RequestExit;
-        menu = new TrayMenu(ShowPanel, ShowRemoteController, RunAsync, RequestExit);
+        menu = new TrayMenu(ShowPanel, ShowRemoteController, ShowFlowPills, RunAsync, RequestExit);
         tray = new NotifyIcon { Icon = grayIcon, Text = "Tlachihuani — Checking services", ContextMenuStrip = menu, Visible = true };
         // WinForms NotifyIcon handles Explorer's TaskbarCreated message and adds the icon again.
         tray.DoubleClick += (_, _) => ShowPanel();
@@ -57,6 +57,8 @@ internal sealed class TrayContext : ApplicationContext
     private void ShowPanel() => WindowActivation.Show(form);
 
     private void ShowRemoteController() => RemoteControllerLauncher.Open(form.Visible ? form : null);
+
+    private void ShowFlowPills() => FlowPillsLauncher.Open(form.Visible ? form : null);
 
     private void RequestExit()
     {

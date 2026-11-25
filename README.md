@@ -131,6 +131,7 @@ and is included in Stop Services. Torrenter remains its own Jobs plane.
 | Read XT's log | **XT → Show panel → Services… → See log** | Tlachihuani.log opens inside XT and follows new lines, including messages from xaiht.org. |
 | Receive messages from xaiht.org | **Services… → xaiht.org → Connect…** | Paste the key from xaiht.org → Tlamatini-RC. See the [xaiht.org link guide](docs/xaiht-link.md). |
 | Chat with running Tlamatini from a phone | **Services… → xaiht.org → Accounts…** | Approve the exact English or Spanish account, then select it on the website. Real answers, cancellation and execution approvals use the existing chat engine. See [account setup](docs/xaiht-link.md#allow-an-account-and-send-a-real-prompt). |
+| Run Tlamatini's flows (`.flw`) and flow pills (`.fpmt`) | **XT → Flow Pills…** | Open, see and run up to 256 flows at once, each with its own live logs. Closing the window can leave them running. See [Flow Pills](docs/flow-pills.md). |
 | Close only the tray | **XT → Exit tray** | The icon disappears. If a service is running, the menu reads **Exit tray (service keeps running)**. |
 
 > [!NOTE]
@@ -199,7 +200,7 @@ These lower-level commands are for component development. **Check** exercises th
 | [0.38.0 release notes](docs/releases/v0.38.0.md) · [0.37.0](docs/releases/v0.37.0.md) · [0.36.0](docs/releases/v0.36.0.md) · [0.3.3](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
 | [Torrenter workspace and REST API](docs/torrenter.md) | [Architecture and process responsibilities](docs/architecture.md) |
 | [Service lifecycle](docs/lifecycle.md) | [Controller commands and JSON replies](docs/control-protocol.md) |
-| [Panel and tray](docs/panel-and-tray.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |
+| [Panel and tray](docs/panel-and-tray.md) · [Flow Pills](docs/flow-pills.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |
 | [Windows privileges and local IPC](docs/security-and-installation.md) | [Implementation status and verification evidence](docs/implementation-status.md) |
 | [Remote-Controller (Tlamatini-RC)](docs/remote-controller.md) | [Hosted RC development lab](docs/hosted-development.md) |
 | [xaiht.org link and Tlachihuani.log](docs/xaiht-link.md) | [Real prompt verification](docs/verification/2026-11-23-hosted-prompts.md) · [Initial link verification](docs/verification/2026-11-19-xaiht-link.md) |

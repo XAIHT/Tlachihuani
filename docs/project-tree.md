@@ -3,7 +3,7 @@
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
 Latest version: **[Tlachihuani 0.38.0](releases/v0.38.0.md)**. Source inventory
-updated 23 November 2026. Includes tracked files and new files in this
+updated 25 November 2026. Includes tracked files and new files in this
 working tree; ignored installers, local evidence and build intermediates are excluded.
 
 ~~~text
@@ -34,6 +34,7 @@ docs/control-protocol.md
 docs/design/panel-concept.html
 docs/design/tlamatini-rc-internet-design.html
 docs/development-execution.md
+docs/flow-pills.md
 docs/hosted-development.es.md
 docs/hosted-development.md
 docs/implementation-plan.md
@@ -141,6 +142,22 @@ src/Tlachihuani.Core/README.md
 src/Tlachihuani.Core/Tlachihuani.Core.csproj
 src/Tlachihuani.Core/packages.lock.json
 src/Tlachihuani.Elevated/README.md
+src/Tlachihuani.FlowPills/AcpPalette.cs
+src/Tlachihuani.FlowPills/AgentFlowRun.cs
+src/Tlachihuani.FlowPills/FlowCapacity.cs
+src/Tlachihuani.FlowPills/FlowDocument.cs
+src/Tlachihuani.FlowPills/FlowPillsBasics.cs
+src/Tlachihuani.FlowPills/FlowRegistry.cs
+src/Tlachihuani.FlowPills/FlowRun.cs
+src/Tlachihuani.FlowPills/LogTail.cs
+src/Tlachihuani.FlowPills/ModelServices.cs
+src/Tlachihuani.FlowPills/PromptFlowRun.cs
+src/Tlachihuani.FlowPills/PromptFlowValidator.cs
+src/Tlachihuani.FlowPills/RunJob.cs
+src/Tlachihuani.FlowPills/Tlachihuani.FlowPills.csproj
+src/Tlachihuani.FlowPills/TlamatiniInstall.cs
+src/Tlachihuani.FlowPills/acp-palette.json
+src/Tlachihuani.FlowPills/packages.lock.json
 src/Tlachihuani.Jobs/JobsHost.cs
 src/Tlachihuani.Jobs/OwnedProcesses.cs
 src/Tlachihuani.Jobs/Program.cs
@@ -210,6 +227,10 @@ src/Tlachihuani.Service/README.md
 src/Tlachihuani.Service/ServiceWorker.cs
 src/Tlachihuani.Service/Tlachihuani.Service.csproj
 src/Tlachihuani.Service/packages.lock.json
+src/Tlachihuani.Tray/FlowCanvas.cs
+src/Tlachihuani.Tray/FlowPillsForm.cs
+src/Tlachihuani.Tray/FlowPillsHost.cs
+src/Tlachihuani.Tray/FlowPillsLauncher.cs
 src/Tlachihuani.Tray/LogFileReader.cs
 src/Tlachihuani.Tray/LogHistorySearch.cs
 src/Tlachihuani.Tray/LogViewerForm.cs
@@ -255,6 +276,7 @@ src/Tlachihuani.Windows/Tlachihuani.Windows.csproj
 src/Tlachihuani.Windows/packages.lock.json
 tests/README.md
 tests/Tlachihuani.Checks/DownloadAccessChecks.cs
+tests/Tlachihuani.Checks/FlowPillsChecks.cs
 tests/Tlachihuani.Checks/LogViewerChecks.cs
 tests/Tlachihuani.Checks/Program.cs
 tests/Tlachihuani.Checks/RcBrokerChecks.cs
@@ -347,6 +369,7 @@ tests/unit/workspace_table.test.cjs
 tools/Tlachihuani.TraceWeaver/Program.cs
 tools/Tlachihuani.TraceWeaver/Tlachihuani.TraceWeaver.csproj
 tools/Tlachihuani.TraceWeaver/packages.lock.json
+workers/flowpills/flowpills_compile.py
 workers/torrent/api.py
 workers/torrent/delivery.py
 workers/torrent/engine.py

@@ -45,6 +45,20 @@ internal sealed class ServiceDialogs : StudioForm
         return dialog.Open(owner) == DialogResult.Yes;
     }
 
+    // Three answers: the recommended one (Yes), the destructive one (No), or Cancel.
+    internal static DialogResult Choose(Form owner, string title, string message, string recommended, string destructive)
+    {
+        using var dialog = new ServiceDialogs(owner, "Tlachihuani · " + title, "Tlachihuani   /   Confirmation", title, new(660, 310));
+        dialog.BodyArea.Controls.Add(ReadText(message.Trim(), "Details"));
+        var keep = dialog.Choice(recommended, DialogResult.Yes, ButtonTone.Primary);
+        dialog.Choice(destructive, DialogResult.No, ButtonTone.Danger);
+        var cancel = dialog.Choice("Cancel", DialogResult.Cancel);
+        dialog.AcceptButton = keep;
+        dialog.CancelButton = cancel;
+        dialog.ActiveControl = keep;
+        return dialog.Open(owner);
+    }
+
     private static RichTextBox ReadText(string text, string name) => new()
     {
         Text = text, AccessibleName = name, ReadOnly = true, DetectUrls = false, WordWrap = true,

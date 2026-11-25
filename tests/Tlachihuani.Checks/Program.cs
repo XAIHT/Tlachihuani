@@ -7,6 +7,7 @@ using Tlachihuani.Contracts;
 using Tlachihuani.Core;
 using Tlachihuani.Windows;
 
+if (args is ["--flow-pills-sleeper"]) return FlowPillsChecks.Sleeper();
 if (args is ["--rc-permissions-dialog", var permissionDirectory]) return RcPermissionDialogChecks.Run(permissionDirectory);
 if (args is ["--tray-layout", var directory, var mode]) return TrayLayoutChecks.Run(directory, mode);
 if (args is ["--rc-layout", var rcDirectory, var captureScript, var python]) return RcLayoutChecks.Run(rcDirectory, captureScript, python);
@@ -27,13 +28,17 @@ Request RequestFor(string operation) => new(1, 0, Guid.NewGuid(), operation);
 try
 {
     await Check("Website command relay: real envelopes, lease snapshots and bounded transport", XaihtCommandChecks.Run);
+    await Check("Flow Pills: Tlamatini's flow rules, independent log tails, owned agent processes and machine limits", FlowPillsChecks.Run);
     await Check("XT exit label follows service state and keeps the exit action", () =>
     {
-        int exits = 0, remoteOpens = 0, serviceActions = 0;
-        using var menu = new Tlachihuani.Tray.TrayMenu(() => { }, () => remoteOpens++, _ => { serviceActions++; return Task.CompletedTask; }, () => exits++);
+        int exits = 0, remoteOpens = 0, flowPillsOpens = 0, serviceActions = 0;
+        using var menu = new Tlachihuani.Tray.TrayMenu(() => { }, () => remoteOpens++, () => flowPillsOpens++, _ => { serviceActions++; return Task.CompletedTask; }, () => exits++);
         var remote = menu.Items.Cast<System.Windows.Forms.ToolStripItem>().Single(item => item.Text == "Remote-Controller…");
         remote.PerformClick();
         Require(remoteOpens == 1 && serviceActions == 0, "Opening Remote-Controller must not start any service");
+        var flowPills = menu.Items.Cast<System.Windows.Forms.ToolStripItem>().Single(item => item.Text == "Flow Pills…");
+        flowPills.PerformClick();
+        Require(flowPillsOpens == 1 && serviceActions == 0, "Opening Flow Pills must not start any service");
         var exit = menu.Items[menu.Items.Count - 1];
         const string warning = "Exit tray (service keeps running)";
         Require(exit.Text == warning, "Unobserved services must retain the warning");

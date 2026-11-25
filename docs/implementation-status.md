@@ -2,6 +2,19 @@
 
 Latest version: **[0.38.0](releases/v0.38.0.md)**. Dated sections keep the versions they tested.
 
+## Flow Pills source implementation · 25 November 2026
+
+XT gained a Flow Pills mode: a separate per-user window that opens, draws and runs
+Tlamatini's `.flw` agentic flows and `.fpmt` flow pills (`src/Tlachihuani.FlowPills`,
+`workers/flowpills/flowpills_compile.py` and the window in `src/Tlachihuani.Tray`). Each run
+lives on its own thread and in its own kill-on-close Windows job; up to 256 run at once by
+default, admitted by count and free memory. `scripts\Build.ps1 -Mode Check` passed 13 checks,
+including the new Flow Pills check, and RC 318/318. Visible runs of the real window passed
+with the agents of `C:\Tlamatini`, and a publish with the release settings carries the new
+files. No installer was built or installed, a pill answered by a real model and Terminater
+steps were not exercised, and no version, tag or commit was made. See
+[Flow Pills](flow-pills.md#verification--25-november-2026).
+
 ## Hosted prompt integration · 23 November review
 
 The website path now carries real prompts and answers to an explicitly approved

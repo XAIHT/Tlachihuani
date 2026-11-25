@@ -4,6 +4,14 @@ Latest version: **[0.38.0](docs/releases/v0.38.0.md)**. `Directory.Build.props` 
 internal project lock references declare 0.38.0. Dated sections below keep the
 versions they describe.
 
+## Flow Pills · 25 November 2026
+
+Angela asked for a Flow Pills Service in Tlachihuani that loads, draws and runs Tlamatini's
+`.flw` and `.fpmt` files, many at once, each with its own logs. It is implemented in source
+as XT's `--flow-pills` window; read the [Flow Pills guide](docs/flow-pills.md). It is
+source-verified only: nothing was committed, packaged, installed or tagged. Still open: a
+pill answered by a real Ollama model, Terminater steps and installed acceptance.
+
 ## Documentation handoff · testing stopped on 23 November
 
 The actual phone passed prompt/answer, same-account reload and display of an
