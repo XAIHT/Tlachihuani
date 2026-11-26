@@ -1,0 +1,441 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="840" viewBox="0 0 1280 840" fill="none" role="img" aria-labelledby="arch-title arch-desc">
+  <title id="arch-title">Tlachihuani 1.0.0 — System Architecture and Security Boundaries</title>
+  <desc id="arch-desc">Layered architecture of Tlachihuani 1.0.0: outgoing HTTPS link to xaiht.org with zero open ports, unelevated Windows User Session (XT System Tray, Local Browser and Tlamatini Panels, Flow Pills Window), three Session 0 virtual-account Windows services (Tlachihuani, Tlachihuani.Jobs on 127.0.0.1:12064, Tlachihuani.RemoteController on 127.0.0.1:12481), Installed Tlamatini (English and Spanish), plus unified trace logging, native Control CLI, and isolated ProgramData state.</desc>
+
+  <defs>
+    <!-- Canvas & subtle ambient depth matching readme-hero.svg -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1521"/>
+      <stop offset="0.52" stop-color="#080F19"/>
+      <stop offset="1" stop-color="#102023"/>
+    </linearGradient>
+
+    <radialGradient id="glow-teal" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 310) rotate(25) scale(420 220)">
+      <stop stop-color="#5ECDBD" stop-opacity="0.11"/>
+      <stop offset="1" stop-color="#5ECDBD" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glow-sky" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(460 125) scale(460 120)">
+      <stop stop-color="#38BDF8" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glow-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(430 600) scale(440 190)">
+      <stop stop-color="#E1BE82" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#E1BE82" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glow-violet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1080 510) scale(280 240)">
+      <stop stop-color="#A78BFA" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="card-dark" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#152430"/>
+      <stop offset="1" stop-color="#0F1A24"/>
+    </linearGradient>
+
+    <linearGradient id="card-cloud" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#122436"/>
+      <stop offset="1" stop-color="#0E1B29"/>
+    </linearGradient>
+
+    <linearGradient id="card-scm" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#17232D"/>
+      <stop offset="1" stop-color="#101922"/>
+    </linearGradient>
+
+    <linearGradient id="card-tl" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#1B1E32"/>
+      <stop offset="1" stop-color="#121626"/>
+    </linearGradient>
+
+    <linearGradient id="title-grad" x1="36" y1="44" x2="540" y2="68" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FCFF"/>
+      <stop offset="0.6" stop-color="#E8FCF8"/>
+      <stop offset="1" stop-color="#96E8DC"/>
+    </linearGradient>
+
+    <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" stroke="#6C9DAB" stroke-opacity="0.045"/>
+    </pattern>
+
+    <!-- Precision arrowheads -->
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1.5L9 5L1 8.5L2.8 5Z" fill="#7CE1CF"/>
+    </marker>
+    <marker id="arrow-sky" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1.5L9 5L1 8.5L2.8 5Z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrow-gold" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1.5L9 5L1 8.5L2.8 5Z" fill="#E1BE82"/>
+    </marker>
+    <marker id="arrow-violet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1.5L9 5L1 8.5L2.8 5Z" fill="#C4B5FD"/>
+    </marker>
+  </defs>
+
+  <!-- Canvas & Ambient Glows -->
+  <rect x="1" y="1" width="1278" height="838" rx="22" fill="url(#bg)" stroke="#29404A" stroke-width="1.5"/>
+  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#grid)"/>
+  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-sky)"/>
+  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-teal)"/>
+  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-gold)"/>
+  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-violet)"/>
+
+  <!-- ==================== HEADER ==================== -->
+  <g font-family="Segoe UI, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif">
+    <text x="36" y="40" fill="#E1BE82" font-size="11.5" font-weight="700" letter-spacing="3.2">XAIHT  /  TLACHIHUANI  ·  v1.0.0</text>
+    <text x="36" y="65" fill="url(#title-grad)" font-size="22" font-weight="700" letter-spacing="0.3">System Architecture &amp; Security Boundaries</text>
+
+    <!-- Status Chips (top-right) -->
+    <g transform="translate(744 36)">
+      <rect width="180" height="26" rx="13" fill="#12212C" stroke="#2D4A56"/>
+      <circle cx="15" cy="13" r="3.5" fill="#E1BE82"/>
+      <text x="27" y="17" fill="#DCEEEB" font-size="10.5" font-weight="600" letter-spacing="0.8">3 VIRTUAL SERVICES</text>
+    </g>
+    <g transform="translate(936 36)">
+      <rect width="146" height="26" rx="13" fill="#10202E" stroke="#264C64"/>
+      <circle cx="15" cy="13" r="3.5" fill="#38BDF8"/>
+      <text x="27" y="17" fill="#DCEEEB" font-size="10.5" font-weight="600" letter-spacing="0.8">ZERO OPEN PORTS</text>
+    </g>
+    <g transform="translate(1094 36)">
+      <rect width="154" height="26" rx="13" fill="#13222C" stroke="#2B5158"/>
+      <circle cx="15" cy="13" r="3.5" fill="#7CE1CF"/>
+      <text x="27" y="17" fill="#DCEEEB" font-size="10.5" font-weight="600" letter-spacing="0.8">256 FLOW PILLS</text>
+    </g>
+  </g>
+
+  <!-- ==================== BAND 1: EXTERNAL NETWORK ==================== -->
+  <g>
+    <rect x="32" y="82" width="1216" height="90" rx="14" fill="#0B1825" fill-opacity="0.88" stroke="#264A62" stroke-dasharray="6 4"/>
+    <text x="50" y="102" fill="#7DD3FC" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="2">EXTERNAL NETWORK  ·  ANY ROUTER, OFFICE FIREWALL OR HOTSPOT  ·  OUTGOING HTTPS ONLY</text>
+
+    <!-- R1: xaiht.org -->
+    <g transform="translate(48 112)">
+      <rect width="362" height="48" rx="11" fill="url(#card-cloud)" stroke="#2C5A75"/>
+      <path d="M14 1H64" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"/>
+      <!-- Globe Icon -->
+      <g transform="translate(16 12)" stroke="#38BDF8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9.5"/>
+        <path d="M2.8 12H21.2M12 2.5C14.8 5.2 16.2 8.4 16.2 12C16.2 15.6 14.8 18.8 12 21.5C9.2 18.8 7.8 15.6 7.8 12C7.8 8.4 9.2 5.2 12 2.5Z"/>
+      </g>
+      <text x="50" y="22" fill="#F0F7FA" font-family="Segoe UI, Arial, sans-serif" font-size="13.5" font-weight="700">xaiht.org · Tlamatini-RC</text>
+      <text x="50" y="38" fill="#9BB6C6" font-family="Cascadia Mono, Consolas, monospace" font-size="10.5">/api/rc/poll?wait=25 · /ack · /result</text>
+    </g>
+
+    <!-- Connector R1 <-> R2 -->
+    <line x1="414" y1="136" x2="482" y2="136" stroke="#38BDF8" stroke-width="1.8" marker-start="url(#arrow-sky)" marker-end="url(#arrow-sky)"/>
+    <rect x="424" y="114" width="48" height="17" rx="8.5" fill="#0B1825" stroke="#2C5A75"/>
+    <text x="448" y="126" text-anchor="middle" fill="#7DD3FC" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5" font-weight="600">HTTPS</text>
+
+    <!-- R2: Phone / Remote Browser -->
+    <g transform="translate(486 112)">
+      <rect width="278" height="48" rx="11" fill="url(#card-cloud)" stroke="#2C5A75"/>
+      <path d="M14 1H58" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round"/>
+      <!-- Phone Icon -->
+      <g transform="translate(16 12)" stroke="#7DD3FC" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="2.5" width="12" height="19" rx="2.5"/>
+        <circle cx="12" cy="18" r="0.8" fill="#7DD3FC"/>
+      </g>
+      <text x="48" y="22" fill="#F0F7FA" font-family="Segoe UI, Arial, sans-serif" font-size="13.5" font-weight="700">Phone / Remote Browser</text>
+      <text x="48" y="38" fill="#9BB6C6" font-family="Segoe UI, Arial, sans-serif" font-size="11">Prompts · Ask Execs · Reload-safe</text>
+    </g>
+
+    <!-- R3: Trust Boundary Callout -->
+    <g transform="translate(784 112)">
+      <rect width="448" height="48" rx="11" fill="#101B27" stroke="#3B3E36"/>
+      <path d="M14 1H64" stroke="#E1BE82" stroke-width="2" stroke-linecap="round"/>
+      <!-- Shield Icon -->
+      <g transform="translate(16 12)" stroke="#E1BE82" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.5L20 6V11.5C20 16.4 16.6 20.1 12 21.5C7.4 20.1 4 16.4 4 11.5V6L12 2.5Z"/>
+        <path d="M9 12L11.2 14.2L15.4 9.8"/>
+      </g>
+      <text x="48" y="22" fill="#F2E2BF" font-family="Segoe UI, Arial, sans-serif" font-size="12.5" font-weight="700">Zero Inbound Ports · Explicit Account Approval</text>
+      <text x="48" y="38" fill="#9EB0BA" font-family="Segoe UI, Arial, sans-serif" font-size="10.8">Authenticated HTTPS relay (website sees plaintext · not E2EE / PQ)</text>
+    </g>
+  </g>
+
+  <!-- ==================== BAND 2: WINDOWS USER SESSION ==================== -->
+  <g>
+    <rect x="32" y="224" width="1216" height="170" rx="14" fill="#0B1923" fill-opacity="0.90" stroke="#25515C"/>
+    <!-- Compact eyebrow ends around x=255, leaving >110px clearance for vertical outgoing HTTPS line at x=368 -->
+    <text x="50" y="245" fill="#7CE1CF" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.8">USER SESSION · UNELEVATED</text>
+    <text x="1230" y="245" text-anchor="end" fill="#6F9CA5" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.6">INTERACTIVE WINDOWS DESKTOP</text>
+
+    <!-- U1: XT System Tray -->
+    <g transform="translate(48 260)">
+      <rect width="344" height="118" rx="12" fill="url(#card-dark)" stroke="#2C5761"/>
+      <path d="M16 1H78" stroke="#7CE1CF" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Tray Icon -->
+      <g transform="translate(16 15)" stroke="#7CE1CF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 13H6.5L9.5 16.5H14.5L17.5 13H22L19 5H5ZM2 13V19.5H22V13"/>
+      </g>
+      <text x="48" y="29" fill="#F2FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">XT System Tray</text>
+      <rect x="196" y="13" width="136" height="20" rx="10" fill="#0E252B" stroke="#2B5B64"/>
+      <text x="264" y="26.5" text-anchor="middle" fill="#8AE8D8" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">Tlachihuani.Tray.exe</text>
+
+      <line x1="16" y1="45" x2="328" y2="45" stroke="#223B46"/>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#C6DDE3">
+        <circle cx="22" cy="62" r="2.2" fill="#7CE1CF"/>
+        <text x="32" y="66">Services &amp; RC panels · Interactive launch broker</text>
+        <circle cx="22" cy="82" r="2.2" fill="#7CE1CF"/>
+        <text x="32" y="86">Unified Tlachihuani.log + paged 4-worker See log</text>
+        <circle cx="22" cy="102" r="2.2" fill="#7CE1CF"/>
+        <text x="32" y="106">Outgoing xaiht.org link · Copyable error reports</text>
+      </g>
+    </g>
+
+    <!-- U2: Local Browser & Tlamatini Panels -->
+    <g transform="translate(410 260)">
+      <rect width="432" height="118" rx="12" fill="url(#card-dark)" stroke="#2A5463"/>
+      <path d="M16 1H78" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Browser Icon -->
+      <g transform="translate(16 15)" stroke="#38BDF8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3.5" width="20" height="17" rx="3"/>
+        <line x1="2" y1="8.5" x2="22" y2="8.5"/>
+        <circle cx="6" cy="6" r="0.8" fill="#38BDF8"/>
+        <circle cx="9.2" cy="6" r="0.8" fill="#38BDF8"/>
+      </g>
+      <text x="48" y="29" fill="#F2FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Local Browser &amp; Tlamatini Panels</text>
+      <rect x="326" y="13" width="92" height="20" rx="10" fill="#0E2231" stroke="#285470"/>
+      <text x="372" y="26.5" text-anchor="middle" fill="#7DD3FC" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">Loopback Only</text>
+
+      <line x1="16" y1="45" x2="416" y2="45" stroke="#223B46"/>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#C6DDE3">
+        <circle cx="22" cy="62" r="2.2" fill="#38BDF8"/>
+        <text x="32" y="66">Panels → Torrenter Workspace &amp; Torrenter Sources</text>
+        <circle cx="22" cy="82" r="2.2" fill="#38BDF8"/>
+        <text x="32" y="86">Panels → Tlachihuani · Remote-Controller (account consent)</text>
+        <circle cx="22" cy="102" r="2.2" fill="#38BDF8"/>
+        <text x="32" y="106">Live EN / ES mobile PWA · 12-column customizable queue</text>
+      </g>
+    </g>
+
+    <!-- U3: Flow Pills Window -->
+    <g transform="translate(860 260)">
+      <rect width="372" height="118" rx="12" fill="url(#card-dark)" stroke="#3D3C63"/>
+      <path d="M16 1H78" stroke="#C4B5FD" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Flow Nodes Icon -->
+      <g transform="translate(16 15)" stroke="#C4B5FD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="6.5" height="6.5" rx="1.8"/>
+        <rect x="15.5" y="4" width="6.5" height="6.5" rx="1.8"/>
+        <rect x="15.5" y="13.5" width="6.5" height="6.5" rx="1.8"/>
+        <path d="M8.5 7.2H15.5M11.5 7.2V16.8H15.5"/>
+      </g>
+      <text x="48" y="29" fill="#F2FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Flow Pills Window</text>
+      <rect x="266" y="13" width="92" height="20" rx="10" fill="#1C1A32" stroke="#474175"/>
+      <text x="312" y="26.5" text-anchor="middle" fill="#D5CAFF" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">--flow-pills</text>
+
+      <line x1="16" y1="45" x2="356" y2="45" stroke="#282B42"/>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#C6DDE3">
+        <circle cx="22" cy="62" r="2.2" fill="#C4B5FD"/>
+        <text x="32" y="66">Separate per-user process · Never runs on open</text>
+        <circle cx="22" cy="82" r="2.2" fill="#C4B5FD"/>
+        <text x="32" y="86">Draws &amp; runs .flw agentic flows &amp; .fpmt prompt pills</text>
+        <circle cx="22" cy="102" r="2.2" fill="#C4B5FD"/>
+        <text x="32" y="106">Up to 256 concurrent runs · RAM-aware · Reply bar</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== CORRIDOR 1: OUTGOING HTTPS (XT -> xaiht.org) ==================== -->
+  <g>
+    <!-- Straight vertical arrow at x=368 (113px clear of User Session eyebrow; inside both R1 and U1) -->
+    <line x1="368" y1="260" x2="368" y2="162" stroke="#38BDF8" stroke-width="2.2" marker-end="url(#arrow-sky)"/>
+    <circle cx="368" cy="260" r="3.8" fill="#0B1521" stroke="#38BDF8" stroke-width="2"/>
+    <circle cx="368" cy="224" r="3" fill="#38BDF8"/>
+
+    <!-- Protocol Pill -->
+    <rect x="386" y="185" width="434" height="26" rx="13" fill="#0C1E2E" stroke="#2C5E7E"/>
+    <text x="603" y="201.5" text-anchor="middle" fill="#8AD8FC" font-family="Cascadia Mono, Consolas, monospace" font-size="10" font-weight="600">▲ 25s Outgoing HTTPS Long Poll · DPAPI Key · Zero Open Ports</text>
+  </g>
+
+  <!-- ==================== BAND 3: SESSION 0 SERVICES & INSTALLED TLAMATINI ==================== -->
+  <!-- Session 0 Container -->
+  <g>
+    <rect x="32" y="492" width="794" height="202" rx="14" fill="#101923" fill-opacity="0.92" stroke="#4D4230"/>
+    <!-- Bottom label bar inside Session 0 container (keeps top border 100% clear for vertical pipes) -->
+    <path d="M33 662H825V680C825 687.2 819.2 693 812 693H46C38.8 693 33 687.2 33 680V662Z" fill="#181F27"/>
+    <line x1="33" y1="662" x2="825" y2="662" stroke="#3B3529"/>
+    <text x="50" y="681" fill="#E1BE82" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.8">SESSION 0  ·  OWN-PROCESS VIRTUAL ACCOUNTS  ·  MANUAL STARTUP (STOPPED AFTER REBOOT)</text>
+
+    <!-- S1: Tlachihuani Primary Service -->
+    <g transform="translate(48 508)">
+      <rect width="226" height="142" rx="12" fill="url(#card-scm)" stroke="#444236"/>
+      <path d="M16 1H66" stroke="#E1BE82" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Pulse Icon -->
+      <g transform="translate(14 14)" stroke="#E1BE82" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12H6L9 5L13 19L16 12H22"/>
+      </g>
+      <text x="44" y="28" fill="#FAF6EC" font-family="Segoe UI, Arial, sans-serif" font-size="14.5" font-weight="700">Tlachihuani</text>
+      <rect x="14" y="38" width="198" height="20" rx="6" fill="#1B2125" stroke="#463E2F"/>
+      <text x="113" y="51.5" text-anchor="middle" fill="#E5C98E" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">NT SERVICE\Tlachihuani</text>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#BCCCD4">
+        <text x="16" y="79">• Tlachihuani.Service.exe</text>
+        <text x="16" y="97">• 2s heartbeat · 256-event ring</text>
+        <text x="16" y="115">• 16 ACL named pipe instances</text>
+        <text x="16" y="133">• Core lifecycle &amp; health plane</text>
+      </g>
+    </g>
+
+    <!-- S2: Tlachihuani.Jobs -->
+    <g transform="translate(288 508)">
+      <rect width="244" height="142" rx="12" fill="url(#card-scm)" stroke="#444236"/>
+      <path d="M16 1H66" stroke="#E1BE82" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Download Engine Icon -->
+      <g transform="translate(14 14)" stroke="#E1BE82" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3V14M7.5 9.5L12 14L16.5 9.5M4 16.5V19.5H20V16.5"/>
+      </g>
+      <text x="44" y="28" fill="#FAF6EC" font-family="Segoe UI, Arial, sans-serif" font-size="14.5" font-weight="700">Tlachihuani.Jobs</text>
+      <rect x="14" y="38" width="216" height="20" rx="6" fill="#1B2125" stroke="#463E2F"/>
+      <text x="122" y="51.5" text-anchor="middle" fill="#E5C98E" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">NT SERVICE\Tlachihuani.Jobs</text>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#BCCCD4">
+        <text x="16" y="79">• 127.0.0.1:12064 (REST + SSE)</text>
+        <text x="16" y="97">• CPython 3.12.10 + libtorrent 2.1.1</text>
+        <text x="16" y="115">• SQLite WAL · 4-slot magnet queue</text>
+        <text x="16" y="133">• SHA-256 verified delivery</text>
+      </g>
+    </g>
+
+    <!-- S3: Tlachihuani.RemoteController -->
+    <g transform="translate(546 508)">
+      <rect width="264" height="142" rx="12" fill="url(#card-scm)" stroke="#444236"/>
+      <path d="M16 1H66" stroke="#E1BE82" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Remote Link Icon -->
+      <g transform="translate(14 14)" stroke="#E1BE82" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="2.8"/>
+        <path d="M7.8 7.8C5.5 10.1 5.5 13.9 7.8 16.2M16.2 7.8C18.5 10.1 18.5 13.9 16.2 16.2M4.8 4.8C0.9 8.7 0.9 15.3 4.8 19.2M19.2 4.8C23.1 8.7 23.1 15.3 19.2 19.2"/>
+      </g>
+      <text x="44" y="28" fill="#FAF6EC" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Remote-Controller</text>
+      <rect x="14" y="38" width="236" height="20" rx="6" fill="#1B2125" stroke="#463E2F"/>
+      <text x="132" y="51.5" text-anchor="middle" fill="#E5C98E" font-family="Cascadia Mono, Consolas, monospace" font-size="9">NT SERVICE\Tlachihuani.RemoteController</text>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#BCCCD4">
+        <text x="16" y="79">• 127.0.0.1:12481 (HTTP + WS)</text>
+        <text x="16" y="97">• P-256 browser keys · 5-min invites</text>
+        <text x="16" y="115">• Durable receipts · outcome_unknown</text>
+        <text x="16" y="133">• Schedules · EN / ES mobile PWA</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Installed Tlamatini Container -->
+  <g>
+    <rect x="916" y="492" width="332" height="202" rx="14" fill="#111526" fill-opacity="0.92" stroke="#443F6E"/>
+    <path d="M917 662H1247V680C1247 687.2 1241.2 693 1234 693H930C922.8 693 917 687.2 917 680V662Z" fill="#181A30"/>
+    <line x1="917" y1="662" x2="1247" y2="662" stroke="#373359"/>
+    <text x="934" y="681" fill="#C4B5FD" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.8">SEPARATE APP LIFETIME  ·  HKCU DISCOVERY</text>
+
+    <!-- TL Card -->
+    <g transform="translate(932 508)">
+      <rect width="300" height="142" rx="12" fill="url(#card-tl)" stroke="#4B4578"/>
+      <path d="M16 1H74" stroke="#C4B5FD" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Core AI Icon -->
+      <g transform="translate(15 14)" stroke="#C4B5FD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="5" width="14" height="14" rx="2.5"/>
+        <path d="M9 1V5M15 1V5M9 19V23M15 19V23M1 9H5M1 15H5M19 9H23M19 15H23"/>
+      </g>
+      <text x="46" y="28" fill="#F5F3FF" font-family="Segoe UI, Arial, sans-serif" font-size="14.5" font-weight="700">Installed Tlamatini (EN &amp; ES)</text>
+      <rect x="14" y="38" width="272" height="20" rx="6" fill="#1E1C36" stroke="#4B4578"/>
+      <text x="150" y="51.5" text-anchor="middle" fill="#D8CEFF" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">HKCU\Software\XAIHT\Tlamatini</text>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#CBC8E3">
+        <text x="16" y="79">• AgentConsumer chat &amp; selective Ask Execs</text>
+        <text x="16" y="97">• Agent templates &amp; edition Python runtime</text>
+        <text x="16" y="115">• Configured Ollama server &amp; local models</text>
+        <text x="16" y="133">• Independent DB &amp; process lifetime</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== CORRIDOR 2: INTER-PLANE BUSES & CHANNELS ==================== -->
+  <g>
+    <!-- Channel 2: Local Browser (U2) <-> S2 Jobs (:12064) -->
+    <line x1="478" y1="382" x2="478" y2="504" stroke="#38BDF8" stroke-width="2" marker-start="url(#arrow-sky)" marker-end="url(#arrow-sky)"/>
+
+    <!-- Channel 3: Local Browser (U2) <-> S3 Remote-Controller (:12481) -->
+    <line x1="744" y1="382" x2="744" y2="504" stroke="#38BDF8" stroke-width="2" marker-start="url(#arrow-sky)" marker-end="url(#arrow-sky)"/>
+
+    <!-- Bus 1: XT (U1) <-> S1, S2, S3 via ACL Named Pipes -->
+    <line x1="161" y1="382" x2="161" y2="504" stroke="#7CE1CF" stroke-width="2.1" marker-start="url(#arrow-teal)" marker-end="url(#arrow-teal)"/>
+    <!-- Horizontal spine from x=161 -> 471, bridge hop 471..485 over x=478, continue 485 -> 610 -> down to S3 -->
+    <path d="M161 418H471" stroke="#7CE1CF" stroke-width="2.1"/>
+    <path d="M469 418A9 9 0 0 1 487 418" stroke="#080F19" stroke-width="6.5"/>
+    <path d="M471 418A7 7 0 0 1 485 418H602Q610 418 610 426V504" stroke="#7CE1CF" stroke-width="2.1" marker-end="url(#arrow-teal)"/>
+    <!-- Tap down into S2 -->
+    <line x1="344" y1="418" x2="344" y2="504" stroke="#7CE1CF" stroke-width="2.1" marker-end="url(#arrow-teal)"/>
+    <!-- Bus junction nodes -->
+    <circle cx="161" cy="418" r="4" fill="#0B1521" stroke="#7CE1CF" stroke-width="2.2"/>
+    <circle cx="344" cy="418" r="4" fill="#0B1521" stroke="#7CE1CF" stroke-width="2.2"/>
+
+    <!-- Channel 4: Flow Pills (U3) -> Installed Tlamatini (TL) -->
+    <line x1="1082" y1="380" x2="1082" y2="504" stroke="#C4B5FD" stroke-width="2.1" marker-end="url(#arrow-violet)"/>
+    <circle cx="1082" cy="378" r="3.8" fill="#0B1521" stroke="#C4B5FD" stroke-width="2"/>
+
+    <!-- Channel 5: S3 Remote-Controller <-> Installed Tlamatini -->
+    <line x1="814" y1="583" x2="928" y2="583" stroke="#E1BE82" stroke-width="2.1" marker-start="url(#arrow-gold)" marker-end="url(#arrow-gold)"/>
+
+    <!-- Protocol Pills -->
+    <rect x="176" y="405" width="154" height="26" rx="13" fill="#0C2328" stroke="#4DB8A7"/>
+    <text x="253" y="421.5" text-anchor="middle" fill="#8CF0DF" font-family="Cascadia Mono, Consolas, monospace" font-size="10.5" font-weight="600">ACL Named Pipes</text>
+
+    <rect x="398" y="446" width="160" height="26" rx="13" fill="#0B1E2E" stroke="#2D6A8F"/>
+    <text x="478" y="462.5" text-anchor="middle" fill="#8AD8FC" font-family="Cascadia Mono, Consolas, monospace" font-size="10.5" font-weight="600">REST + SSE · :12064</text>
+
+    <rect x="664" y="446" width="160" height="26" rx="13" fill="#0B1E2E" stroke="#2D6A8F"/>
+    <text x="744" y="462.5" text-anchor="middle" fill="#8AD8FC" font-family="Cascadia Mono, Consolas, monospace" font-size="10.5" font-weight="600">HTTP + WS · :12481</text>
+
+    <rect x="932" y="428" width="300" height="28" rx="14" fill="#181730" stroke="#665CA6"/>
+    <text x="1082" y="445.5" text-anchor="middle" fill="#DCD3FF" font-family="Cascadia Mono, Consolas, monospace" font-size="10.5" font-weight="600">Per-Run Job Objects · Python &amp; Ollama</text>
+
+    <rect x="830" y="560" width="82" height="46" rx="10" fill="#1A1D24" stroke="#7A6A4B"/>
+    <text x="871" y="579" text-anchor="middle" fill="#F0D8A8" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700">Approved</text>
+    <text x="871" y="595" text-anchor="middle" fill="#F0D8A8" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700">Adapter</text>
+  </g>
+
+  <!-- ==================== BAND 4: CROSS-CUTTING FOUNDATION ==================== -->
+  <g>
+    <!-- F1: Unified Trace Logging -->
+    <g transform="translate(32 712)">
+      <rect width="392" height="84" rx="12" fill="url(#card-dark)" stroke="#274A54"/>
+      <path d="M16 1H72" stroke="#7CE1CF" stroke-width="2" stroke-linecap="round"/>
+      <text x="18" y="25" fill="#7CE1CF" font-family="Segoe UI, Arial, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.2">UNIFIED DIAGNOSTICS &amp; TRACEWEAVER</text>
+      <text x="18" y="47" fill="#D5E8ED" font-family="Segoe UI, Arial, sans-serif" font-size="11.5">Roslyn compile-time weaving · TraceLog.Pass (quiet idle)</text>
+      <text x="18" y="67" fill="#8FAAB6" font-family="Cascadia Mono, Consolas, monospace" font-size="10">%ProgramData%\*\logs → Tlachihuani.log (masked)</text>
+    </g>
+
+    <!-- F2: Native Control CLI & Hardened IPC -->
+    <g transform="translate(444 712)">
+      <rect width="392" height="84" rx="12" fill="url(#card-dark)" stroke="#474132"/>
+      <path d="M16 1H72" stroke="#E1BE82" stroke-width="2" stroke-linecap="round"/>
+      <text x="18" y="25" fill="#E1BE82" font-family="Segoe UI, Arial, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.2">NATIVE CLI &amp; HARDENED CONTROL</text>
+      <text x="18" y="47" fill="#D5E8ED" font-family="Cascadia Mono, Consolas, monospace" font-size="9.8">Control.exe [status | events | start | stop | restart]</text>
+      <text x="18" y="67" fill="#8FAAB6" font-family="Segoe UI, Arial, sans-serif" font-size="11">Closed typed operations · Global mutex · Verified handles</text>
+    </g>
+
+    <!-- F3: Isolated State & Verified Delivery -->
+    <g transform="translate(856 712)">
+      <rect width="392" height="84" rx="12" fill="url(#card-dark)" stroke="#27485E"/>
+      <path d="M16 1H72" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"/>
+      <text x="18" y="25" fill="#7DD3FC" font-family="Segoe UI, Arial, sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.2">ISOLATED STATE &amp; VERIFIED DELIVERY</text>
+      <text x="18" y="47" fill="#D5E8ED" font-family="Cascadia Mono, Consolas, monospace" font-size="10">%ProgramData%\XAIHT\* · manifests, WAL, COW state</text>
+      <text x="18" y="67" fill="#8FAAB6" font-family="Segoe UI, Arial, sans-serif" font-size="11">Atomic SHA-256 Downloads\Torrenter · Retained on uninstall</text>
+    </g>
+  </g>
+
+  <!-- ==================== FOOTER LEGEND & ATTRIBUTION ==================== -->
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11">
+    <circle cx="44" cy="816" r="4" fill="#7CE1CF"/>
+    <text x="55" y="820" fill="#99B3BE">ACL Named Pipes</text>
+
+    <circle cx="176" cy="816" r="4" fill="#38BDF8"/>
+    <text x="187" y="820" fill="#99B3BE">Loopback HTTP / Outgoing HTTPS</text>
+
+    <circle cx="388" cy="816" r="4" fill="#E1BE82"/>
+    <text x="399" y="820" fill="#99B3BE">Session 0 Virtual Accounts</text>
+
+    <circle cx="564" cy="816" r="4" fill="#C4B5FD"/>
+    <text x="575" y="820" fill="#99B3BE">Flow Pills / Tlamatini Runtime</text>
+
+    <text x="1244" y="820" text-anchor="end" fill="#79929E" font-size="11.5" letter-spacing="0.3">Tlachihuani 1.0.0  ·  Created by Angela López Mendoza  ·  XAIHT</text>
+  </g>
+</svg>
