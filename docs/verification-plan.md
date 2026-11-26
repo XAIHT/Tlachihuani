@@ -1,10 +1,10 @@
 # Verification plan
 
-Latest version: **[0.38.0](releases/v0.38.0.md)**. Consult
+Latest version: **[1.0.0](releases/v1.0.0.md)**. Consult
 [implementation status](implementation-status.md) and the
 [10 November source results](verification/2026-11-10-torrenter-recovery.md) before
 marking any gate complete. Historical source checks and MSI fixtures do not
-certify a newly built 0.38.0 installation. Remote-Controller gates are in the
+certify a newly built 1.0.0 installation. Remote-Controller gates are in the
 [predeployment checklist](remote-control-predeployment-checklist.md); the XT
 workspace sign-in source evidence is the [17 November record](verification/2026-11-17-workspace-signin.md);
 the xaiht.org link source evidence is the [19 November record](verification/2026-11-19-xaiht-link.md),

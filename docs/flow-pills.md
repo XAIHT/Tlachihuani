@@ -9,6 +9,7 @@ each one on its own, for as long as it runs:
 - **Flow pills (`.fpmt`)** from Tlamatini's Prompt Flow Panel run with the models
   Tlamatini is configured with, by the rules of its own runner.
 
+Flow Pills is new in [Tlachihuani 1.0.0](releases/v1.0.0.md), the first official release.
 Up to **256 flows** run at once by default, each on its own thread, with its own agent
 processes and its own logs, tailed independently. Flow Pills replaces the unfinished
 Tlamatini-FlowPills application, which could open `.flw` files but never ran them and

@@ -1,16 +1,26 @@
-# Tlachihuani handoff · 21 November 2026 · 0.38.0
+# Tlachihuani handoff · 25 November 2026 · 1.0.0
 
-Latest version: **[0.38.0](docs/releases/v0.38.0.md)**. `Directory.Build.props` and the
-internal project lock references declare 0.38.0. Dated sections below keep the
+Latest version: **[1.0.0](docs/releases/v1.0.0.md)**, Tlachihuani's first official
+release after several pre-releases (0.1.0 to 0.40.1). `Directory.Build.props` and the
+internal project lock references declare 1.0.0. Dated sections below keep the
 versions they describe.
+
+## 1.0.0 · first official release · 25 November 2026
+
+Angela committed the Flow Pills work as `a7bd0df`, tagged it `v1.0.0` and ran the
+release builder, which passed its checks and wrote `dist/Tlachihuani-1.0.0-windows-x64.zip`
+with its `.sha256`. The documentation now names 1.0.0 as the first official release.
+That first ZIP was built before the 1.0.0 wording of `START-HERE.html`; rebuild it with
+`Build-Release.cmd` before uploading. Still open: a clean-Windows installation and reboot
+of the 1.0.0 package, a flow pill answered by a real Ollama model, Terminater steps, and
+real-phone denial and cancellation of website prompts.
 
 ## Flow Pills · 25 November 2026
 
 Angela asked for a Flow Pills Service in Tlachihuani that loads, draws and runs Tlamatini's
-`.flw` and `.fpmt` files, many at once, each with its own logs. It is implemented in source
-as XT's `--flow-pills` window; read the [Flow Pills guide](docs/flow-pills.md). It is
-source-verified only: nothing was committed, packaged, installed or tagged. Still open: a
-pill answered by a real Ollama model, Terminater steps and installed acceptance.
+`.flw` and `.fpmt` files, many at once, each with its own logs. It is implemented as XT's
+`--flow-pills` window; read the [Flow Pills guide](docs/flow-pills.md). It ships in 1.0.0
+and is verified from source; it has not been installed yet.
 
 ## Documentation handoff · testing stopped on 23 November
 
@@ -700,12 +710,12 @@ The earlier handoff below is historical context.
 Work in `C:\Development\XAIHT\repo\Tlachihuani`. The separate Tlamatini reference checkout is `C:\Development\XAIHT\Tlamatini`. Read AGENTS.md, CLAUDE.md, [the Torrenter operating guide](docs/torrenter.md) and [implementation status](docs/implementation-status.md). The design baseline is Revision 05 of `TlachihuaniKickoffDesign.html` on Angela’s Desktop.
 
 The checkout path above supersedes the original location. Product metadata and
-internal project lock references now declare **0.38.0**; this documentation
+internal project lock references now declare **1.0.0**; this documentation
 pass preserves those existing edits. See the [11 November checkout verification](docs/verification/2026-11-11-documentation.md).
 
 ## Current version and installation evidence
 
-**Latest version: [0.38.0](docs/releases/v0.38.0.md).** The previous [0.3.3 notes](docs/releases/v0.3.3.md) cover torrent queue recovery, accurate completion/error reporting, sortable account workspaces and the existing offline setup. Use the [Windows setup guide](packaging/setup/README.md) and [verification status](docs/implementation-status.md). The 0.1.0 workstation installation of 3 November and isolated 0.2.1 MSI checks of 4 November remain historical evidence; they do not certify a 0.38.0 installation.
+**Latest version: [1.0.0](docs/releases/v1.0.0.md), the first official release.** The [0.38.0 notes](docs/releases/v0.38.0.md) describe the last documented pre-release; the earlier [0.3.3 notes](docs/releases/v0.3.3.md) cover torrent queue recovery, accurate completion/error reporting, sortable account workspaces and the existing offline setup. Use the [Windows setup guide](packaging/setup/README.md) and [verification status](docs/implementation-status.md). The 0.1.0 workstation installation of 3 November and isolated 0.2.1 MSI checks of 4 November remain historical evidence; they do not certify a 1.0.0 installation.
 
 The [10 November recovery record](docs/verification/2026-11-10-torrenter-recovery.md)
 records 64 automated checks and 48 headed-browser checks across both development
@@ -731,14 +741,14 @@ The service and controller fixes require their respective installed updates.
 
 The root release command is now `Build-Release.cmd`; read [release building](docs/release-building.md). It rebuilds the current checkout at the latest numeric local Git-tag version and emits a checked ZIP/checksum in `dist`. Setup now asks for the optional common login shortcut and always creates Start/Desktop shortcuts. Services remain Manual/stopped after installation and reboot. The normal unelevated installer opens XT once after success; an elevated launch directs the operator to the normal Desktop shortcut.
 
-For 0.38.0, the builder selects the numeric `v0.38.0` tag; GitHub's release
+For 1.0.0, the builder selects the numeric `v1.0.0` tag; GitHub's release
 flags are independent, and suffixed tags are ignored. This documentation update
 does not stamp product metadata, build, install, modify services, create tags,
 commit or publish. The separate **Panels → Tlachihuani** lifecycle panel remains
 a design target; **Panels → Torrenter Workspace** is implemented.
 
 1. Complete the release acceptance gates with a sign-out/Explorer restart, reboot, power interruption, multi-day transfer, a second real Windows login and packaged signing/rollback qualification. Keep the original service’s force-stop consent helper on its own backlog.
-2. When authorized, qualify a fresh 0.38.0 package and the scheduler/disk changes on a clean Windows QA machine. Extend tracker error telemetry and rate-history visualization, and qualify large queues, network failures and disk exhaustion. The current REST and UI surfaces are listed in the [Torrenter guide](docs/torrenter.md).
+2. When authorized, qualify a fresh 1.0.0 package and the scheduler/disk changes on a clean Windows QA machine. Extend tracker error telemetry and rate-history visualization, and qualify large queues, network failures and disk exhaustion. The current REST and UI surfaces are listed in the [Torrenter guide](docs/torrenter.md).
 3. Keep the existing Tlamatini wrapped Torrenter client compatible with the scoped REST contract. The future Tlamatini Panels integration and agent catalog belong to that checkout. Preserve its protected database mechanics.
 
 Tlachihuani upstream is [angelahack1/Tlachihuani](https://github.com/angelahack1/Tlachihuani). Tlamatini upstream is [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini). Keep the implementation uncommitted until Angela requests otherwise. Snyk remains disabled.

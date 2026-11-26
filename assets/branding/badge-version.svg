@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="202" height="28" role="img" aria-label="Tlachihuani v0.38.0 pre-release">
-  <title>Tlachihuani v0.38.0 pre-release</title>
-  <rect width="132" height="28" fill="#172533"/>
-  <rect x="132" width="70" height="28" fill="#E5C76B"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="212" height="28" role="img" aria-label="Tlachihuani v1.0.0, first official release">
+  <title>Tlachihuani v1.0.0, first official release</title>
+  <rect width="150" height="28" fill="#172533"/>
+  <rect x="150" width="62" height="28" fill="#E5C76B"/>
   <g font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">
-    <text x="66" y="18" letter-spacing="1" fill="#F0F6F8">PRE-RELEASE</text>
-    <text x="167" y="18" fill="#101827">v0.38.0</text>
+    <text x="75" y="18" letter-spacing="1" fill="#F0F6F8">FIRST RELEASE</text>
+    <text x="181" y="18" fill="#101827">v1.0.0</text>
   </g>
 </svg>

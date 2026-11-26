@@ -22,20 +22,20 @@
       "tlachihuani.core": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[0.40.0, )"
+          "Tlachihuani.Contracts": "[1.0.0, )"
         }
       },
       "tlachihuani.rc": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[0.40.0, )"
+          "Tlachihuani.Contracts": "[1.0.0, )"
         }
       },
       "tlachihuani.windows": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Core": "[0.40.0, )",
-          "Tlachihuani.RC": "[0.40.0, )"
+          "Tlachihuani.Core": "[1.0.0, )",
+          "Tlachihuani.RC": "[1.0.0, )"
         }
       }
     },

@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/releases/v0.38.0.md"><img src="assets/branding/badge-version.svg" alt="Tlachihuani v0.38.0 pre-release — release notes" /></a>
+  <a href="docs/releases/v1.0.0.md"><img src="assets/branding/badge-version.svg" alt="Tlachihuani v1.0.0, first official release — release notes" /></a>
   <a href="#installation"><img src="assets/branding/badge-windows.svg" alt="Windows 11 x64 installation" /></a>
   <a href="packaging/setup/README.md"><img src="assets/branding/badge-package.svg" alt="Offline ZIP installation package" /></a>
   <a href="#build-from-source"><img src="assets/branding/badge-dotnet.svg" alt="Build with .NET 10" /></a>
@@ -21,13 +21,13 @@
 </p>
 
 <p align="center">
-  <b>Current pre-release: <a href="docs/releases/v0.38.0.md">v0.38.0</a></b><br />
-  <b>Resilient torrent queues · Sortable workspace · Verified file delivery</b><br />
+  <b>First official release: <a href="docs/releases/v1.0.0.md">v1.0.0</a></b>, after several pre-releases<br />
+  <b>Flow Pills · Prompts from your phone · Resilient torrent queues · Verified file delivery</b><br />
   Offline installer &amp; uninstaller · Optional XT at sign-in · Desktop shortcut · Control Panel removal
 </p>
 
 <p align="center">
-  <a href="docs/releases/v0.38.0.md">What's new in 0.38.0</a> ·
+  <a href="docs/releases/v1.0.0.md">What's new in 1.0.0</a> ·
   <a href="#installation">Install &amp; uninstall</a> ·
   <a href="packaging/setup/README.md">Package guide</a> ·
   <a href="#first-download">First download</a> ·
@@ -59,7 +59,21 @@ The website relay is not end-to-end or post-quantum encrypted.
 3. **Start the transfer.** Choose the files you want and select **Download selected files**. You can close the browser or Tlamatini while the Jobs service continues downloading.
 4. **Find your files.** Select the completed transfer and open **Verified output** for its saved directory and each file’s SHA-256. The usual destination is **Downloads → Torrenter**. If Windows refuses delivery there, check Verified output for the application’s `content_generated` fallback.
 
-## What's new in 0.38.0
+## What's new in 1.0.0 · first official release
+
+Tlachihuani 1.0.0 is the first official release, after a series of pre-releases
+from 0.1.0 to 0.40.1. See the [1.0.0 notes](docs/releases/v1.0.0.md).
+
+- **Flow Pills.** **XT → Flow Pills…** opens the `.flw` flows and `.fpmt` flow pills
+  made in Tlamatini, draws them, and runs up to 256 at once, each with its own
+  agents and live logs. See [Flow Pills](docs/flow-pills.md).
+- **Prompts from your phone.** The website sends typed prompts to an approved
+  Tlamatini account through XT and returns real answers (0.40.0). A full answer over
+  8 MB is now refused with a named reason (0.40.1).
+- **Stable log browsing.** **See log** pauses while you browse and searches every
+  retained log file (0.39.0).
+
+### Carried forward from 0.38.0
 
 - **One verbose log for everything.** XT, the three services, the Torrenter
   engine, setup and the scripts write a trace log of every statement, request and
@@ -143,7 +157,7 @@ Use **Windows 11 x64**. The download includes private .NET and Python runtimes; 
 
 ### Install with the Windows wizard
 
-1. Get the matching **Tlachihuani-0.38.0-windows-x64.zip** from your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **0.38.0** in the installer before proceeding. If an earlier version is installed, [uninstall it](#uninstall-and-keep-your-downloads) first; your downloads stay. The release command produces the ZIP in `dist\`.
+1. Get the matching **Tlachihuani-1.0.0-windows-x64.zip** from the GitHub release or your distributor. Right-click it → **Extract All**, then open **START-HERE.html** for the offline illustrated guide. Confirm **1.0.0** in the installer before proceeding. If an earlier version is installed, [uninstall it](#uninstall-and-keep-your-downloads) first; your downloads stay. The release command produces the ZIP in `dist\`.
 2. Sign in as the Windows user who will operate XT. Open **Installer.exe** and choose whether **XT should appear at Windows sign-in**. This choice applies to all Windows users on the PC. Select **Review**, check the version, operator, destination and startup choice, then choose **Install** and approve Windows' administrator prompt.
 3. After **Installation complete**, XT appears gray in your normal Windows session. Check the hidden-icons arrow beside the clock. **Start menu and Desktop shortcuts** always let you reopen it. If the entire wizard was launched as administrator, open XT from either shortcut yourself.
 4. Choose **Start Services** only when needed. Both services remain **Stopped / Manual** after installation and reboot. Login opens XT only when you selected that option; it never starts services or downloads. With the option unchecked, open XT manually after signing in.
@@ -170,8 +184,8 @@ Or run `.\Build-Release.cmd` in a visible PowerShell console. Each run reads the
 
 The current checkout, including local edits, supplies the code; the tag supplies its version. Keep your local tags current. Prerelease tags are ignored, and a highest release tag outside the checkout's history stops the build. Fresh staging prevents old published files from leaking into a new ZIP. Build logs and source provenance stay under `artifacts/release-builds/`. See the [release command guide](docs/release-building.md) for prerequisites and acceptance checks.
 
-For **0.38.0**, the builder selects the numeric `v0.38.0` tag by those rules;
-GitHub's release flags are separate. A suffixed tag such as `v0.38.0-rc.1` is not
+For **1.0.0**, the builder selects the numeric `v1.0.0` tag by those rules;
+GitHub's release flags are separate. A suffixed tag such as `v1.0.0-rc.1` is not
 selected by this builder.
 Building the ZIP and publishing a release are separate steps.
 
@@ -197,7 +211,7 @@ These lower-level commands are for component development. **Check** exercises th
 
 | For operators | For developers |
 | :--- | :--- |
-| [0.38.0 release notes](docs/releases/v0.38.0.md) · [0.37.0](docs/releases/v0.37.0.md) · [0.36.0](docs/releases/v0.36.0.md) · [0.3.3](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
+| [1.0.0 release notes](docs/releases/v1.0.0.md) · [0.38.0](docs/releases/v0.38.0.md) · [0.37.0](docs/releases/v0.37.0.md) · [0.36.0](docs/releases/v0.36.0.md) · [0.3.3](docs/releases/v0.3.3.md) | [Torrenter recovery verification](docs/verification/2026-11-10-torrenter-recovery.md) |
 | [Torrenter workspace and REST API](docs/torrenter.md) | [Architecture and process responsibilities](docs/architecture.md) |
 | [Service lifecycle](docs/lifecycle.md) | [Controller commands and JSON replies](docs/control-protocol.md) |
 | [Panel and tray](docs/panel-and-tray.md) · [Flow Pills](docs/flow-pills.md) | [Tlamatini integration design](docs/tlamatini-integration.md) |

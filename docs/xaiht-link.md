@@ -1,6 +1,6 @@
 # xaiht.org link, remote prompts and Tlachihuani.log
 
-Latest version: **[0.38.0](releases/v0.38.0.md)**. Requested by Angela López Mendoza
+Latest version: **[1.0.0](releases/v1.0.0.md)**. Requested by Angela López Mendoza
 on 19 November 2026.
 
 A signed-in user of **xaiht.org** opens **Tlamatini-RC**, selects her computer

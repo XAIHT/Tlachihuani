@@ -13,10 +13,11 @@ Keep the XAIHT/Angela attribution and original artwork. Do not invent a new logo
 The README uses local SVG badges for the current version/channel, Windows platform, offline ZIP,
 .NET and REST API. They share the hero's slate, blue, teal and gold palette and do not
 depend on an external badge service. Keep `badge-version.svg` aligned with
-the README's release notes. The current documentation badge reads **v0.38.0
-PRE-RELEASE**, using the existing gold accent; its title and accessible label
-match. Angela explicitly requested this channel on 11 November 2026. Preserve
-an explicitly requested pre-release designation. A future package stamp uses
+the README's release notes. The current documentation badge reads **FIRST
+RELEASE v1.0.0**, using the existing gold accent; its title and accessible label
+match. Angela declared 1.0.0 the first official release, after the pre-releases,
+on 25 November 2026. Preserve an explicitly requested channel designation. A
+future package stamp uses
 `Directory.Build.props` and internal project locks together. Preserve historical
 release entries and dated verification evidence; a documentation update does not
 authorize commits, pushes, tags or executable builds.

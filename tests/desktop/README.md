@@ -1,6 +1,6 @@
 # Visible desktop checks
 
-For the **[0.38.0](../../docs/releases/v0.38.0.md)** workspace, use
+For the **[1.0.0](../../docs/releases/v1.0.0.md)** workspace, use
 [the headed table/recovery harness](torrenter-table.md). Its 48 passing checks
 are documented in the [10 November record](../../docs/verification/2026-11-10-torrenter-recovery.md).
 It does not build or install the product.

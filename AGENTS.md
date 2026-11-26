@@ -2,9 +2,10 @@
 
 Read [CLAUDE.md](CLAUDE.md) and [NEXT_SESSION.md](NEXT_SESSION.md) before implementation.
 
-Latest version: **[0.38.0](docs/releases/v0.38.0.md)**, as requested by Angela on
-21 November 2026. Every current documentation pointer names 0.38.0. Historical
-versions and dated verification results remain historical. This documentation
+Latest version: **[1.0.0](docs/releases/v1.0.0.md)**, Tlachihuani's first official
+release after several pre-releases, as requested by Angela on 25 November 2026.
+Every current documentation pointer names 1.0.0. Historical versions and dated
+verification results remain historical. This documentation
 bump does not authorize builds, tags, commits or publication.
 
 - The authoritative source checkout is `C:\Development\XAIHT\repo\Tlachihuani` (Angela's correction, 11 November 2026). Use this root for all new work; do not use the former checkout as the active codebase. The separate reference checkout is `C:\Development\XAIHT\Tlamatini`, upstream [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini).

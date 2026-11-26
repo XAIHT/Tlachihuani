@@ -38,7 +38,7 @@ flowchart LR
 
 The service continues when no browser is open, Tlamatini is closed, the tray exits, or the user logs off. The tray only exists in participating interactive sessions. Windows isolates service UI from the user's desktop; a separate session process is required. This split follows [Microsoft's interactive-services guidance](https://learn.microsoft.com/en-us/windows/win32/services/interactive-services).
 
-## Implemented planes · 0.38.0
+## Implemented planes · 1.0.0
 
 The current product runs three independent own-process Windows services and the
 per-session XT tray. The installer registers every service **Manual and stopped**,

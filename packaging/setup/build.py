@@ -168,6 +168,7 @@ if not isolated:
     # Build only an allowlisted public bundle, never the checkout or local state.
     quick=OUT/"READ-ME-FIRST.txt"
     quick.write_text(f"TLACHIHUANI {VERSION} - WINDOWS x64\n\n"
+        "Tlachihuani 1.0.0 is our first official release, after several pre-releases.\n\n"
         "1. Right-click the downloaded ZIP and choose Extract All.\n"
         "2. Open START-HERE.html for the illustrated installation guide.\n"
         "3. Double-click Installer.exe. Choose whether XT should appear at sign-in.\n"

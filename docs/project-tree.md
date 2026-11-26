@@ -1,8 +1,8 @@
-# Project files · 0.38.0
+# Project files · 1.0.0
 
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
-Latest version: **[Tlachihuani 0.38.0](releases/v0.38.0.md)**. Source inventory
+Latest version: **[Tlachihuani 1.0.0](releases/v1.0.0.md)**, the first official release. Source inventory
 updated 25 November 2026. Includes tracked files and new files in this
 working tree; ignored installers, local evidence and build intermediates are excluded.
 
@@ -55,6 +55,7 @@ docs/releases/v0.3.3.md
 docs/releases/v0.36.0.md
 docs/releases/v0.37.0.md
 docs/releases/v0.38.0.md
+docs/releases/v1.0.0.md
 docs/remote-control-predeployment-checklist.md
 docs/remote-controller.md
 docs/remote-mobile-parity.md

@@ -3,10 +3,11 @@
 
 This is the onboarding document for Claude, Codex, and every coding agent working on Tlachihuani.
 
-Latest version: **[0.38.0](docs/releases/v0.38.0.md)**, as requested by Angela on
-21 November 2026. Read the [Windows setup guide](packaging/setup/README.md)
+Latest version: **[1.0.0](docs/releases/v1.0.0.md)**, Tlachihuani's first official
+release after several pre-releases (0.1.0 to 0.40.1), as requested by Angela on
+25 November 2026. Read the [Windows setup guide](packaging/setup/README.md)
 for packaging and migration, and the [10 November recovery record](docs/verification/2026-11-10-torrenter-recovery.md)
-for source verification. This checkout declares `0.38.0` in `Directory.Build.props` and internal
+for source verification. This checkout declares `1.0.0` in `Directory.Build.props` and internal
 project lock references. Preserve those matching values. Future stamps must update
 both together; documentation changes do not rebuild existing binaries or create Git tags.
 
@@ -77,7 +78,7 @@ Runs use only the agent templates, Python and `config.json` of the Tlamatini tha
 itself in `HKCU\Software\XAIHT\Tlamatini`. End processes only through the run's job; wait
 for `FlowRegistry.Idle` before closing. Keep the compiler and the pill validator in step with
 Tlamatini. Read [Flow Pills](docs/flow-pills.md) for behavior, limits and dated evidence;
-it is source-verified only, not installed.
+it ships in 1.0.0 and is verified from source, not yet installed.
 
 ## Original service design decisions
 

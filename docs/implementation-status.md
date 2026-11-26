@@ -1,6 +1,17 @@
-# Implementation status · 0.38.0
+# Implementation status · 1.0.0
 
-Latest version: **[0.38.0](releases/v0.38.0.md)**. Dated sections keep the versions they tested.
+Latest version: **[1.0.0](releases/v1.0.0.md)**, the first official release after several pre-releases. Dated sections keep the versions they tested.
+
+## 1.0.0 · first official release · 25 November 2026
+
+Tlachihuani 1.0.0 is the first official release, after the pre-releases 0.1.0 to
+0.40.1; see the [1.0.0 notes](releases/v1.0.0.md). The `v1.0.0` tag points to commit
+`a7bd0df`. The release builder (run `20261125-135752-f5990157`) passed the
+release-version regression checks, 13 component checks including Flow Pills, publish,
+setup, and the MSI payload and ZIP verifications, and wrote
+`dist/Tlachihuani-1.0.0-windows-x64.zip` with its `.sha256`. `Directory.Build.props`
+and the internal lock references declare **1.0.0**. A clean-Windows installation and
+reboot of the 1.0.0 package have not been performed.
 
 ## Flow Pills source implementation · 25 November 2026
 
@@ -11,8 +22,9 @@ lives on its own thread and in its own kill-on-close Windows job; up to 256 run 
 default, admitted by count and free memory. `scripts\Build.ps1 -Mode Check` passed 13 checks,
 including the new Flow Pills check, and RC 318/318. Visible runs of the real window passed
 with the agents of `C:\Tlamatini`, and a publish with the release settings carries the new
-files. No installer was built or installed, a pill answered by a real model and Terminater
-steps were not exercised, and no version, tag or commit was made. See
+files. That pass built no installer and made no version change, tag or commit; the work
+was then committed as `a7bd0df` and released in 1.0.0. A pill answered by a real model
+and Terminater steps were not exercised. See
 [Flow Pills](flow-pills.md#verification--25-november-2026).
 
 ## Hosted prompt integration · 23 November review
@@ -130,7 +142,7 @@ Exact evidence paths and scope are in the linked verification record.
 
 ## Previous implementation evidence
 
-Latest version: **[0.38.0](releases/v0.38.0.md)**. The 0.3.3 documentation was
+Latest version: **[1.0.0](releases/v1.0.0.md)**. The 0.3.3 documentation was
 updated 11 November 2026; its source evidence is the
 [10 November Torrenter recovery record](verification/2026-11-10-torrenter-recovery.md):
 64 automated checks, 48 headed-browser checks across both controller editions,
@@ -144,7 +156,7 @@ package tests below retain the versions actually tested. No new package or
 installed-service acceptance is implied by this documentation bump.
 
 The active checkout is `C:\Development\XAIHT\repo\Tlachihuani`. Its product
-metadata declares 0.38.0. The [11 November documentation check](verification/2026-11-11-documentation.md)
+metadata declares 1.0.0. The [11 November documentation check](verification/2026-11-11-documentation.md)
 records the path correction and documentation-only validation separately from
 the historical runtime tests below.
 
@@ -221,7 +233,7 @@ The following entries are the historical October 11 foundation record.
 
 The following foundation inventory and limitations describe the 11 October
 baseline. Later Jobs and installer evidence appears above; do not read this
-historical list as the current 0.38.0 feature inventory.
+historical list as the current 1.0.0 feature inventory.
 
 This page distinguishes working code from the broader design. No SCM service, registry startup entry, local Git repository or GitHub repository was created. Tlamatini remains a separate, read-only checkout at `C:\Development\XAIHT\Tlamatini`, https://github.com/XAIHT/Tlamatini.
 
