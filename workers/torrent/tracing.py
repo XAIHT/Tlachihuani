@@ -2,8 +2,10 @@
 
 Every line of the engine's own files (worker, api, engine, storage, delivery) is logged as
 it runs, with the call's arguments and the value it returns, plus every libtorrent alert
-and every request and reply exchanged with Jobs. The format matches the C# trace lines,
-so XT copies them into Tlachihuani.log next to the services' own.
+and every request and reply exchanged with Jobs. A generator expression is logged as the
+statement that holds it, not once per item, and functions marked quiet are left out. The
+format matches the C# trace lines, so XT copies them into Tlachihuani.log next to the
+services' own.
 
 The folder comes from TLACHIHUANI_LOG_DIR (set by Jobs), else <state>/logs.
 TLACHIHUANI_LOG_LEVEL: trace (default), debug, info, warn, error or off.
@@ -159,6 +161,12 @@ _current = threading.local()
 _history = {}
 _history_lock = threading.Lock()
 _quiet_codes = set()
+
+# A generator expression runs in a frame of its own, resumed once per item of the statement
+# that holds it. That statement is traced; its items are not (Angela, 26 November 2026). The
+# file-name checks wrote one entry per character, more than half of the 450,000 entries of
+# the first tick after a start, and the engine answered only after Jobs had stopped waiting.
+_PER_ITEM = frozenset({"<genexpr>", "<listcomp>", "<setcomp>", "<dictcomp>"})
 
 
 def quiet(func):
@@ -402,7 +410,8 @@ def _local(frame, event, arg):
 
 def _global(frame, event, arg):
     code = frame.f_code
-    if event != "call" or code in _quiet_codes or not _is_ours(code.co_filename):
+    if (event != "call" or code in _quiet_codes or code.co_name in _PER_ITEM
+            or not _is_ours(code.co_filename)):
         return None
     _record(TRACE, "E", f"→ {code.co_qualname}({_arguments(frame)})", code.co_filename, frame.f_lineno, code.co_name, code.co_qualname, None)
     return _local

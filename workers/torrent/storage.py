@@ -11,6 +11,8 @@ import time
 import uuid
 from pathlib import Path
 
+import tracing
+
 
 class Problem(Exception):
     def __init__(self, status, message):
@@ -18,6 +20,9 @@ class Problem(Exception):
         self.status = status
 
 
+# Called for every check, thousands of times a tick. The statement that calls it is traced,
+# and a failure is traced as the exception it raises in that caller.
+@tracing.quiet
 def require(condition, status, message):
     if not condition:
         raise Problem(status, message)

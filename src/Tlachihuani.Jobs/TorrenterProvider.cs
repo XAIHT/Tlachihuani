@@ -65,7 +65,15 @@ internal sealed class TorrenterProvider(JobsSettings settings, ILogger log) : IJ
                     pass.Rename("Jobs web request " + (string?)req["method"] + " " + (string?)req["path"]);
                     // Only Windows-authenticated native clients may enter the admin channel.
                     req.Remove("admin"); req.Remove("owner");
-                    var reply = await worker.Request(req, token);
+                    JsonObject reply;
+                    try { reply = await worker.Request(req, token); }
+                    catch (Exception ex) when ((ex is TimeoutException or IOException) && !token.IsCancellationRequested)
+                    {
+                        // One unanswered request gets 503; the web facade and a busy engine stay
+                        // up. Closing the facade here restarted both (Angela, 26 November 2026).
+                        log.LogWarning("Torrenter engine did not answer {Method} {Path}: {Message}", (string?)req["method"], (string?)req["path"], ex.Message);
+                        reply = new() { ["code"] = 503, ["body"] = new JsonObject { ["error"] = "The Torrenter engine is busy or restarting. Try again shortly." } };
+                    }
                     await web.StandardInput.WriteLineAsync(reply.ToJsonString().AsMemory(), token);
                 }
             }
@@ -120,6 +128,7 @@ internal sealed class TorrenterProvider(JobsSettings settings, ILogger log) : IJ
                         reply["impact"] = impact["body"]?.DeepClone();
                     }
                     catch (IOException) { reply["engine"] = false; }
+                    catch (TimeoutException) { reply["engine_busy"] = true; }
                 }
             }
             else if (op is "issue" or "approve-delete" or "pending-deletions" or "deletion-details" or "revoke")
