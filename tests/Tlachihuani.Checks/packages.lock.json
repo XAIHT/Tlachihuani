@@ -298,7 +298,7 @@
       "tlachihuani.client": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Windows": "[1.0.0, )"
+          "Tlachihuani.Windows": "[1.0.1, )"
         }
       },
       "tlachihuani.contracts": {
@@ -307,40 +307,40 @@
       "tlachihuani.core": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[1.0.0, )"
+          "Tlachihuani.Contracts": "[1.0.1, )"
         }
       },
       "tlachihuani.flowpills": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Windows": "[1.0.0, )"
+          "Tlachihuani.Windows": "[1.0.1, )"
         }
       },
       "tlachihuani.jobs": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Hosting.WindowsServices": "[10.0.12, )",
-          "Tlachihuani.Windows": "[1.0.0, )"
+          "Tlachihuani.Windows": "[1.0.1, )"
         }
       },
       "tlachihuani.rc": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[1.0.0, )"
+          "Tlachihuani.Contracts": "[1.0.1, )"
         }
       },
       "tlachihuani.tray": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Client": "[1.0.0, )",
-          "Tlachihuani.FlowPills": "[1.0.0, )"
+          "Tlachihuani.Client": "[1.0.1, )",
+          "Tlachihuani.FlowPills": "[1.0.1, )"
         }
       },
       "tlachihuani.windows": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Core": "[1.0.0, )",
-          "Tlachihuani.RC": "[1.0.0, )"
+          "Tlachihuani.Core": "[1.0.1, )",
+          "Tlachihuani.RC": "[1.0.1, )"
         }
       }
     },
