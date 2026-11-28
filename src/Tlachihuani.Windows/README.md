@@ -2,7 +2,7 @@
 
 Fixed-name own-process SCM adapter, protected installation-manifest discovery, named-pipe creation with explicit DACL/remote denial, held process-image identity and cross-process lifecycle mutex. Native installed-service ACL/elevation testing remains pending; see [verification](../../docs/verification/2026-10-11-foundation.md).
 
-## Stopping and per-user processes · after 1.0.1, not yet committed
+## Stopping and per-user processes · after 1.0.1 (commit 41b045a)
 
 - `ForcedStop` is XT's **Stop Services**. A Windows service is asked to stop first; one still
   running 3 seconds later is ended through the process the Service Control Manager names for

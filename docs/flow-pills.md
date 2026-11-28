@@ -160,7 +160,7 @@ Flow Pills writes to `Tlachihuani.log` as `xt-flow-pills`.
 
 ## Verification · 27 November 2026
 
-Source checks of the work after 1.0.1, which is not committed yet. In a test folder of its
+Source checks of the work after 1.0.1, since committed in `41b045a`. In a test folder of its
 own, the real window published its process with no flows; the Runtime **Stop** closed it and
 removed its record; **Stop Services** ended it in under 3 seconds, without asking; and
 `Tlachihuani.log` recorded both. These are the 4 Flow Pills checks of visible run

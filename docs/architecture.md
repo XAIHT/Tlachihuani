@@ -44,7 +44,7 @@ The service continues when no browser is open, Tlamatini is closed, the tray exi
 
 The current product runs three independent own-process Windows services and the
 per-session XT tray, plus two per-user processes started from XT: Flow Pills and
-HandGI. HandGI is in the source after the `v1.0.1` tag and is not yet committed. The
+HandGI. HandGI is in the source after the `v1.0.1` tag (commit `41b045a`). The
 installer registers every service **Manual and stopped**, each under its own virtual
 account `NT SERVICE\<service name>`.
 

@@ -3,8 +3,8 @@
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
 Latest version: **[Tlachihuani 1.0.1](releases/v1.0.1.md)**, a fix release for 1.0.0, the first official release. Source inventory
-updated 27 November 2026. Includes tracked files and new files in this
-working tree; ignored installers, local evidence and build intermediates are excluded.
+updated 27 November 2026. Includes the tracked files; ignored installers, local evidence and build
+intermediates are excluded.
 
 ~~~text
 .editorconfig

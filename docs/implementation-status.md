@@ -2,7 +2,7 @@
 
 Latest version: **[1.0.1](releases/v1.0.1.md)**, a fix release for 1.0.0, the first official release after several pre-releases. Dated sections keep the versions they tested.
 
-## In the source after 1.0.1 · not committed · 27 November 2026
+## In the source after 1.0.1 · commit 41b045a · 27 November 2026
 
 **HandGI** (`src/Tlachihuani.HandGI`, `src/Tlachihuani.HandGI.Core`) controls the sound
 volume with hand signs in front of a camera; XT controls it from **Services… → Runtime →
@@ -12,10 +12,10 @@ Pills publishes its process so that its Runtime **Stop** can stop every flow and
 A new layout check of HandGI's windows found three problems, and all three were fixed.
 Visible run `artifacts/verification/services-handgi-2026-11-27-h` then passed: 19 unit
 checks, the HandGI lifecycle (7) and the Flow Pills lifecycle (4) in test folders, and the
-Services panel and HandGI windows at 144 and 96 DPI. A 1.0.1 package built from this
-working tree (`artifacts/release-builds/20261127-222520-d6ba8cb5`, local edits included)
+Services panel and HandGI windows at 144 and 96 DPI. A 1.0.1 package built from the
+working tree before that commit (`artifacts/release-builds/20261127-222520-d6ba8cb5`)
 passed its package checks and was installed on Angela's computer; her own check of the
-installed HandGI stopped at its first step. None of this is committed. See
+installed HandGI stopped at its first step. All of it is committed in `41b045a`. See
 [HandGI](handgi.md) and the [27 November verification](verification/2026-11-27-handgi.md).
 
 ## 1.0.1 · fix release · 26 November 2026

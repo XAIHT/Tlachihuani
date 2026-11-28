@@ -78,7 +78,7 @@ kill-on-close Windows job, with every log tailed independently. Opening never ru
 Runs use only the agent templates, Python and `config.json` of the Tlamatini that publishes
 itself in `HKCU\Software\XAIHT\Tlamatini`. End processes only through the run's job; wait
 for `FlowRegistry.Idle` before closing. Keep the compiler and the pill validator in step with
-Tlamatini. In the current source (after 1.0.1, not yet committed) the open window publishes
+Tlamatini. In the current source (after 1.0.1, commit `41b045a`) the open window publishes
 its process record (`process.json`): **Services… → Runtime → Flow Pills → Stop** asks it to
 stop every flow and close, and Stop Services ends it at once. Read [Flow Pills](docs/flow-pills.md)
 for behavior, limits and dated evidence. It ships in 1.0.0 and 1.0.1 and is verified from
@@ -94,7 +94,7 @@ open and ends it only through its `service.json` record, whose PID, start time a
 are verified first. Stop Services ends it at once. Tests run it in a test folder
 (`TLACHIHUANI_USER_DIR`) with `--camera-off`: never turn on Angela's camera in a test. Read
 [HandGI](docs/handgi.md) and run its visible checks (`tests/desktop/ServicesAndHandGI.ps1`). It is in the
-source after 1.0.1 and not yet committed; see the [27 November verification](docs/verification/2026-11-27-handgi.md).
+source after 1.0.1 (commit `41b045a`); see the [27 November verification](docs/verification/2026-11-27-handgi.md).
 
 ## Original service design decisions
 

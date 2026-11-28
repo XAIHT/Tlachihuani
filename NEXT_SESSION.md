@@ -7,8 +7,7 @@ references declare 1.0.1. Dated sections below keep the versions they describe.
 
 ## HandGI, Stop Services and the 1.0.1 package · 27 November 2026
 
-**None of this section is committed.** It is local edits on `main`; HEAD is `35504f5`,
-which is also on GitHub. Angela said "Not now" to a commit.
+**This section is committed** as `41b045a` on `main`, the commit after `35504f5`.
 
 - **HandGI** (`src/Tlachihuani.HandGI`, `src/Tlachihuani.HandGI.Core`): hand signs in
   front of a camera control the sound volume. XT controls it from **Services… →
@@ -21,17 +20,17 @@ which is also on GitHub. Angela said "Not now" to a commit.
 - **Layout checks** for HandGI's windows found three problems. All three were fixed and
   the visible suite passed (run `services-handgi-2026-11-27-h`). Read the
   [27 November verification](docs/verification/2026-11-27-handgi.md).
-- **The 1.0.1 package with HandGI** was built from this working tree
+- **The 1.0.1 package with HandGI** was built from the working tree before that commit
   (`20261127-222520-d6ba8cb5`) and installed on Angela's computer. Its restore first
   stalled, because the builder's own package cache had never held HandGI's packages;
   copying them from the developer NuGet folder fixed it. See
   [When restore stalls](docs/release-building.md#when-restore-stalls).
 - **The ZIP in `dist` is that working-tree build** (27 November, 16:28). It replaced the
-  ZIP built from the clean `v1.0.1` tag, so it carries the uncommitted HandGI work. Do
-  not publish it as the tagged 1.0.1.
+  ZIP built from the clean `v1.0.1` tag, so it carries the HandGI work that the tag does
+  not have. Do not publish it as the tagged 1.0.1.
 - **Still open:** Angela's own check of the three fixes in the installed HandGI (she
-  stopped at the first step), real hand signs on the installed package, a computer
-  without a supported NVIDIA graphics card, and a commit.
+  stopped at the first step), real hand signs on the installed package, and a computer
+  without a supported NVIDIA graphics card.
 - **Do not resume the tests on your own.** Angela stopped them to get back to
   implementation.
 
