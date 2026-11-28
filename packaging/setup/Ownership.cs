@@ -81,6 +81,14 @@ internal static class Ownership {
                     throw new InvalidOperationException("Choose Exit tray in XT before continuing.");
             }catch(System.ComponentModel.Win32Exception){throw new InvalidOperationException("Could not verify the running XT tray. Close XT in other signed-in sessions and retry.");}
         }
+        // HandGI runs in a signed-in user's session from this folder; XT's Stop Services ends it.
+        string handgi=Path.Combine(Program,"HandGI","Tlachihuani.HandGI.exe");
+        if(!remove) foreach(var candidate in Process.GetProcessesByName("Tlachihuani.HandGI")) using(candidate){
+            try{
+                if(String.Equals(candidate.MainModule.FileName,handgi,StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidOperationException("Choose XT → Stop Services, then Exit tray before continuing.");
+            }catch(System.ComponentModel.Win32Exception){throw new InvalidOperationException("Could not verify the running HandGI. Stop it in other signed-in sessions and retry.");}
+        }
         if (!remove && !managed && Directory.Exists(Program)) throw new InvalidOperationException("This program folder already exists. Use the existing installation's maintenance tools. Setup will not overwrite it.");
         foreach (int plane in new[]{0,1,2}) {
             string name=PlaneName(plane);

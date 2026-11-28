@@ -1,9 +1,10 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Text.Json.Nodes;
 using Tlachihuani.Client;
+using Tlachihuani.Contracts;
 using Tlachihuani.Core;
+using Tlachihuani.FlowPills;
 using Tlachihuani.Windows;
 
 namespace Tlachihuani.Tray;
@@ -34,6 +35,8 @@ internal sealed class TrayServices(Controller primary)
 
     internal async Task<ServiceSnapshot> StartAsync(CancellationToken token)
     {
+        // A start the user asks for wins over a guard still stopping restarts after Stop Services.
+        ForcedStop.CancelRestartGuards();
         await ChangePrimaryAsync("start", token);
         try
         {
@@ -57,7 +60,22 @@ internal sealed class TrayServices(Controller primary)
         }
         catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
         { throw new InvalidOperationException("Remote-Controller could not start: " + ex.Message, ex); }
+        StartHandGIIfChosen();
         return await ServiceReadiness.WaitAsync(ObserveAsync, TimeSpan.FromSeconds(40), token);
+    }
+
+    // HandGI starts with the other services only when the user chose that in HandGI's Camera
+    // settings ("Start with the other services"). It is optional, so a failure is logged, never fatal.
+    private static void StartHandGIIfChosen()
+    {
+        if (!HandGIEndpoint.StartsWithServices()) return;
+        try
+        {
+            if (HandGIEndpoint.IsRunning()) { TraceLog.I("Start Services: HandGI is already running"); return; }
+            HandGIEndpoint.Launch("--service");
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or Win32Exception or InvalidOperationException or IOException or UnauthorizedAccessException)
+        { TraceLog.W($"Start Services could not start HandGI: {ex.Message}"); }
     }
 
     private async Task ChangePrimaryAsync(string action, CancellationToken token)
@@ -66,77 +84,51 @@ internal sealed class TrayServices(Controller primary)
         if (!reply.Ok) throw new ServiceReadinessException(reply.Error?.Message ?? $"Tlachihuani could not {action}.", new(reply, null, null), []);
     }
 
+    // Stop Services ends every Tlachihuani service at once, whatever it is doing. HandGI and Flow
+    // Pills (processes in this user's session) are ended immediately. Every Windows service is asked
+    // to stop, and whatever still runs a few seconds later is ended through the process Windows names
+    // for it (ForcedStop). A service Windows restarts by itself (Jobs' recovery setting) is stopped
+    // again. Each service's outcome goes to the log; any service left running is reported.
     internal async Task StopAsync(CancellationToken token)
     {
-        // Jobs checkpoints active transfers, then closes the kill-on-close Windows Job Object
-        // containing its worker and web facade. Always also try the other independent service.
-        var errors = new List<Exception>();
-        try
+        TraceLog.W("Stop Services: ending every Tlachihuani service");
+        var main = new ScmBackend();
+        var remote = ScmBackend.ForRemoteController();
+        var windows = new Dictionary<string, IServiceBackend>
         {
-            if (ScmBackend.ForRemoteController().Query().State is not ("stopped" or "not_installed"))
-                await RcLifecycle.ExecuteAsync("stop", token);
-        }
-        catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
-        { errors.Add(new InvalidOperationException("Remote-Controller: " + ex.Message, ex)); }
-        foreach (var name in new[] { JobsEndpoint.ServiceName, Contracts.Protocol.ServiceName })
+            ["Remote-Controller"] = remote, [JobsEndpoint.ServiceName] = jobs, [Contracts.Protocol.ServiceName] = main
+        };
+        var outcomes = await Task.WhenAll(
+            Guarded("HandGI", () => ForcedStop.UserProcessAsync("HandGI", HandGIEndpoint.RecordPath, HandGIEndpoint.ExecutableName, token)),
+            Guarded("Flow Pills", () => ForcedStop.UserProcessAsync("Flow Pills", FlowPillsPaths.ProcessRecord, FlowPillsSignals.ExecutableName, token)),
+            Guarded("Remote-Controller", () => ForcedStop.ServiceAsync("Remote-Controller", remote,
+                () => { remote.ValidateRemoteControllerInstallation(); return RcInstallation.Image; }, token)),
+            Guarded(JobsEndpoint.ServiceName, () => ForcedStop.ServiceAsync(JobsEndpoint.ServiceName, jobs,
+                () => { jobs.ValidateJobsInstallation(); return JobsInstallation.Image; }, token)),
+            Guarded(Contracts.Protocol.ServiceName, () => ForcedStop.ServiceAsync(Contracts.Protocol.ServiceName, main,
+                () => { var install = Installation.Load(); main.ValidateInstallation(install); return install.ServicePath; }, token)));
+        foreach (var outcome in outcomes)
         {
-            token.ThrowIfCancellationRequested();
-            try { await StopHostAsync(name == JobsEndpoint.ServiceName, token); }
-            catch (Exception ex) when (!token.IsCancellationRequested && ex is not OutOfMemoryException)
-            { errors.Add(new InvalidOperationException($"{name}: {ex.Message}", ex)); }
+            if (outcome.Down) TraceLog.I($"Stop Services · {outcome.Service}: {outcome.Message}");
+            else TraceLog.E($"Stop Services · {outcome.Service}: {outcome.Message}");
+            if (outcome.Result == "ended" && windows.TryGetValue(outcome.Service, out var backend))
+                ForcedStop.GuardAgainstRestart(outcome.Service, backend);
         }
-        if (errors.Count != 0) throw new AggregateException("Service shutdown failed. " + string.Join("; ", errors.Select(e => e.Message)), errors);
+        var failed = outcomes.Where(o => !o.Down).ToArray();
+        if (failed.Length != 0)
+            throw new AggregateException("Service shutdown failed. " + string.Join("; ", failed.Select(o => o.Message)),
+                failed.Select(o => new InvalidOperationException(o.Message)));
+        TraceLog.W("Stop Services: every Tlachihuani service is down");
     }
 
-    private async Task StopHostAsync(bool stopJobs, CancellationToken token)
+    // One service's stop never stops the others: a failure becomes that service's outcome.
+    private static async Task<StopOutcome> Guarded(string name, Func<Task<StopOutcome>> stop)
     {
-        var scm = stopJobs ? jobs : new ScmBackend();
-        var before = scm.Query();
-        if (before.State is "stopped" or "not_installed") return;
-        string expected;
-        if (stopJobs)
+        try { return await stop(); }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not OperationCanceledException)
         {
-            scm.ValidateJobsInstallation();
-            expected = JobsInstallation.Image;
+            TraceLog.E($"Stop Services could not stop {name}", ex);
+            return new(name, "failed", $"{name}: {ex.Message}");
         }
-        else
-        {
-            var install = Installation.Load();
-            scm.ValidateInstallation(install);
-            expected = install.ServicePath;
-        }
-        using var host = ObserveHost(before.Pid, expected);
-        if (stopJobs) await new Lifecycle(scm).ExecuteAsync("stop", TimeSpan.FromSeconds(40), token);
-        else await ChangePrimaryAsync("stop", token);
-        // SCM can report Stopped just before the executable exits. Keep the original identity
-        // for observation only. Neither a process name nor a recycled PID is a kill target.
-        using var exit = CancellationTokenSource.CreateLinkedTokenSource(token);
-        exit.CancelAfter(TimeSpan.FromSeconds(12));
-        try
-        {
-            while (host is not null ? !host.HasExited : PidPresent(before.Pid))
-                await Task.Delay(100, exit.Token);
-        }
-        catch (OperationCanceledException) when (!token.IsCancellationRequested)
-        { throw new TimeoutException("Windows reported Stopped, but process exit could not be confirmed."); }
-        if (scm.Query().State != "stopped") throw new InvalidOperationException("The service state changed during shutdown.");
-    }
-
-    private static ProcessIdentity? ObserveHost(int pid, string expected)
-    {
-        if (pid == 0) return null;
-        ProcessIdentity identity;
-        try { identity = ProcessIdentity.Open(pid); }
-        catch (Win32Exception ex) when (ex.NativeErrorCode is 5 or 87) { return null; }
-        if (string.Equals(identity.ImagePath, expected, StringComparison.OrdinalIgnoreCase)) return identity;
-        identity.Dispose();
-        throw new InvalidOperationException("The service process no longer matches the installation.");
-    }
-
-    private static bool PidPresent(int pid)
-    {
-        if (pid == 0) return false;
-        try { using var process = Process.GetProcessById(pid); return true; }
-        catch (ArgumentException) { return false; }
     }
 }

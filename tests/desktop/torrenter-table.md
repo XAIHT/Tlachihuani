@@ -1,6 +1,7 @@
 # Torrenter table regression checks
 
-Referenced by **[1.0.0](../../docs/releases/v1.0.0.md)**. The
+Referenced by **[1.0.0](../../docs/releases/v1.0.0.md)**; the latest version is
+**[1.0.1](../../docs/releases/v1.0.1.md)**. The
 [10 November record](../../docs/verification/2026-11-10-torrenter-recovery.md)
 reports 48 passing headed checks, 24 per edition.
 

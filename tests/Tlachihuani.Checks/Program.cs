@@ -18,6 +18,8 @@ if (args is ["--log-viewer-preview", var logFile]) return LogViewerChecks.Previe
 if (args is ["--service-readiness", var serviceEvidence]) return ServiceReadinessChecks.Run(serviceEvidence);
 if (args.Length > 0 && args[0] == "--xaiht-relay") return await XaihtRelayChecks.Run(args[1..]);
 if (args is ["--xaiht-accounts-dialog", var websiteDialogOutput]) return XaihtAccountsVisual.Run(websiteDialogOutput);
+if (args is ["--handgi-lifecycle", var handgiExe]) return await ServiceStopChecks.HandGILifecycle(handgiExe);
+if (args is ["--flow-pills-lifecycle", var trayExe]) return await ServiceStopChecks.FlowPillsLifecycle(trayExe);
 
 var passed = 0;
 async Task Check(string name, Func<Task> body) { await body(); Console.WriteLine($"PASS {name}"); passed++; }
@@ -102,6 +104,13 @@ try
         await Reject<LifecycleException>(() => new Lifecycle(hung).ExecuteAsync("stop", TimeSpan.FromMilliseconds(250), default));
         Require(hung.Actions.SequenceEqual(["stop"]) && hung.State == "stop_pending", "Unexpected termination");
     });
+    await Check("Stop Services: a service that stops within its grace is stopped, never ended", ServiceStopChecks.Graceful);
+    await Check("Stop Services: a service that ignores or refuses the stop is ended through the process Windows names", ServiceStopChecks.Ended);
+    await Check("Stop Services: an old installation is waited for and named; a foreign process is never touched", ServiceStopChecks.Refusals);
+    await Check("Stop Services: stopped and missing services are left alone", ServiceStopChecks.AlreadyDown);
+    await Check("Stop Services: a restart Windows makes is stopped again; a start in XT cancels the guard", ServiceStopChecks.Guards);
+    await Check("User-session services: a record names one live process and is refused when stale, damaged or foreign", ServiceStopChecks.Records);
+    await Check("User-session services: Stop Services ends the recorded process at once and removes its record", ServiceStopChecks.EndsRecordedProcess);
     await Check("Stop reconciles a failed pending start without issuing a second control", async () =>
     {
         var backend = new FakeBackend { State = "start_pending", FailPendingStart = true };

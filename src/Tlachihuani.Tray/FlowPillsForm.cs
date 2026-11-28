@@ -22,8 +22,10 @@ internal sealed class FlowPillsForm : StudioForm
     private static readonly Font Mono = new("Consolas", 9.5f);
     private readonly FlowPillsSettings settings = FlowPillsSettings.Load();
     private readonly FlowRegistry registry;
-    private readonly EventWaitHandle showSignal;
+    private readonly EventWaitHandle showSignal, stopSignal;
+    private readonly Action<int> runsChanged;
     private readonly IReadOnlyList<string> initialFiles;
+    private int publishedRuns;
     private readonly System.Windows.Forms.Timer refresh = new() { Interval = 400 };
     private readonly List<FlowDocument> flows = [];
     private readonly Dictionary<FlowDocument, (StudioButton Tab, FlowCanvas Canvas, TreeNode Tree)> views = [];
@@ -53,10 +55,14 @@ internal sealed class FlowPillsForm : StudioForm
     private DateTime stopDeadline, lastFooter;
     private TreeTag? inspected;
 
-    internal FlowPillsForm(Icon icon, EventWaitHandle showSignal, IReadOnlyList<string> files)
+    // stopSignal: the Services panel asks to stop every flow and close. runsChanged: how many flows
+    // run or wait, for the process record the panel reads.
+    internal FlowPillsForm(Icon icon, EventWaitHandle showSignal, EventWaitHandle stopSignal, IReadOnlyList<string> files, Action<int> runsChanged)
         : base(icon, "Tlachihuani · Flow Pills", "Tlachihuani   /   Flow Pills Service", "Flow Pills", new(1320, 820), new(1000, 640))
     {
         this.showSignal = showSignal;
+        this.stopSignal = stopSignal;
+        this.runsChanged = runsChanged;
         initialFiles = files;
         registry = new FlowRegistry(settings);
         ShowInTaskbar = true;
@@ -609,6 +615,20 @@ internal sealed class FlowPillsForm : StudioForm
             inBackground = false;
             WindowActivation.Show(this);
             LoadFiles(FlowPillsInbox.Take());
+        }
+        if (stopSignal.WaitOne(0) && !stopping)
+        {
+            int count = registry.Active + registry.Waiting;
+            TraceLog.I($"Flow Pills was asked to stop by the Services panel; stopping {count} flow(s) and closing");
+            stopping = true;
+            stopDeadline = DateTime.UtcNow.AddSeconds(30);
+            registry.StopAll();
+        }
+        int runs = registry.Active + registry.Waiting;
+        if (runs != publishedRuns)
+        {
+            publishedRuns = runs;
+            runsChanged(runs);
         }
         var all = registry.Runs;
         foreach (var run in all) UpdateRow(run);

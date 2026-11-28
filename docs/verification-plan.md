@@ -1,10 +1,11 @@
 # Verification plan
 
-Latest version: **[1.0.0](releases/v1.0.0.md)**. Consult
+Latest version: **[1.0.1](releases/v1.0.1.md)**. Consult
 [implementation status](implementation-status.md) and the
 [10 November source results](verification/2026-11-10-torrenter-recovery.md) before
 marking any gate complete. Historical source checks and MSI fixtures do not
-certify a newly built 1.0.0 installation. Remote-Controller gates are in the
+certify a newly built 1.0.1 installation. HandGI's checks are in the
+[27 November record](verification/2026-11-27-handgi.md). Remote-Controller gates are in the
 [predeployment checklist](remote-control-predeployment-checklist.md); the XT
 workspace sign-in source evidence is the [17 November record](verification/2026-11-17-workspace-signin.md);
 the xaiht.org link source evidence is the [19 November record](verification/2026-11-19-xaiht-link.md),
@@ -32,6 +33,13 @@ Run every command/test from a verified visible foreground console; use browser a
 | T02 | Explorer restarts; tray launched twice | Icon re-registers; one instance per session |
 | T03 | Multiple Windows sessions | Session-specific tray status/consent; shared service state |
 | T04 | Exit tray / UAC denied / no interactive session | Service continues or operation cancels honestly; no invisible elevation |
+| H01 | HandGI started twice in one session, and in two sessions | One HandGI per session; a second start that names a window opens it in the running HandGI; each session has its own pipe |
+| H02 | HandGI pipe opened by another user or a network client; spoofed pipe server; stale `service.json` | Refusal without crash or hang; no request reaches, and no reply is accepted from, another process |
+| H03 | Start Services with **Start with the other services** off and on; Stop Services; Runtime Stop | HandGI starts only when chosen; both stops end the recorded process; a recycled PID or another program is never touched |
+| H04 | No supported NVIDIA GPU; CPU compatibility mode | The GTX 1060 message, camera not started; CPU mode uses at most four threads and leaves a core for the window |
+| H05 | Camera on: hand control paused, on, and every HandGI window closed | Pictures stay on this computer, never saved or sent; paused hand control changes no volume; closing a window leaves the camera as it was |
+| H06 | HandGI windows at 100/150/200% DPI | No cut or covered text, reachable buttons; the volume display never takes the keyboard |
+| H07 | Install or repair while an installed HandGI runs | Setup stops with its Stop Services message; the installation is unchanged |
 | W01 | Future menu and modal while chat answers | Panels stays available; chat unaffected; correct shared theme |
 | W02 | Escape/X/outside click/Tab/zoom/reduced motion | Shared dismissal policy, focus trap/return, readable content and reachable footer |
 | W03 | Unauthorized account, CSRF, GET mutation, account switch | Backend refuses mutation/leak; stale account response discarded |
@@ -41,7 +49,7 @@ Run every command/test from a verified visible foreground console; use browser a
 | I02 | Upgrade while running/stopped and failed upgrade | Correct desired state, rollback evidence, retained configuration |
 | I03 | Tlamatini source versus frozen installed integration | Separate verdicts, correct controller discovery and asset carriage |
 
-Every result records artifact/version/hash, Windows/session, action, expected and observed state, timestamp, status (PASS/FAIL/BLOCKED/NOT_RUN), evidence path, and cleanup. Do not claim installation success from a helper-only or mocked test. Do not test force kill on the user's unrelated processes. Installation/destructive lifecycle verification uses an explicitly authorized test target.
+Every result records artifact/version/hash, Windows/session, action, expected and observed state, timestamp, status (PASS/FAIL/BLOCKED/NOT_RUN), evidence path, and cleanup. Do not claim installation success from a helper-only or mocked test. Do not test force kill on the user's unrelated processes. Automated HandGI checks run in their own test folder (`TLACHIHUANI_USER_DIR`) with the camera off; a case that needs the camera (H05) is run by the person at that computer, and a test never turns their camera on. Installation/destructive lifecycle verification uses an explicitly authorized test target.
 
 ## Hosted prompt integration · 23 November review
 

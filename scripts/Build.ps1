@@ -18,7 +18,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "RC checks failed: $LASTEXITCODE" }
     }
     if ($Mode -eq 'Publish') {
-        foreach ($component in @('Service', 'Control', 'Tray', 'Jobs', 'RC.Server')) {
+        foreach ($component in @('Service', 'Control', 'Tray', 'Jobs', 'RC.Server', 'HandGI')) {
             # Private runtimes travel with each executable. No client SDK/runtime
             # install or self-extraction into a user's TEMP directory is needed.
             $folder = if ($component -eq 'RC.Server') { 'RCServer' } else { $component }

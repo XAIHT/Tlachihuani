@@ -2,11 +2,12 @@
 
 Read [CLAUDE.md](CLAUDE.md) and [NEXT_SESSION.md](NEXT_SESSION.md) before implementation.
 
-Latest version: **[1.0.0](docs/releases/v1.0.0.md)**, Tlachihuani's first official
-release after several pre-releases, as requested by Angela on 25 November 2026.
-Every current documentation pointer names 1.0.0. Historical versions and dated
-verification results remain historical. This documentation
-bump does not authorize builds, tags, commits or publication.
+Latest version: **[1.0.1](docs/releases/v1.0.1.md)**, a fix release for
+[1.0.0](docs/releases/v1.0.0.md), Tlachihuani's first official release after several
+pre-releases, as requested by Angela on 25 November 2026. Every current
+documentation pointer names 1.0.1. Historical versions and dated verification
+results remain historical. This documentation update does not authorize builds,
+tags, commits or publication.
 
 - The authoritative source checkout is `C:\Development\XAIHT\repo\Tlachihuani` (Angela's correction, 11 November 2026). Use this root for all new work; do not use the former checkout as the active codebase. The separate reference checkout is `C:\Development\XAIHT\Tlamatini`, upstream [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini).
 - A .NET 10 lifecycle foundation is implemented. Read [implementation status](docs/implementation-status.md) for evidence and remaining gates. Console-host verification does not certify an installed SCM service.
@@ -20,6 +21,8 @@ bump does not authorize builds, tags, commits or publication.
 - The service accepts a closed, typed operation set. No arbitrary command, executable path, service name, or PID supplied by a browser may be executed or killed.
 - Use owned process handles and verified identities for termination; never kill by image name or a stale PID.
 - Flow Pills (XT's `--flow-pills` window) runs only the agents, Python and models of the Tlamatini installation it finds, and ends processes only through each run's own job. Read [Flow Pills](docs/flow-pills.md) before changing it.
+- HandGI (`Tlachihuani.HandGI.exe`) runs only in the signed-in user's session. XT ends it only through its verified `service.json` record. Tests run it in a test folder with `--camera-off` and never turn on Angela's camera. Read [HandGI](docs/handgi.md) before changing it.
+- `Build-Release.cmd` restores into its own package cache. If restore stalls on packages that cache has never held, follow [When restore stalls](docs/release-building.md#when-restore-stalls) instead of retrying.
 - Do not add dependencies until needed. Pin and review them during implementation, not by copying Tlamatini's large dependency set.
 - Angela disabled Snyk on 2026-10-11. Do not invoke Snyk tools, skills, hooks, or scans. Use the pinned package lock files and NuGet audit for dependency checks.
 

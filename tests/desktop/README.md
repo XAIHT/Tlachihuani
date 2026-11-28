@@ -1,13 +1,14 @@
 # Visible desktop checks
 
-For the **[1.0.0](../../docs/releases/v1.0.0.md)** workspace, use
+For the **[1.0.1](../../docs/releases/v1.0.1.md)** workspace, use
 [the headed table/recovery harness](torrenter-table.md). Its 48 passing checks
 are documented in the [10 November record](../../docs/verification/2026-11-10-torrenter-recovery.md).
 It does not build or install the product.
 
 ## Open workspace sign-in
 
-`workspace_signin.py` checks that XT's **Open workspace** always reaches the
+`workspace_signin.py` checks that XT's REST workspace **Open** (formerly **Open workspace**)
+always reaches the
 Tlamatini login page and that the queue then belongs only to the account that
 signed in. It runs the source Tlamatini in-process with a throwaway database,
 answers Jobs calls with a recorder, and serves the newly built launcher page with
@@ -39,6 +40,25 @@ python tests\desktop\xaiht_link.py
 ```
 
 Results: [19 November record](../../docs/verification/2026-11-19-xaiht-link.md).
+
+## Services panel, Stop Services and HandGI
+
+`ServicesAndHandGI.ps1` checks the Services window's sections, **Stop Services**, HandGI, its
+windows and Flow Pills. It runs the unit checks (Stop Services against fake Windows services, and
+process records against a real child process), a real HandGI and a real Flow Pills in test folders
+of their own (`TLACHIHUANI_USER_DIR`; HandGI with its camera off), the native dialog audit and the
+HandGI window audit (`Tlachihuani.HandGI.Checks.exe --layout`, camera off) at the desktop DPI and
+at 96 DPI. No installed service is stopped and the real HandGI and Flow Pills are never touched.
+Tlamatini's Shoter agent takes a whole-desktop photo at each step, and the script refuses to run
+while the screen is locked. Build the solution in Release first, then from a verified visible
+foreground console:
+
+```powershell
+./tests/desktop/ServicesAndHandGI.ps1
+```
+
+Results go to `artifacts/verification/services-handgi-<date>-<time>/`: `run.log`, `photos/`
+and the layout screenshots.
 
 Real XT tray presence/menu, Explorer restart, per-session behavior, DPI, keyboard operation and host consent. Every harness must be visible, monitored and retain truthful evidence; no headless mode. See [the execution policy](../../docs/development-execution.md).
 

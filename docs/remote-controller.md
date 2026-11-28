@@ -1,6 +1,6 @@
-# Tlachihuani-RC Server · 1.0.0
+# Tlachihuani-RC Server · 1.0.1
 
-Latest version: **[1.0.0](releases/v1.0.0.md)**, the first official release.
+Latest version: **[1.0.1](releases/v1.0.1.md)**, a fix release for [1.0.0](releases/v1.0.0.md), the first official release.
 
 Created for Angela López Mendoza · XAIHT.
 
@@ -70,8 +70,8 @@ Stop, Restart and Open RC client. `Tlachihuani.Tray.exe --remote-controller` ope
 the same panel directly. Closing the panel or exiting XT leaves services alone.
 
 **Start Services** includes RC only when its Network setting explicitly opts in.
-**Stop Services** stops RC first, then continues stopping the original and Jobs
-services even if an earlier stop reports an error. Stopping RC alone disconnects
+**Stop Services** stops RC together with the original and Jobs services and ends
+any still running after three seconds; one failure never keeps the others running. Stopping RC alone disconnects
 its clients and suspends its scheduler. It neither stops Tlamatini nor controls
 Torrenter. The remote client cannot start its own stopped server.
 

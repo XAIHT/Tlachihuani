@@ -1,6 +1,32 @@
-# Implementation status · 1.0.0
+# Implementation status · 1.0.1
 
-Latest version: **[1.0.0](releases/v1.0.0.md)**, the first official release after several pre-releases. Dated sections keep the versions they tested.
+Latest version: **[1.0.1](releases/v1.0.1.md)**, a fix release for 1.0.0, the first official release after several pre-releases. Dated sections keep the versions they tested.
+
+## In the source after 1.0.1 · not committed · 27 November 2026
+
+**HandGI** (`src/Tlachihuani.HandGI`, `src/Tlachihuani.HandGI.Core`) controls the sound
+volume with hand signs in front of a camera; XT controls it from **Services… → Runtime →
+HandGI**. XT's **Stop Services** now ends every service at once (`ForcedStop`), every
+**Services… → Runtime** section has the same light, status line and buttons, and Flow
+Pills publishes its process so that its Runtime **Stop** can stop every flow and close it.
+A new layout check of HandGI's windows found three problems, and all three were fixed.
+Visible run `artifacts/verification/services-handgi-2026-11-27-h` then passed: 19 unit
+checks, the HandGI lifecycle (7) and the Flow Pills lifecycle (4) in test folders, and the
+Services panel and HandGI windows at 144 and 96 DPI. A 1.0.1 package built from this
+working tree (`artifacts/release-builds/20261127-222520-d6ba8cb5`, local edits included)
+passed its package checks and was installed on Angela's computer; her own check of the
+installed HandGI stopped at its first step. None of this is committed. See
+[HandGI](handgi.md) and the [27 November verification](verification/2026-11-27-handgi.md).
+
+## 1.0.1 · fix release · 26 November 2026
+
+The `v1.0.1` tag points to commit `4ef6b61`. Jobs no longer restarts a busy Torrenter
+engine: a 15-second timeout now means busy, and only an engine that has owed a reply for
+more than 3 minutes is restarted. The release builder built the tag with no local edits
+(run `20261127-044723-c3f7fa5b`): 13 component checks, publish, setup and the MSI payload
+and ZIP checks passed. `Directory.Build.props` and the internal lock references declare
+**1.0.1**. A clean-Windows installation and reboot of the 1.0.1 package have not been
+performed. See the [1.0.1 notes](releases/v1.0.1.md).
 
 ## 1.0.0 · first official release · 25 November 2026
 
@@ -142,7 +168,7 @@ Exact evidence paths and scope are in the linked verification record.
 
 ## Previous implementation evidence
 
-Latest version: **[1.0.0](releases/v1.0.0.md)**. The 0.3.3 documentation was
+Latest version: **[1.0.1](releases/v1.0.1.md)**. The 0.3.3 documentation was
 updated 11 November 2026; its source evidence is the
 [10 November Torrenter recovery record](verification/2026-11-10-torrenter-recovery.md):
 64 automated checks, 48 headed-browser checks across both controller editions,
@@ -156,7 +182,7 @@ package tests below retain the versions actually tested. No new package or
 installed-service acceptance is implied by this documentation bump.
 
 The active checkout is `C:\Development\XAIHT\repo\Tlachihuani`. Its product
-metadata declares 1.0.0. The [11 November documentation check](verification/2026-11-11-documentation.md)
+metadata declares 1.0.1. The [11 November documentation check](verification/2026-11-11-documentation.md)
 records the path correction and documentation-only validation separately from
 the historical runtime tests below.
 
@@ -233,7 +259,7 @@ The following entries are the historical October 11 foundation record.
 
 The following foundation inventory and limitations describe the 11 October
 baseline. Later Jobs and installer evidence appears above; do not read this
-historical list as the current 1.0.0 feature inventory.
+historical list as the current 1.0.1 feature inventory.
 
 This page distinguishes working code from the broader design. No SCM service, registry startup entry, local Git repository or GitHub repository was created. Tlamatini remains a separate, read-only checkout at `C:\Development\XAIHT\Tlamatini`, https://github.com/XAIHT/Tlamatini.
 

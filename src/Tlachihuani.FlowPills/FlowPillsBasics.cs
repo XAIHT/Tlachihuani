@@ -19,6 +19,7 @@ public sealed class FlowPillsException(string code, string message) : Exception(
 //   FlowPills\runs\{run}\            the flow that ran, events.log, transcript.log and run.json
 //   FlowPills\inbox\                 flows a second launch asks the open window to load
 //   FlowPills\settings.json          optional limits (docs/flow-pills.md)
+//   FlowPills\process.json           the open Flow Pills process (UserProcessRecord), for XT
 public static class FlowPillsPaths
 {
     public static string Root => Path.Combine(LogPaths.UserFolder, "FlowPills");
@@ -26,7 +27,34 @@ public static class FlowPillsPaths
     public static string Runs => Path.Combine(Root, "runs");
     public static string Inbox => Path.Combine(Root, "inbox");
     public static string SettingsFile => Path.Combine(Root, "settings.json");
+    public static string ProcessRecord => Path.Combine(Root, "process.json");
     public static string CompileWorker => Path.Combine(AppContext.BaseDirectory, "flowpills", "flowpills_compile.py");
+}
+
+// The names an open Flow Pills window answers to, in the signed-in user's session. Show brings it
+// forward; Stop asks it to stop every flow and close. XT's Stop Services does not ask: it ends the
+// process the window published (ForcedStop.UserProcessAsync). A test folder gets its own names.
+public static class FlowPillsSignals
+{
+    public static string Singleton => @"Local\XAIHT.Tlachihuani.FlowPills.v1" + LogPaths.UserScope;
+    public static string Show => @"Local\XAIHT.Tlachihuani.FlowPills.Show.v1" + LogPaths.UserScope;
+    public static string Stop => @"Local\XAIHT.Tlachihuani.FlowPills.Stop.v1" + LogPaths.UserScope;
+    public const string ExecutableName = "Tlachihuani.Tray.exe";
+
+    public static bool RequestShow() => Signal(Show);
+
+    public static bool RequestStop() => Signal(Stop);
+
+    // The open Flow Pills process, if its record still names that same process.
+    public static ProcessIdentity? OpenRunning(bool terminate = false)
+        => UserProcessRecord.Read(FlowPillsPaths.ProcessRecord)?.OpenVerified(ExecutableName, terminate);
+
+    private static bool Signal(string name)
+    {
+        if (!EventWaitHandle.TryOpenExisting(name, out var handle)) return false;
+        using (handle) handle.Set();
+        return true;
+    }
 }
 
 // What FlowPills\settings.json may set. A value written there is obeyed exactly, even one that

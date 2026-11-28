@@ -12,9 +12,12 @@
     <Project Path="src/Tlachihuani.RC.Server/Tlachihuani.RC.Server.csproj" />
     <Project Path="src/Tlachihuani.RC.Cloud/Tlachihuani.RC.Cloud.csproj" />
     <Project Path="src/Tlachihuani.Tray/Tlachihuani.Tray.csproj" />
+    <Project Path="src/Tlachihuani.HandGI.Core/Tlachihuani.HandGI.Core.csproj" />
+    <Project Path="src/Tlachihuani.HandGI/Tlachihuani.HandGI.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Tlachihuani.Checks/Tlachihuani.Checks.csproj" />
+    <Project Path="tests/Tlachihuani.HandGI.Checks/Tlachihuani.HandGI.Checks.csproj" />
     <Project Path="tests/Tlachihuani.RC.Checks/Tlachihuani.RC.Checks.csproj" />
   </Folder>
   <Folder Name="/tools/">

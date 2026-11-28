@@ -55,7 +55,7 @@ if (installed && args is ["--scm-acceptance", var qaDirectory, var qaId, var qaP
         || !qaRoot.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "XAIHT", "Acceptance") + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
         throw new InvalidOperationException("Invalid isolated acceptance root.");
     _ = new SecurityIdentifier(qaSid);
-    OperatorProcessAccess.AllowIdentityCheck(qaSid);
+    OperatorProcessAccess.AllowOperatorStop(qaSid);
     settings = new(qaRoot, "XAIHT.RC.Dev." + qaGuid.ToString("N"), qaSid,
         new RcConfiguration { Port = qaNumber, PublicOrigin = $"http://127.0.0.1:{qaNumber}" }, true);
 }
@@ -63,7 +63,8 @@ else if (installed && args.Length == 0)
 {
     var installation = RcInstallation.Load();
     if (!string.Equals(Environment.ProcessPath, RcInstallation.Image, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("RC image differs from the installed service.");
-    OperatorProcessAccess.AllowIdentityCheck(installation.OperatorSid);
+    // The operator may check this process's identity, and XT's Stop Services may end it.
+    OperatorProcessAccess.AllowOperatorStop(installation.OperatorSid);
     settings = new(RcInstallation.Root, RcEndpoint.Pipe(installation), installation.OperatorSid, RcInstallation.Configuration(), true);
 }
 else if (!installed && args is ["--console", var directory, var id, var portText] && Guid.TryParseExact(id, "N", out var devId) && int.TryParse(portText, out var port))

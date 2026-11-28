@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    HandGI engine (Angela López Mendoza · XAIHT): camera capture, GPU graphs, hand tracking,
+    gestures, GPU training and Windows volume. It has no UI references; the HandGI service
+    (src/Tlachihuani.HandGI) hosts it in the signed-in user's session.
+    Every source file is marked tlachihuani:trace-off: the engine runs on every camera frame
+    and in tight GPU and training loops. Its own messages reach Tlachihuani.log through the
+    service's log bridge (HandGiLog.Message).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <RootNamespace>HandGI.Core</RootNamespace>
+    <AssemblyName>Tlachihuani.HandGI.Core</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CA1416;CS8981</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.24.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Google's own answers (TensorFlow Lite) for 18 test hands; regenerate with tools/handgi/gesture_reference.py. -->
+    <EmbeddedResource Include="SelfTest\gesture_vectors.json" LogicalName="HandGI.Core.SelfTest.gesture_vectors.json" />
+    <InternalsVisibleTo Include="Tlachihuani.Checks" />
+  </ItemGroup>
+</Project>

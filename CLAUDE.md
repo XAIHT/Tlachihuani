@@ -3,15 +3,16 @@
 
 This is the onboarding document for Claude, Codex, and every coding agent working on Tlachihuani.
 
-Latest version: **[1.0.0](docs/releases/v1.0.0.md)**, Tlachihuani's first official
-release after several pre-releases (0.1.0 to 0.40.1), as requested by Angela on
-25 November 2026. Read the [Windows setup guide](packaging/setup/README.md)
+Latest version: **[1.0.1](docs/releases/v1.0.1.md)**, a fix release for
+[1.0.0](docs/releases/v1.0.0.md), Tlachihuani's first official release after several
+pre-releases (0.1.0 to 0.40.1), as requested by Angela on 25 November 2026. Read the
+[Windows setup guide](packaging/setup/README.md)
 for packaging and migration, and the [10 November recovery record](docs/verification/2026-11-10-torrenter-recovery.md)
-for source verification. This checkout declares `1.0.0` in `Directory.Build.props` and internal
+for source verification. This checkout declares `1.0.1` in `Directory.Build.props` and internal
 project lock references. Preserve those matching values. Future stamps must update
 both together; documentation changes do not rebuild existing binaries or create Git tags.
 
-`Build-Release.cmd` is the root release entry point. It chooses the highest stable local Git tag numerically, stamps product/internal project versions, rebuilds into fresh staging and verifies before copying the install ZIP to `dist`. It never commits, tags or pushes. See [release building](docs/release-building.md). Setup asks whether XT should appear at sign-in, always installs Start/Desktop shortcuts, and leaves all services stopped/Manual. Startup shortcuts must never start services. Preserve the distinction between the original unelevated wizard and its privileged MSI helper.
+`Build-Release.cmd` is the root release entry point. It chooses the highest stable local Git tag numerically, stamps product/internal project versions, rebuilds into fresh staging and verifies before copying the install ZIP to `dist`. It never commits, tags or pushes. See [release building](docs/release-building.md). Setup asks whether XT should appear at sign-in, always installs Start/Desktop shortcuts, and leaves all services stopped/Manual. Startup shortcuts must never start services. Preserve the distinction between the original unelevated wizard and its privileged MSI helper. The builder restores into its own package cache; when restore stalls on packages that cache has never held, follow [When restore stalls](docs/release-building.md#when-restore-stalls) instead of retrying.
 
 ## Hosted prompt integration · 23 November review
 
@@ -77,14 +78,29 @@ kill-on-close Windows job, with every log tailed independently. Opening never ru
 Runs use only the agent templates, Python and `config.json` of the Tlamatini that publishes
 itself in `HKCU\Software\XAIHT\Tlamatini`. End processes only through the run's job; wait
 for `FlowRegistry.Idle` before closing. Keep the compiler and the pill validator in step with
-Tlamatini. Read [Flow Pills](docs/flow-pills.md) for behavior, limits and dated evidence;
-it ships in 1.0.0 and is verified from source, not yet installed.
+Tlamatini. In the current source (after 1.0.1, not yet committed) the open window publishes
+its process record (`process.json`): **Services… → Runtime → Flow Pills → Stop** asks it to
+stop every flow and close, and Stop Services ends it at once. Read [Flow Pills](docs/flow-pills.md)
+for behavior, limits and dated evidence. It ships in 1.0.0 and 1.0.1 and is verified from
+source; the installed 1.0.1 package has not been checked for it.
+
+## HandGI · 27 November 2026
+
+**Services… → Runtime → HandGI** controls HandGI (`Tlachihuani.HandGI.exe`): hand signs in
+front of a camera control the sound volume, with ready-made signs and nothing to train. It is
+a process of the signed-in user, not a Session 0 service, because the camera, the sound and its
+Ctrl+Alt+H shortcut belong to that session. XT reaches it through a pipe only that user can
+open and ends it only through its `service.json` record, whose PID, start time and executable
+are verified first. Stop Services ends it at once. Tests run it in a test folder
+(`TLACHIHUANI_USER_DIR`) with `--camera-off`: never turn on Angela's camera in a test. Read
+[HandGI](docs/handgi.md) and run its visible checks (`tests/desktop/ServicesAndHandGI.ps1`). It is in the
+source after 1.0.1 and not yet committed; see the [27 November verification](docs/verification/2026-11-27-handgi.md).
 
 ## Original service design decisions
 
 - SCM service name and display name: `Tlachihuani`; own-process Windows service.
 - Resident binaries implemented: `Tlachihuani.Service.exe` (SCM/Session 0 or explicit development console) and `Tlachihuani.Tray.exe` (signed-in user's session).
-- `Tlachihuani.Control.exe` implements synchronous JSON/SCM bridging. `Tlachihuani.Elevated.exe`, force-stop, durable operation receipts and host consent are still future work.
+- `Tlachihuani.Control.exe` implements synchronous JSON/SCM bridging. `Tlachihuani.Elevated.exe`, durable operation receipts and host consent are still future work. XT's **Stop Services** ends every service itself ([ForcedStop.cs](src/Tlachihuani.Windows/ForcedStop.cs)); see [panel and tray](docs/panel-and-tray.md).
 - C#/.NET 10 Worker Service + WinForms tray; solution `Tlachihuani.slnx`, SDK `10.0.401`, WindowsServices package `10.0.12`, lock files saved in each project. See [implementation status](docs/implementation-status.md).
 - Reuse the existing XT icon copied from `C:\Development\XAIHT\Tlamatini\Tlamatini.ico`, with provenance in `assets/branding/`. Do not generate a replacement logo.
 - Local-only named-pipe IPC, explicit Windows ACLs, bounded/versioned messages. Tlamatini exposes authenticated same-origin web endpoints; the browser never talks directly to the service.

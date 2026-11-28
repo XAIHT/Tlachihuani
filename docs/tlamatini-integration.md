@@ -2,8 +2,9 @@
 
 > **Implemented since this design (0.36.0):** both Tlamatini editions provide
 > **Panels → Torrenter Workspace**, **Panels → Torrenter Sources** and the account
-> page **Panels → Tlachihuani · Remote-Controller**. XT's **Open workspace** signs
-> in through the edition's own login page. The **Panels → Tlachihuani** lifecycle
+> page **Panels → Tlachihuani · Remote-Controller**. XT's **Services… → Runtime →
+> REST workspace → Open** signs in through the edition's own login page. The
+> **Panels → Tlachihuani** lifecycle
 > dialog described below remains a design target. See [Torrenter](torrenter.md) and
 > [Remote-Controller](remote-controller.md).
 

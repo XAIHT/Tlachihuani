@@ -1,9 +1,46 @@
-# Tlachihuani handoff · 25 November 2026 · 1.0.0
+# Tlachihuani handoff · 27 November 2026 · 1.0.1
 
-Latest version: **[1.0.0](docs/releases/v1.0.0.md)**, Tlachihuani's first official
-release after several pre-releases (0.1.0 to 0.40.1). `Directory.Build.props` and the
-internal project lock references declare 1.0.0. Dated sections below keep the
-versions they describe.
+Latest version: **[1.0.1](docs/releases/v1.0.1.md)**, a fix release for
+[1.0.0](docs/releases/v1.0.0.md), Tlachihuani's first official release after several
+pre-releases (0.1.0 to 0.40.1). `Directory.Build.props` and the internal project lock
+references declare 1.0.1. Dated sections below keep the versions they describe.
+
+## HandGI, Stop Services and the 1.0.1 package · 27 November 2026
+
+**None of this section is committed.** It is local edits on `main`; HEAD is `35504f5`,
+which is also on GitHub. Angela said "Not now" to a commit.
+
+- **HandGI** (`src/Tlachihuani.HandGI`, `src/Tlachihuani.HandGI.Core`): hand signs in
+  front of a camera control the sound volume. XT controls it from **Services… →
+  Runtime → HandGI**. **Start Services** starts it only when its Camera settings say
+  **Start with the other services**, which is off by default. Read [HandGI](docs/handgi.md).
+- **Stop Services** ends every service at once (`ForcedStop`). Every **Services… →
+  Runtime** section now has the same light, status line and buttons, and Flow Pills
+  has a **Stop** there. Read [panel and tray](docs/panel-and-tray.md) and
+  [Flow Pills](docs/flow-pills.md).
+- **Layout checks** for HandGI's windows found three problems. All three were fixed and
+  the visible suite passed (run `services-handgi-2026-11-27-h`). Read the
+  [27 November verification](docs/verification/2026-11-27-handgi.md).
+- **The 1.0.1 package with HandGI** was built from this working tree
+  (`20261127-222520-d6ba8cb5`) and installed on Angela's computer. Its restore first
+  stalled, because the builder's own package cache had never held HandGI's packages;
+  copying them from the developer NuGet folder fixed it. See
+  [When restore stalls](docs/release-building.md#when-restore-stalls).
+- **The ZIP in `dist` is that working-tree build** (27 November, 16:28). It replaced the
+  ZIP built from the clean `v1.0.1` tag, so it carries the uncommitted HandGI work. Do
+  not publish it as the tagged 1.0.1.
+- **Still open:** Angela's own check of the three fixes in the installed HandGI (she
+  stopped at the first step), real hand signs on the installed package, a computer
+  without a supported NVIDIA graphics card, and a commit.
+- **Do not resume the tests on your own.** Angela stopped them to get back to
+  implementation.
+
+## 1.0.1 · fix release · 26 November 2026
+
+The `v1.0.1` tag (`4ef6b61`) stops Jobs from restarting a busy Torrenter engine: a
+15-second timeout now means busy, and the engine is restarted only after a reply has
+been owed for 3 minutes. Read the [1.0.1 notes](docs/releases/v1.0.1.md) and
+[A busy engine](docs/torrenter.md#a-busy-engine).
 
 ## 1.0.0 · first official release · 25 November 2026
 
@@ -710,12 +747,12 @@ The earlier handoff below is historical context.
 Work in `C:\Development\XAIHT\repo\Tlachihuani`. The separate Tlamatini reference checkout is `C:\Development\XAIHT\Tlamatini`. Read AGENTS.md, CLAUDE.md, [the Torrenter operating guide](docs/torrenter.md) and [implementation status](docs/implementation-status.md). The design baseline is Revision 05 of `TlachihuaniKickoffDesign.html` on Angela’s Desktop.
 
 The checkout path above supersedes the original location. Product metadata and
-internal project lock references now declare **1.0.0**; this documentation
+internal project lock references now declare **1.0.1**; this documentation
 pass preserves those existing edits. See the [11 November checkout verification](docs/verification/2026-11-11-documentation.md).
 
 ## Current version and installation evidence
 
-**Latest version: [1.0.0](docs/releases/v1.0.0.md), the first official release.** The [0.38.0 notes](docs/releases/v0.38.0.md) describe the last documented pre-release; the earlier [0.3.3 notes](docs/releases/v0.3.3.md) cover torrent queue recovery, accurate completion/error reporting, sortable account workspaces and the existing offline setup. Use the [Windows setup guide](packaging/setup/README.md) and [verification status](docs/implementation-status.md). The 0.1.0 workstation installation of 3 November and isolated 0.2.1 MSI checks of 4 November remain historical evidence; they do not certify a 1.0.0 installation.
+**Latest version: [1.0.1](docs/releases/v1.0.1.md), a fix release for 1.0.0, the first official release.** The [0.38.0 notes](docs/releases/v0.38.0.md) describe the last documented pre-release; the earlier [0.3.3 notes](docs/releases/v0.3.3.md) cover torrent queue recovery, accurate completion/error reporting, sortable account workspaces and the existing offline setup. Use the [Windows setup guide](packaging/setup/README.md) and [verification status](docs/implementation-status.md). The 0.1.0 workstation installation of 3 November and isolated 0.2.1 MSI checks of 4 November remain historical evidence; they do not certify a 1.0.1 installation.
 
 The [10 November recovery record](docs/verification/2026-11-10-torrenter-recovery.md)
 records 64 automated checks and 48 headed-browser checks across both development
@@ -741,14 +778,14 @@ The service and controller fixes require their respective installed updates.
 
 The root release command is now `Build-Release.cmd`; read [release building](docs/release-building.md). It rebuilds the current checkout at the latest numeric local Git-tag version and emits a checked ZIP/checksum in `dist`. Setup now asks for the optional common login shortcut and always creates Start/Desktop shortcuts. Services remain Manual/stopped after installation and reboot. The normal unelevated installer opens XT once after success; an elevated launch directs the operator to the normal Desktop shortcut.
 
-For 1.0.0, the builder selects the numeric `v1.0.0` tag; GitHub's release
+For 1.0.1, the builder selects the numeric `v1.0.1` tag; GitHub's release
 flags are independent, and suffixed tags are ignored. This documentation update
 does not stamp product metadata, build, install, modify services, create tags,
 commit or publish. The separate **Panels → Tlachihuani** lifecycle panel remains
 a design target; **Panels → Torrenter Workspace** is implemented.
 
 1. Complete the release acceptance gates with a sign-out/Explorer restart, reboot, power interruption, multi-day transfer, a second real Windows login and packaged signing/rollback qualification. Keep the original service’s force-stop consent helper on its own backlog.
-2. When authorized, qualify a fresh 1.0.0 package and the scheduler/disk changes on a clean Windows QA machine. Extend tracker error telemetry and rate-history visualization, and qualify large queues, network failures and disk exhaustion. The current REST and UI surfaces are listed in the [Torrenter guide](docs/torrenter.md).
+2. When authorized, qualify a fresh 1.0.1 package and the scheduler/disk changes on a clean Windows QA machine. Extend tracker error telemetry and rate-history visualization, and qualify large queues, network failures and disk exhaustion. The current REST and UI surfaces are listed in the [Torrenter guide](docs/torrenter.md).
 3. Keep the existing Tlamatini wrapped Torrenter client compatible with the scoped REST contract. The future Tlamatini Panels integration and agent catalog belong to that checkout. Preserve its protected database mechanics.
 
 Tlachihuani upstream is [angelahack1/Tlachihuani](https://github.com/angelahack1/Tlachihuani). Tlamatini upstream is [XAIHT/Tlamatini](https://github.com/XAIHT/Tlamatini). Keep the implementation uncommitted until Angela requests otherwise. Snyk remains disabled.

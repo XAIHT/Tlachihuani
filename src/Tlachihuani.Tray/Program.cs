@@ -44,6 +44,8 @@ internal static class Program
         if (!first) { if (args.Contains("--show")) showTray.Set(); return; }
         using var context = new TrayContext(args.Contains("--show"), showTray);
         Application.Run(context);
+        // A service Windows restarted after Stop Services is stopped again even when XT closes now.
+        Tlachihuani.Windows.ForcedStop.FinishGuards(Tlachihuani.Windows.ForcedStop.GuardWindow);
         singleton.ReleaseMutex();
     }
 }

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Checks for HandGI's windows (docs/handgi.md). HandGI is built for Windows 10 version 2004 and
+    later and carries its own copy of XT's window code, so its checks are a program of their own.
+    They share DesktopChecks.cs with Tlachihuani.Checks: HandGI's windows meet the rules XT's meet.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Tlachihuani.HandGI/Tlachihuani.HandGI.csproj" />
+    <Compile Include="../Tlachihuani.Checks/DesktopChecks.cs" Link="DesktopChecks.cs" />
+  </ItemGroup>
+
+</Project>

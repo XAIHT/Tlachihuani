@@ -33,6 +33,18 @@ public static class LogPaths
                 : Path.GetFullPath(custom);
         }
     }
+    // A different user folder (TLACHIHUANI_USER_DIR, as tests use) also gets its own window, event
+    // and pipe names, so a test HandGI or Flow Pills never meets the user's real one. Empty otherwise.
+    public static string UserScope
+    {
+        get
+        {
+            var custom = Environment.GetEnvironmentVariable("TLACHIHUANI_USER_DIR");
+            if (string.IsNullOrWhiteSpace(custom)) return "";
+            var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Path.GetFullPath(custom).ToUpperInvariant()));
+            return "." + Convert.ToHexString(hash, 0, 6);
+        }
+    }
     public static string UserLog => Path.Combine(UserFolder, "Tlachihuani.log");
     public static string ScriptLogs => Path.Combine(UserFolder, "script-logs");
 

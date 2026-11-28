@@ -45,7 +45,8 @@ if (installed && args.Length == 0)
     string expected = JobsInstallation.Image;
     if (!string.Equals(Environment.ProcessPath, expected, StringComparison.OrdinalIgnoreCase))
         throw new InvalidOperationException("Jobs service image differs from the installation.");
-    OperatorProcessAccess.AllowIdentityCheck(installation.OperatorSid);
+    // The operator may check this process's identity, and XT's Stop Services may end it.
+    OperatorProcessAccess.AllowOperatorStop(installation.OperatorSid);
     settings = new(JobsEndpoint.Pipe(installation), installation.OperatorSid,
         Path.Combine(JobsInstallation.Root, "state"), 12064, false);
 }

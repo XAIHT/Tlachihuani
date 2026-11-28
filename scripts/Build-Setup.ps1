@@ -15,7 +15,7 @@ try {
     if(!$env:DOTNET_CLI_HOME){$env:DOTNET_CLI_HOME=Join-Path $cache 'dotnet'}
     if(!$env:NUGET_PACKAGES){$env:NUGET_PACKAGES=Join-Path $cache 'packages'}
     $version=([xml](Get-Content -LiteralPath 'Directory.Build.props' -Raw)).Project.PropertyGroup.Version
-    foreach($component in 'Service','Control','Tray','Jobs'){
+    foreach($component in 'Service','Control','Tray','Jobs','HandGI'){
         $image=(Resolve-Path (Join-Path $PublishDirectory "$component\Tlachihuani.$component.exe")).Path
         $v=[Diagnostics.FileVersionInfo]::GetVersionInfo($image)
         if("$($v.FileMajorPart).$($v.FileMinorPart).$($v.FileBuildPart)" -ne $version){throw "Publish $component at version $version before packaging."}

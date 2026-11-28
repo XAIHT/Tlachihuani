@@ -1,11 +1,18 @@
 # Verification
 
-Latest version: **[1.0.0](../docs/releases/v1.0.0.md)**, the first official release. The documentation incorporates
+Latest version: **[1.0.1](../docs/releases/v1.0.1.md)**, a fix release for 1.0.0, the first official release. The documentation incorporates
 the [10 November source recovery results](../docs/verification/2026-11-10-torrenter-recovery.md):
 64 automated checks and 48 visible browser checks. Those dated results are not
 certification of a newly built installer.
 
 `Tlachihuani.Checks` is a dependency-free executable suite invoked by the visible `scripts/Build.ps1 -Mode Check`. It covers framing attacks, protocol bounds, event retention, lifecycle idempotence/order/timeouts, startup races, native local IPC, server-image rejection, 32 concurrent real-host clients, heartbeat, correlated version refusal and graceful console shutdown.
+
+`Tlachihuani.HandGI.Checks` holds HandGI's windows to the same layout rules as XT's
+(`Tlachihuani.Checks/DesktopChecks.cs`), with the camera off;
+[ServicesAndHandGI.ps1](desktop/README.md#services-panel-stop-services-and-handgi) runs it,
+together with the Stop Services checks in `Tlachihuani.Checks` (`ServiceStopChecks.cs`): fake
+Windows services, user-session process records against a real child process, and a real
+HandGI and a real Flow Pills in test folders of their own.
 
 The unit, desktop and integration directories contain the table, real-peer,
 metadata queue, delivery, release packaging and setup tests. Start with the
@@ -28,7 +35,7 @@ dependencies; no new product dependency was introduced.
 `Tlachihuani.RC.Checks` (run by `scripts/Build.ps1 -Mode Check`) and
 `Tlachihuani.RC.ContainerChecks` cover the Remote-Controller; the `rc_*` scripts in
 [integration](integration/README.md#remote-controller-checks) cover its browser,
-installed and hosted flows. The XT **Open workspace** sign-in has its own headed
+installed and hosted flows. The XT REST workspace **Open** sign-in has its own headed
 check, [workspace_signin.py](desktop/README.md#open-workspace-sign-in), and the xaiht.org
 link has [xaiht_link.py](desktop/README.md#xaihtorg-link-and-tlachihuanilog).
 

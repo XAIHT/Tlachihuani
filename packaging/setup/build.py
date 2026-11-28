@@ -96,10 +96,12 @@ def component(folder,key):
     cid=ident("C",key)
     child(feature,"ComponentRef",Id=cid)
     return child(folder,"Component",Id=cid,Guid=str(uuid.uuid5(FAMILY,key)),Bitness="always64")
-for rel in ["Service/Tlachihuani.Service.exe","Control/Tlachihuani.Control.exe","Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","Jobs/runtime/python.exe","Jobs/worker/worker.py","Jobs/wwwroot/index.html","RCServer/Tlachihuani.RC.Server.exe","RCServer/wwwroot/remote.html","RCServer/wwwroot/remote.js"]:
+for rel in ["Service/Tlachihuani.Service.exe","Control/Tlachihuani.Control.exe","Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","Jobs/runtime/python.exe","Jobs/worker/worker.py","Jobs/wwwroot/index.html","RCServer/Tlachihuani.RC.Server.exe","RCServer/wwwroot/remote.html","RCServer/wwwroot/remote.js",
+            "HandGI/Tlachihuani.HandGI.exe","HandGI/models/palm_detection_mediapipe_2023feb.onnx",
+            "HandGI/models/handpose_estimation_mediapipe_2023feb.onnx","HandGI/models/gesture_recognizer.task"]:
     if not (PUB/rel).is_file():raise RuntimeError("Missing published component: "+rel)
 if not isolated:
-    for part in ("Service","Control","Tray","Jobs","RCServer"):
+    for part in ("Service","Control","Tray","Jobs","RCServer","HandGI"):
         executable = "RC.Server" if part == "RCServer" else part
         rc=json.loads((PUB/part/("Tlachihuani."+executable+".runtimeconfig.json")).read_text())["runtimeOptions"]
         if "framework" in rc or "frameworks" in rc or not rc.get("includedFrameworks"):
@@ -108,14 +110,14 @@ if not isolated:
             if not (PUB/part/name).is_file(): raise RuntimeError("Missing private runtime: "+part+"/"+name)
 guide=WORK/"START-HERE.html"
 guide.write_text((SRC/"START-HERE.html").read_text(encoding="utf-8").replace("{{VERSION}}",VERSION),encoding="utf-8")
-payload=[(p.relative_to(PUB).as_posix(),p) for part in ["Service","Control","Tray","Jobs","RCServer"] for p in sorted((PUB/part).rglob("*")) if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc",".pdb")]
+payload=[(p.relative_to(PUB).as_posix(),p) for part in ["Service","Control","Tray","Jobs","RCServer","HandGI"] for p in sorted((PUB/part).rglob("*")) if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc",".pdb")]
 if isolated:
     # These services cannot access the production pipe, manifests or downloads.
     # Keep the same directory layout, MSI actions, security and wizard code.
     fixture=compile_tool("Fixture.exe","Fixture.cs")
     payload=[(rel,fixture) for rel,_ in payload if rel in (
         "Service/Tlachihuani.Service.exe","Control/Tlachihuani.Control.exe",
-        "Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","RCServer/Tlachihuani.RC.Server.exe")]
+        "Tray/Tlachihuani.Tray.exe","Jobs/Tlachihuani.Jobs.exe","RCServer/Tlachihuani.RC.Server.exe","HandGI/Tlachihuani.HandGI.exe")]
 for rel,p in payload+[("Setup/SetupIdentity.exe",guard),("Uninstaller.exe",remove),("Setup/START-HERE.html",guide)]:
     comp=component(directory(rel.rpartition("/")[0]),rel)
     fid=ident("F",rel)

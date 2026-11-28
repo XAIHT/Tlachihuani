@@ -39,7 +39,8 @@ try
         var installation = Installation.Load();
         if (!string.Equals(Path.GetFullPath(Environment.ProcessPath!), Path.GetFullPath(installation.ServicePath), StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("The service image does not match the installation manifest.");
-        OperatorProcessAccess.AllowIdentityCheck(installation.OperatorSid);
+        // The operator may check this process's identity, and XT's Stop Services may end it.
+        OperatorProcessAccess.AllowOperatorStop(installation.OperatorSid);
         installationId = installation.InstallationId; pipeName = installation.PipeName; operatorSid = installation.OperatorSid;
     }
     // Verbose trace log: %ProgramData%\XAIHT\Tlachihuani\logs\service.log (installed), or the

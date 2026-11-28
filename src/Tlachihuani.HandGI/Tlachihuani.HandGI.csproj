@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    HandGI, Tlachihuani's hand-gesture service (Angela López Mendoza · XAIHT). It runs in the
+    signed-in user's session, because the camera, the sound volume and its shortcut belong to that
+    session; XT starts it, asks it how it is through a pipe and ends it with Stop Services
+    (docs/handgi.md). The engine is Tlachihuani.HandGI.Core. Expert\ holds the standalone HandGI's
+    window, hosted by the service; the other files are the service and its everyday window.
+    StudioForm and UiTrace are XT's own files, so every Tlachihuani window looks and logs alike.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationVisualStyles>true</ApplicationVisualStyles>
+    <ApplicationUseCompatibleTextRendering>false</ApplicationUseCompatibleTextRendering>
+    <ApplicationIcon>../../assets/branding/XT.ico</ApplicationIcon>
+    <RootNamespace>HandGI.App</RootNamespace>
+    <AssemblyName>Tlachihuani.HandGI</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Tlachihuani.HandGI.Core/Tlachihuani.HandGI.Core.csproj" />
+    <ProjectReference Include="../Tlachihuani.Windows/Tlachihuani.Windows.csproj" />
+    <Compile Include="../Tlachihuani.Tray/StudioForm.cs" Link="Studio/StudioForm.cs" />
+    <Compile Include="../Tlachihuani.Tray/UiTrace.cs" Link="Studio/UiTrace.cs" />
+    <EmbeddedResource Include="../../assets/branding/XT.ico" LogicalName="Tlachihuani.XT.ico" />
+    <None Include="../../assets/handgi/models/*" Link="models/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <InternalsVisibleTo Include="Tlachihuani.Checks" />
+    <InternalsVisibleTo Include="Tlachihuani.HandGI.Checks" />
+  </ItemGroup>
+
+</Project>

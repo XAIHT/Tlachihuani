@@ -1,9 +1,8 @@
 // Tlachihuani — Angela López Mendoza · XAIHT
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
 using Tlachihuani.Contracts;
 using Tlachihuani.Tray;
+using static DesktopChecks;
 
 internal static class TrayLayoutChecks
 {
@@ -42,7 +41,7 @@ internal static class TrayLayoutChecks
         }
         void Snap(Form dialog, string name)
         {
-            dialog.Activate(); Application.DoEvents(); Pump(180);
+            dialog.Activate(); TakeForeground(dialog); Application.DoEvents(); Pump(180);
             if (GetForegroundWindow() != dialog.Handle || !dialog.Visible) throw new Exception($"Window is not foreground: {name}");
             int count = Audit(dialog, name);
             if (!Screen.FromControl(dialog).WorkingArea.Contains(dialog.Bounds)) throw new Exception($"{name}: window exceeds the working area.");
@@ -69,10 +68,11 @@ internal static class TrayLayoutChecks
             foreach (bool minimum in new[] { false, true })
             {
                 services.Size = minimum ? services.MinimumSize : size;
-                foreach (string view in new[] { "Runtime", "Access" })
+                foreach (string view in new[] { "Runtime", "Access", "xaiht.org" })
                 {
                     All(services).OfType<Button>().Single(b => b.Text == view).PerformClick();
                     Snap(services, "services-" + view.ToLowerInvariant() + (minimum ? "-min" : ""));
+                    if (!minimum) Photo($"services-{view.ToLowerInvariant()}-{mode}");
                 }
             }
             services.Close();
@@ -104,11 +104,16 @@ internal static class TrayLayoutChecks
 
         Modal("credential-issue", () => ServiceDialogs.RequestCredential(owner));
         Modal("credential-result", () => ServiceDialogs.ShowCredential(owner, "sample-token-for-layout-verification-only"));
-        foreach (var (title, button) in new[] { ("Stop the Jobs host?", "Stop Jobs"), ("Stop Torrenter?", "Stop provider"),
-            ("Restart Torrenter?", "Restart provider"), ("Revoke account access?", "Revoke access") })
-            Modal("confirm-" + button.Replace(' ', '-'), () => ServiceDialogs.Confirm(owner, title, button == "Revoke access"
-                ? "This revokes all REST sessions and enrolled gateways for your Windows account."
-                : "Active transfers will be checkpointed. 10 active transfers across 250 records.", button));
+        const string transfers = "Active transfers will be checkpointed. 10 active transfers across 250 records.";
+        foreach (var (title, text, button) in new[]
+        {
+            ("Stop the Jobs host?", transfers, "Stop Jobs"), ("Stop Torrenter?", transfers, "Stop provider"),
+            ("Restart Torrenter?", transfers, "Restart provider"),
+            ("Revoke account access?", "This revokes all REST sessions and enrolled gateways for your Windows account.", "Revoke access"),
+            ("Stop Remote-Controller?", "Remote clients will disconnect and RC schedules will pause. Tlamatini and Torrenter keep running.", "Stop server"),
+            ("Stop Flow Pills?", "12 flows will be stopped the way Tlamatini's Stop does, then Flow Pills closes.", "Stop flows")
+        })
+            Modal("confirm-" + button.Replace(' ', '-'), () => ServiceDialogs.Confirm(owner, title, text, button));
         Modal("service-ready", () => ServiceDialogs.Notice(owner, "Services ready", "Open your downloads from the signed-in Tlamatini account."));
         Modal("no-files", () => ServiceDialogs.Notice(owner, "File erasure", "There are no pending file-erasure requests."));
         Modal("operation-error", () => ServiceDialogs.Notice(owner, "Service action failed", "Windows could not complete this operation. Check the service status and try again."));
@@ -124,70 +129,4 @@ internal static class TrayLayoutChecks
         Modal("erasure-review-many", () => ServiceDialogs.ReviewFiles(owner, Preview(32)));
         owner.AllowExit = true; owner.Close();
     }
-
-    private static void Pump(int milliseconds)
-    {
-        var clock = Stopwatch.StartNew();
-        while (clock.ElapsedMilliseconds < milliseconds) { Application.DoEvents(); Thread.Sleep(10); }
-    }
-    private static IEnumerable<Control> All(Control parent)
-    {
-        foreach (Control child in parent.Controls)
-        {
-            yield return child;
-            foreach (var nested in All(child)) yield return nested;
-        }
-    }
-    private static int Audit(Control parent, string view)
-    {
-        var children = parent.Controls.Cast<Control>().Where(c => c.Visible).ToArray();
-        int count = 0;
-        if (parent is ScrollableControl panel && (panel.VerticalScroll.Visible || panel.HorizontalScroll.Visible))
-            throw new Exception($"{view}: unexpected scrolling in {parent.GetType().Name}.");
-        foreach (var child in children)
-        {
-            string id = $"{view}: {child.GetType().Name} {child.Text}";
-            if (!parent.ClientRectangle.Contains(child.Bounds) || child.Width <= 0 || child.Height <= 0)
-                throw new Exception($"{id}: {child.Bounds} outside {parent.ClientRectangle}.");
-            foreach (var sibling in children.Where(other => other != child))
-                if (Rectangle.Intersect(child.Bounds, sibling.Bounds) is { Width: > 0, Height: > 0 })
-                    throw new Exception($"{id} overlaps {sibling.GetType().Name} {sibling.Text}.");
-            using var graphics = child.CreateGraphics();
-            var flags = TextFormatFlags.NoPrefix | TextFormatFlags.SingleLine;
-            var available = child.ClientSize;
-            if (child is Label or ButtonBase)
-            {
-                int width = available.Width - (child is RadioButton ? child.LogicalToDeviceUnits(22) : 0);
-                var needed = TextRenderer.MeasureText(graphics, child.Text, child.Font, Size.Empty, flags);
-                if (child is Label && needed.Width > width)
-                    needed = TextRenderer.MeasureText(graphics, child.Text, child.Font, new(width, 10000), TextFormatFlags.NoPrefix | TextFormatFlags.WordBreak);
-                if (needed.Width > width || needed.Height > available.Height)
-                    throw new Exception($"{id}: requires {needed}, available {width}x{available.Height}.");
-            }
-            if (child is PictureBox picture && (picture.Image == null || picture.SizeMode != PictureBoxSizeMode.Zoom))
-                throw new Exception($"{id}: brand image missing or cropped.");
-            if (child is TextBox field)
-            {
-                if (field.Height < field.PreferredHeight) throw new Exception($"{id}: input height {field.Height} < {field.PreferredHeight}.");
-                var placeholder = TextRenderer.MeasureText(graphics, field.PlaceholderText, field.Font, Size.Empty, flags);
-                if (placeholder.Width > available.Width) throw new Exception($"{id}: placeholder requires {placeholder.Width}px.");
-            }
-            if (child is RichTextBox rich && rich.TextLength > 0)
-            {
-                if (view == "erasure-review-many")
-                {
-                    rich.Select(rich.TextLength, 0);
-                    rich.ScrollToCaret();
-                }
-                var end = rich.GetPositionFromCharIndex(rich.TextLength - 1);
-                if (end.X < 0 || end.Y < 0 || end.X >= rich.ClientSize.Width || end.Y + rich.Font.Height > rich.ClientSize.Height)
-                    throw new Exception($"{id}: last line outside the text viewport.");
-                if (view == "erasure-review-many") { rich.Select(0, 0); rich.ScrollToCaret(); }
-            }
-            count += 1 + Audit(child, view);
-        }
-        return count;
-    }
-
-    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
 }

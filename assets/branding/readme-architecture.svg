@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="840" viewBox="0 0 1280 840" fill="none" role="img" aria-labelledby="arch-title arch-desc">
-  <title id="arch-title">Tlachihuani 1.0.0 — System Architecture and Security Boundaries</title>
-  <desc id="arch-desc">Layered architecture of Tlachihuani 1.0.0: outgoing HTTPS link to xaiht.org with zero open ports, unelevated Windows User Session (XT System Tray, Local Browser and Tlamatini Panels, Flow Pills Window), three Session 0 virtual-account Windows services (Tlachihuani, Tlachihuani.Jobs on 127.0.0.1:12064, Tlachihuani.RemoteController on 127.0.0.1:12481), Installed Tlamatini (English and Spanish), plus unified trace logging, native Control CLI, and isolated ProgramData state.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="972" viewBox="0 0 1280 972" fill="none" role="img" aria-labelledby="arch-title arch-desc">
+  <title id="arch-title">Tlachihuani 1.0.1 — System Architecture and Security Boundaries</title>
+  <desc id="arch-desc">Layered architecture of Tlachihuani 1.0.1: outgoing HTTPS link to xaiht.org with zero open ports, unelevated Windows User Session (XT System Tray, HandGI hand-sign volume control with its camera, hand models on the DirectML GPU and Windows volume, Local Browser and Tlamatini Panels, Flow Pills Window), three Session 0 virtual-account Windows services (Tlachihuani, Tlachihuani.Jobs on 127.0.0.1:12064, Tlachihuani.RemoteController on 127.0.0.1:12481), Installed Tlamatini (English and Spanish), plus unified trace logging, native Control CLI, and isolated ProgramData state.</desc>
 
   <defs>
     <!-- Canvas & subtle ambient depth matching readme-hero.svg -->
@@ -10,7 +10,7 @@
       <stop offset="1" stop-color="#102023"/>
     </linearGradient>
 
-    <radialGradient id="glow-teal" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 310) rotate(25) scale(420 220)">
+    <radialGradient id="glow-teal" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 380) rotate(25) scale(420 260)">
       <stop stop-color="#5ECDBD" stop-opacity="0.11"/>
       <stop offset="1" stop-color="#5ECDBD" stop-opacity="0"/>
     </radialGradient>
@@ -20,14 +20,19 @@
       <stop offset="1" stop-color="#38BDF8" stop-opacity="0"/>
     </radialGradient>
 
-    <radialGradient id="glow-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(430 600) scale(440 190)">
+    <radialGradient id="glow-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(430 732) scale(440 190)">
       <stop stop-color="#E1BE82" stop-opacity="0.09"/>
       <stop offset="1" stop-color="#E1BE82" stop-opacity="0"/>
     </radialGradient>
 
-    <radialGradient id="glow-violet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1080 510) scale(280 240)">
+    <radialGradient id="glow-violet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1080 642) scale(280 240)">
       <stop stop-color="#A78BFA" stop-opacity="0.10"/>
       <stop offset="1" stop-color="#A78BFA" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glow-rose" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(840 318) scale(430 110)">
+      <stop stop-color="#FDA4AF" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#FDA4AF" stop-opacity="0"/>
     </radialGradient>
 
     <linearGradient id="card-dark" x1="0" y1="0" x2="0" y2="1">
@@ -73,22 +78,31 @@
     <marker id="arrow-violet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M1 1.5L9 5L1 8.5L2.8 5Z" fill="#C4B5FD"/>
     </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1.5L9 5L1 8.5L2.8 5Z" fill="#FDA4AF"/>
+    </marker>
   </defs>
 
   <!-- Canvas & Ambient Glows -->
-  <rect x="1" y="1" width="1278" height="838" rx="22" fill="url(#bg)" stroke="#29404A" stroke-width="1.5"/>
-  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#grid)"/>
-  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-sky)"/>
-  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-teal)"/>
-  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-gold)"/>
-  <rect x="18" y="18" width="1244" height="804" rx="14" fill="url(#glow-violet)"/>
+  <rect x="1" y="1" width="1278" height="970" rx="22" fill="url(#bg)" stroke="#29404A" stroke-width="1.5"/>
+  <rect x="18" y="18" width="1244" height="936" rx="14" fill="url(#grid)"/>
+  <rect x="18" y="18" width="1244" height="936" rx="14" fill="url(#glow-sky)"/>
+  <rect x="18" y="18" width="1244" height="936" rx="14" fill="url(#glow-teal)"/>
+  <rect x="18" y="18" width="1244" height="936" rx="14" fill="url(#glow-gold)"/>
+  <rect x="18" y="18" width="1244" height="936" rx="14" fill="url(#glow-violet)"/>
+  <rect x="18" y="18" width="1244" height="936" rx="14" fill="url(#glow-rose)"/>
 
   <!-- ==================== HEADER ==================== -->
   <g font-family="Segoe UI, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif">
-    <text x="36" y="40" fill="#E1BE82" font-size="11.5" font-weight="700" letter-spacing="3.2">XAIHT  /  TLACHIHUANI  ·  v1.0.0</text>
+    <text x="36" y="40" fill="#E1BE82" font-size="11.5" font-weight="700" letter-spacing="3.2">XAIHT  /  TLACHIHUANI  ·  v1.0.1</text>
     <text x="36" y="65" fill="url(#title-grad)" font-size="22" font-weight="700" letter-spacing="0.3">System Architecture &amp; Security Boundaries</text>
 
     <!-- Status Chips (top-right) -->
+    <g transform="translate(560 36)">
+      <rect width="172" height="26" rx="13" fill="#22161C" stroke="#5C3A46"/>
+      <circle cx="15" cy="13" r="3.5" fill="#FDA4AF"/>
+      <text x="27" y="17" fill="#DCEEEB" font-size="10.5" font-weight="600" letter-spacing="0.8">HANDGI HAND SIGNS</text>
+    </g>
     <g transform="translate(744 36)">
       <rect width="180" height="26" rx="13" fill="#12212C" stroke="#2D4A56"/>
       <circle cx="15" cy="13" r="3.5" fill="#E1BE82"/>
@@ -158,14 +172,14 @@
 
   <!-- ==================== BAND 2: WINDOWS USER SESSION ==================== -->
   <g>
-    <rect x="32" y="224" width="1216" height="170" rx="14" fill="#0B1923" fill-opacity="0.90" stroke="#25515C"/>
+    <rect x="32" y="224" width="1216" height="302" rx="14" fill="#0B1923" fill-opacity="0.90" stroke="#25515C"/>
     <!-- Compact eyebrow ends around x=255, leaving >110px clearance for vertical outgoing HTTPS line at x=368 -->
     <text x="50" y="245" fill="#7CE1CF" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.8">USER SESSION · UNELEVATED</text>
     <text x="1230" y="245" text-anchor="end" fill="#6F9CA5" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.6">INTERACTIVE WINDOWS DESKTOP</text>
 
     <!-- U1: XT System Tray -->
     <g transform="translate(48 260)">
-      <rect width="344" height="118" rx="12" fill="url(#card-dark)" stroke="#2C5761"/>
+      <rect width="344" height="250" rx="12" fill="url(#card-dark)" stroke="#2C5761"/>
       <path d="M16 1H78" stroke="#7CE1CF" stroke-width="2.2" stroke-linecap="round"/>
       <!-- Tray Icon -->
       <g transform="translate(16 15)" stroke="#7CE1CF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -183,11 +197,71 @@
         <text x="32" y="86">Unified Tlachihuani.log + paged 4-worker See log</text>
         <circle cx="22" cy="102" r="2.2" fill="#7CE1CF"/>
         <text x="32" y="106">Outgoing xaiht.org link · Copyable error reports</text>
+        <circle cx="22" cy="122" r="2.2" fill="#7CE1CF"/>
+        <text x="32" y="126">Start Services · Stop Services ends all at once</text>
+        <circle cx="22" cy="142" r="2.2" fill="#7CE1CF"/>
+        <text x="32" y="146">Runtime: one light, status line &amp; buttons each</text>
+        <circle cx="22" cy="162" r="2.2" fill="#7CE1CF"/>
+        <text x="32" y="166">Opens Flow Pills · drives HandGI over its pipe</text>
+      </g>
+      <line x1="16" y1="186" x2="328" y2="186" stroke="#223B46"/>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#9FBFC6">
+        <circle cx="22" cy="206" r="3" fill="#7CE1CF"/>
+        <text x="32" y="210">Colored icon: services ready · Gray: not ready</text>
+        <circle cx="22" cy="226" r="2.6" fill="none" stroke="#6F9CA5" stroke-width="1.2"/>
+        <text x="32" y="230">Exiting XT never stops a running service</text>
       </g>
     </g>
 
+    <!-- XT <-> HandGI: a named pipe only the signed-in user can open -->
+    <line x1="396" y1="319" x2="436" y2="319" stroke="#7CE1CF" stroke-width="1.8" marker-start="url(#arrow-teal)" marker-end="url(#arrow-teal)"/>
+    <rect x="401" y="293" width="30" height="16" rx="8" fill="#0C2328" stroke="#4DB8A7"/>
+    <text x="416" y="304.5" text-anchor="middle" fill="#8CF0DF" font-family="Cascadia Mono, Consolas, monospace" font-size="8.5" font-weight="700">PIPE</text>
+
+    <!-- U4: HandGI (per-user process: camera, hand models on the GPU, Windows volume) -->
+    <g transform="translate(440 260)">
+      <rect width="792" height="118" rx="12" fill="url(#card-dark)" stroke="#5C3A46"/>
+      <path d="M16 1H78" stroke="#FDA4AF" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- Hand Icon -->
+      <g transform="translate(16 15)" stroke="#FDA4AF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 12V5.2a1.6 1.6 0 0 1 3.2 0V11"/>
+        <path d="M10.2 10.6V3.6a1.6 1.6 0 0 1 3.2 0v7"/>
+        <path d="M13.4 10.8V5a1.6 1.6 0 0 1 3.2 0v6.4"/>
+        <path d="M16.6 9.2a1.6 1.6 0 0 1 3.2 0V14c0 4.2-2.9 7.5-7 7.5h-1.2c-2.2 0-3.6-0.8-5-2.3L3.4 16a1.6 1.6 0 0 1 2.3-2.2L7 15.1V12"/>
+      </g>
+      <text x="48" y="29" fill="#F2FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">HandGI · Hand Signs</text>
+      <rect x="630" y="13" width="148" height="20" rx="10" fill="#26161C" stroke="#6B3F4C"/>
+      <text x="704" y="26.5" text-anchor="middle" fill="#FFD1D9" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">Tlachihuani.HandGI.exe</text>
+
+      <line x1="16" y1="45" x2="776" y2="45" stroke="#3A2A33"/>
+      <g font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#C6DDE3">
+        <circle cx="22" cy="62" r="2.2" fill="#FDA4AF"/>
+        <text x="32" y="66">Ready-made hand signs set the sound volume</text>
+        <circle cx="22" cy="82" r="2.2" fill="#FDA4AF"/>
+        <text x="32" y="86">From XT: Start, Stop, Pause · Ctrl+Alt+H</text>
+        <circle cx="22" cy="102" r="2.2" fill="#FDA4AF"/>
+        <text x="32" y="106">Per-user process · ended via its verified record</text>
+      </g>
+
+      <!-- Camera -> hand models on the GPU -> Windows volume -->
+      <g font-family="Segoe UI, Arial, sans-serif" text-anchor="middle">
+        <rect x="350" y="54" width="120" height="38" rx="9" fill="#1E1419" stroke="#6B3F4C"/>
+        <text x="410" y="70" fill="#FFE1E6" font-size="11.5" font-weight="700">Camera</text>
+        <text x="410" y="85" fill="#C9A9B1" font-size="9.5">chosen in Camera…</text>
+        <rect x="500" y="54" width="150" height="38" rx="9" fill="#1E1419" stroke="#6B3F4C"/>
+        <text x="575" y="70" fill="#FFE1E6" font-size="11.5" font-weight="700">3 hand models</text>
+        <text x="575" y="85" fill="#C9A9B1" font-size="9.5">DirectML · NVIDIA GPU</text>
+        <rect x="676" y="54" width="100" height="38" rx="9" fill="#1E1419" stroke="#6B3F4C"/>
+        <text x="726" y="70" fill="#FFE1E6" font-size="11.5" font-weight="700">Sound volume</text>
+        <text x="726" y="85" fill="#C9A9B1" font-size="9.5">Windows audio</text>
+        <text x="563" y="108" fill="#A8B9C0" font-size="10">Needs a GTX 1060 or newer · or CPU compatibility mode (≤ 4 threads)</text>
+      </g>
+      <line x1="473" y1="73" x2="496" y2="73" stroke="#FDA4AF" stroke-width="1.6" marker-end="url(#arrow-rose)"/>
+      <line x1="653" y1="73" x2="672" y2="73" stroke="#FDA4AF" stroke-width="1.6" marker-end="url(#arrow-rose)"/>
+    </g>
+
     <!-- U2: Local Browser & Tlamatini Panels -->
-    <g transform="translate(410 260)">
+    <g transform="translate(440 392)">
       <rect width="432" height="118" rx="12" fill="url(#card-dark)" stroke="#2A5463"/>
       <path d="M16 1H78" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round"/>
       <!-- Browser Icon -->
@@ -213,8 +287,8 @@
     </g>
 
     <!-- U3: Flow Pills Window -->
-    <g transform="translate(860 260)">
-      <rect width="372" height="118" rx="12" fill="url(#card-dark)" stroke="#3D3C63"/>
+    <g transform="translate(890 392)">
+      <rect width="342" height="118" rx="12" fill="url(#card-dark)" stroke="#3D3C63"/>
       <path d="M16 1H78" stroke="#C4B5FD" stroke-width="2.2" stroke-linecap="round"/>
       <!-- Flow Nodes Icon -->
       <g transform="translate(16 15)" stroke="#C4B5FD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -224,10 +298,10 @@
         <path d="M8.5 7.2H15.5M11.5 7.2V16.8H15.5"/>
       </g>
       <text x="48" y="29" fill="#F2FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">Flow Pills Window</text>
-      <rect x="266" y="13" width="92" height="20" rx="10" fill="#1C1A32" stroke="#474175"/>
-      <text x="312" y="26.5" text-anchor="middle" fill="#D5CAFF" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">--flow-pills</text>
+      <rect x="236" y="13" width="92" height="20" rx="10" fill="#1C1A32" stroke="#474175"/>
+      <text x="282" y="26.5" text-anchor="middle" fill="#D5CAFF" font-family="Cascadia Mono, Consolas, monospace" font-size="9.5">--flow-pills</text>
 
-      <line x1="16" y1="45" x2="356" y2="45" stroke="#282B42"/>
+      <line x1="16" y1="45" x2="326" y2="45" stroke="#282B42"/>
       <g font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#C6DDE3">
         <circle cx="22" cy="62" r="2.2" fill="#C4B5FD"/>
         <text x="32" y="66">Separate per-user process · Never runs on open</text>
@@ -251,6 +325,8 @@
     <text x="603" y="201.5" text-anchor="middle" fill="#8AD8FC" font-family="Cascadia Mono, Consolas, monospace" font-size="10" font-weight="600">▲ 25s Outgoing HTTPS Long Poll · DPAPI Key · Zero Open Ports</text>
   </g>
 
+  <!-- Everything below the user session moves down by its second row (132 px) -->
+  <g transform="translate(0 132)">
   <!-- ==================== BAND 3: SESSION 0 SERVICES & INSTALLED TLAMATINI ==================== -->
   <!-- Session 0 Container -->
   <g>
@@ -436,6 +512,10 @@
     <circle cx="564" cy="816" r="4" fill="#C4B5FD"/>
     <text x="575" y="820" fill="#99B3BE">Flow Pills / Tlamatini Runtime</text>
 
-    <text x="1244" y="820" text-anchor="end" fill="#79929E" font-size="11.5" letter-spacing="0.3">Tlachihuani 1.0.0  ·  Created by Angela López Mendoza  ·  XAIHT</text>
+    <circle cx="780" cy="816" r="4" fill="#FDA4AF"/>
+    <text x="791" y="820" fill="#99B3BE">HandGI</text>
+
+    <text x="1244" y="820" text-anchor="end" fill="#79929E" font-size="11.5" letter-spacing="0.3">Tlachihuani 1.0.1  ·  Created by Angela López Mendoza  ·  XAIHT</text>
+  </g>
   </g>
 </svg>

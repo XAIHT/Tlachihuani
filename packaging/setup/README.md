@@ -1,6 +1,6 @@
 # Windows setup
 
-Latest version: **[1.0.0](../../docs/releases/v1.0.0.md)**, the first official release after several pre-releases.
+Latest version: **[1.0.1](../../docs/releases/v1.0.1.md)**, a fix release for 1.0.0, the first official release after several pre-releases.
 
 The two x64 Windows wizards use Tlamatini's dark setup palette, Segoe UI and the original XT icon. Their title and version label use the compiled assembly version sourced from the project's `Directory.Build.props`. Installer.exe contains a compressed Windows Installer package. Uninstaller.exe targets the corresponding registered product. Neither needs the source tree at runtime.
 
@@ -23,7 +23,7 @@ existing version identifiers and installed services remain unchanged.
 
 ## Install and operate
 
-Use Windows 11 x64. Extract the matching `Tlachihuani-1.0.0-windows-x64.zip` with **Extract All** and read `START-HERE.html`. This package carries private .NET 10 and CPython/libtorrent runtimes; clients do not need to install a runtime or SDK. Sign in as the intended operator. Open **Installer.exe**, choose **Review**, confirm version **1.0.0**, the operator and destination, and select **Install**. Approve UAC. If a different administrator supplies credentials, the operator shown in the original review remains the delegated operator.
+Use Windows 11 x64. Extract the matching `Tlachihuani-1.0.1-windows-x64.zip` with **Extract All** and read `START-HERE.html`. This package carries private .NET 10 and CPython/libtorrent runtimes; clients do not need to install a runtime or SDK. Sign in as the intended operator. Open **Installer.exe**, choose **Review**, confirm version **1.0.1**, the operator and destination, and select **Install**. Approve UAC. If a different administrator supplies credentials, the operator shown in the original review remains the delegated operator.
 
 Before Review, choose **Show XT at Windows sign-in (all users of this PC)** or leave it unchecked. Review displays that choice. After **Installation complete**, the original unelevated wizard opens the gray tray icon once; all installed services remain stopped. **Start menu and Desktop shortcuts** always reopen XT. If the entire wizard was launched as administrator, use either shortcut from your normal Desktop session. Choose **Start Services** in XT when needed.
 
@@ -33,6 +33,11 @@ from Start Services until explicitly selected in its Network settings. Stop Serv
 includes it. See [its implementation boundary](../../docs/remote-controller.md);
 the source change does not certify an already distributed or installed package.
 
+The package also carries **HandGI** (`HandGI/`, with its three models). It is a
+per-user program, not a Windows service: it joins Start Services only when its
+Camera settings say so, and Stop Services ends it. Installing or repairing stops
+with a message while an installed HandGI is running. See [HandGI](../../docs/handgi.md).
+
 The optional per-machine Startup shortcut displays only XT at sign-in. With the option unchecked, no login shortcut is installed. The services use Manual startup under separate virtual accounts and stay stopped after reboot. Signing out/in does not stop services already started by the operator. Windows enforces service permissions separately.
 
 ## Remove and reinstall
@@ -41,9 +46,9 @@ Stop all services from XT. Exit the tray in every active Windows session. Start 
 
 Windows Installer removes registered services, its own shortcuts and packaged files. Downloads, application-generated exports, job state and account manifests are retained. Reinstall as the original operator. Windows Installed apps also provides removal if the standalone uninstaller is lost. A different-version installation or a script-managed deployment must be maintained using the tools for that installation. An in-place upgrade is not offered by these wizards.
 
-### Moving from a pre-release wizard installation to 1.0.0
+### Moving from an earlier wizard installation to 1.0.1
 
-Stop Services, exit XT, remove the old wizard installation through Windows or its original uninstaller and run the 1.0.0 installer as the same operator. Preserve the retained identities, journal and downloads. The release builder writes the distributable to `dist/Tlachihuani-1.0.0-windows-x64.zip` when its selected numeric tag is 1.0.0. Existing historical packages and tags remain unchanged.
+This applies to 1.0.0 and to the pre-releases alike: the wizards never install over an existing installation. Stop Services, exit XT, remove the old wizard installation through Windows or its original uninstaller and run the 1.0.1 installer as the same operator. Preserve the retained identities, journal and downloads. The release builder writes the distributable to `dist/Tlachihuani-1.0.1-windows-x64.zip` when its selected numeric tag is 1.0.1. Existing historical packages and tags remain unchanged.
 
 For a legacy PowerShell installation, use its [unregister scripts](../windows/README.md) first. Disable its per-user XT startup entry. Preserve the legacy program directory and both ProgramData directories under separate backup names before a fresh wizard install. A journal in a renamed legacy folder is a backup, not an imported queue. Leave it intact.
 
@@ -57,7 +62,7 @@ If Review reports an existing service, unexpected image, different operator, or 
 
 For the complete release, run **`Build-Release.cmd`** from a visible Command Prompt at the repository root (or `.\Build-Release.cmd` in PowerShell). It reads the latest numeric local release tag, stamps product versions, rebuilds into fresh staging, checks the payload and writes the ZIP plus SHA-256 into **`dist/`**. It performs no Git writes or publication. See [the full command guide](../../docs/release-building.md).
 
-The latest version is 1.0.0, the first official release. The existing builder
+The latest version is 1.0.1, a fix release for 1.0.0, the first official release. The existing builder
 selects numeric tags and ignores suffixes such as `-rc.1`; the offline guide's
 `{{VERSION}}` is replaced from the actual package version. The documentation
 update did not regenerate installers or certify their acceptance.

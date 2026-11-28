@@ -100,7 +100,7 @@ try:
         finally: api.MsiCloseHandle(view)
         print("Checking cabinet", n + 1, "of", len(cabinets), flush=True)
         subprocess.run(["expand.exe", "-F:*", str(cab), str(extracted)], check=True, stdout=subprocess.DEVNULL)
-    expected = {p.relative_to(publish) for part in ("Service", "Jobs", "Control", "Tray", "RCServer") for p in (publish/part).rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc", ".pdb")}
+    expected = {p.relative_to(publish) for part in ("Service", "Jobs", "Control", "Tray", "RCServer", "HandGI") for p in (publish/part).rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc", ".pdb")}
     setup_sources = {Path("Setup/SetupIdentity.exe"): "SetupIdentity.exe", Path("Uninstaller.exe"): "Uninstaller.exe", Path("Setup/START-HERE.html"): "START-HERE.html"}
     actual, setup_actual = set(), set()
     for fid, cid, filename in rows("SELECT `File`,`Component_`,`FileName` FROM `File`", 3):

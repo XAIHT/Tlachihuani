@@ -3,7 +3,7 @@
 Run `node --test tests/unit/workspace_table.test.cjs` from a verified visible
 foreground console. The 30 checks cover numeric/natural ordering, unknown values,
 multi-sort, filtering, pagination, completion labels and recovery-action eligibility.
-Latest version: [1.0.0](../../docs/releases/v1.0.0.md); see the [10 November recovery evidence](../../docs/verification/2026-11-10-torrenter-recovery.md).
+Latest version: [1.0.1](../../docs/releases/v1.0.1.md); see the [10 November recovery evidence](../../docs/verification/2026-11-10-torrenter-recovery.md).
 
 Contract bounds, lifecycle transitions, timeouts, idempotency and permission
 decisions are covered by the separate `Tlachihuani.Checks` executable. Running it

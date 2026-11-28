@@ -32,17 +32,21 @@ flowchart LR
     CTL <-->|"local named pipe"| SVC
     TRAY["Tlachihuani.Tray — user session; XT icon"] <-->|"local named pipe"| SVC
     TRAY -->|"shared native control library"| SCM
-    TRAY -->|"explicit host consent / UAC"| ELEV["Tlachihuani.Elevated — transient"]
+    TRAY -->|"Stop Services: the process SCM names, executable checked"| SVC
+    TRAY <-->|"per-user pipe; service.json record verified"| HANDGI["Tlachihuani.HandGI — user session; camera and volume"]
+    TRAY -->|"explicit host consent / UAC"| ELEV["Tlachihuani.Elevated — transient (planned)"]
     ELEV -->|"verified own-process termination"| SVC
 ```
 
 The service continues when no browser is open, Tlamatini is closed, the tray exits, or the user logs off. The tray only exists in participating interactive sessions. Windows isolates service UI from the user's desktop; a separate session process is required. This split follows [Microsoft's interactive-services guidance](https://learn.microsoft.com/en-us/windows/win32/services/interactive-services).
 
-## Implemented planes · 1.0.0
+## Implemented planes · 1.0.1 and the current source
 
 The current product runs three independent own-process Windows services and the
-per-session XT tray. The installer registers every service **Manual and stopped**,
-each under its own virtual account `NT SERVICE\<service name>`.
+per-session XT tray, plus two per-user processes started from XT: Flow Pills and
+HandGI. HandGI is in the source after the `v1.0.1` tag and is not yet committed. The
+installer registers every service **Manual and stopped**, each under its own virtual
+account `NT SERVICE\<service name>`.
 
 | Process | Role | Details |
 |---|---|---|
@@ -51,6 +55,7 @@ each under its own virtual account `NT SERVICE\<service name>`.
 | `Tlachihuani.RemoteController` (`RCServer/Tlachihuani.RC.Server.exe`) | Tlamatini-RC web client, enrollment, device grants, sessions, receipts, events and schedules; local-only on `127.0.0.1:12481` by default | [Remote-Controller](remote-controller.md) |
 | `Tlachihuani.Tray` (XT) | Session tray, Services and Remote-Controller panels, the interactive-session application-launch broker used by RC, Tlachihuani.log with See log, and the xaiht.org link | [Panel and tray](panel-and-tray.md), [xaiht.org link](xaiht-link.md) |
 | `Tlachihuani.Tray --flow-pills` (Flow Pills) | A separate per-user window, not a service: opens, draws and runs Tlamatini's `.flw` flows and `.fpmt` flow pills, each run on its own thread and in its own Windows job | [Flow Pills](flow-pills.md) |
+| `Tlachihuani.HandGI` (HandGI) | A per-user process, not a Windows service: hand signs in front of a camera control the sound volume. It runs in the signed-in user's session because the camera, the sound and its Ctrl+Alt+H shortcut belong to that session. XT starts it, shows its windows and stops it through a pipe only that user can open | [HandGI](handgi.md) |
 
 Since 0.37.0 XT also receives messages from the **Tlamatini-RC** page on
 xaiht.org (the XAIHT `web-app`). XT asks `https://xaiht.org/api/rc/poll` with its
@@ -64,6 +69,19 @@ each service writes under `%ProgramData%\XAIHT\<service>\logs` (`service.log`,
 `jobs.log`, `web.log`, `torrent.log`, `rc.log`). A service cannot write into the
 user's profile, so XT copies the services' new lines into Tlachihuani.log while it
 runs. See the [0.38.0 notes](releases/v0.38.0.md).
+
+Since 1.0.1 a Torrenter engine that does not answer within 15 seconds is treated as
+busy, not dead: Jobs keeps it and its web facade running and restarts it only after
+it has owed a reply for more than 3 minutes. See the [1.0.1 notes](releases/v1.0.1.md).
+
+In the current source XT's **Stop Services** ends every Tlachihuani service at once
+([ForcedStop.cs](../src/Tlachihuani.Windows/ForcedStop.cs)). HandGI and Flow Pills are
+ended through the process each one published (`UserProcess.cs`: PID, creation time and
+executable must all still match), and the programs they started end with their
+kill-on-close jobs. The Windows services are asked to stop together; one still running
+three seconds later is ended through the process the Service Control Manager names for
+it, after its executable is checked against the installation. See
+[panel and tray](panel-and-tray.md#tray).
 
 `Tlachihuani.RC.Cloud` is a separate cross-platform development host (hosted BFF,
 computer directory and opaque relay) for the isolated HTTPS loopback lab. It
@@ -90,6 +108,8 @@ Follow [Microsoft's Worker Service guide](https://learn.microsoft.com/en-us/dotn
 | `src/Tlachihuani.Elevated` | Fixed-service force-stop and other explicitly scoped administrative operations |
 | `src/Tlachihuani.Jobs` | Implemented: provider registry, Torrenter worker lifetime, REST/web facade and launcher page on port 12064 |
 | `src/Tlachihuani.FlowPills` | Implemented: flow documents, the run registry and admission limits, `.flw` runs with Tlamatini's agents in owned jobs (compiled by `workers/flowpills`), `.fpmt` runs with Tlamatini's models, independent log tails |
+| `src/Tlachihuani.HandGI` | Implemented: HandGI's per-user process, its windows (Signs, Camera, Try it and the expert view), the control pipe XT uses and its bridge to Tlachihuani.log |
+| `src/Tlachihuani.HandGI.Core` | Implemented: camera capture, hand tracking and sign recognition with ONNX Runtime, sign learning, volume control and self-tests |
 | `src/Tlachihuani.RC` | Implemented: Remote-Controller contracts, access/permissions, durable operations and state store |
 | `src/Tlachihuani.RC.Server` | Implemented: Remote-Controller service, web client assets, mobile workspace and outbound hosted connector |
 | `src/Tlachihuani.RC.Cloud` | Implemented for development only: hosted BFF, OIDC sign-in, computer directory and bounded relay |

@@ -83,12 +83,13 @@ internal sealed class NativeSecurity : IDisposable
     [DllImport("kernel32.dll")] private static extern IntPtr LocalFree(IntPtr pointer);
 }
 
-public sealed class ProcessIdentity : IDisposable
+public sealed class ProcessIdentity : IEndableProcess
 {
     private readonly SafeProcessHandle handle;
     public int Id { get; }
     public string ImagePath { get; }
     public long CreationTime { get; }
+    public bool CanTerminate { get; }
     public bool HasExited
     {
         get
@@ -97,21 +98,51 @@ public sealed class ProcessIdentity : IDisposable
             return exitCode != 259;
         }
     }
-    private ProcessIdentity(SafeProcessHandle handle, int id, string path, long creation) { this.handle = handle; Id = id; ImagePath = path; CreationTime = creation; }
-    public static ProcessIdentity Open(int pid)
+    private ProcessIdentity(SafeProcessHandle handle, int id, string path, long creation, bool terminate)
     {
-        var handle = OpenProcess(0x1000, false, pid);
+        this.handle = handle; Id = id; ImagePath = path; CreationTime = creation; CanTerminate = terminate;
+    }
+    public static ProcessIdentity Open(int pid) => Open(pid, terminate: false);
+
+    // terminate also asks for PROCESS_TERMINATE. Windows grants it for the caller's own processes
+    // and for a service that gave its operator that right (OperatorProcessAccess.AllowOperatorStop).
+    public static ProcessIdentity Open(int pid, bool terminate)
+    {
+        var handle = OpenProcess(terminate ? 0x1001u : 0x1000u, false, pid);
         if (handle.IsInvalid) { var error = Marshal.GetLastWin32Error(); handle.Dispose(); throw new Win32Exception(error); }
         try
         {
             var path = new StringBuilder(32768); var length = path.Capacity;
             if (!QueryFullProcessImageName(handle, 0, path, ref length) || !GetProcessTimes(handle, out var created, out _, out _, out _))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
-            return new(handle, pid, path.ToString(), created);
+            return new(handle, pid, path.ToString(), created, terminate);
         }
         catch { handle.Dispose(); throw; }
     }
+
+    // Ends this exact process (the handle was opened for it, so a reused PID cannot be hit).
+    // Requires an identity opened with terminate: true.
+    public void Terminate(uint exitCode)
+    {
+        if (TerminateProcess(handle, exitCode)) return;
+        int error = Marshal.GetLastWin32Error();
+        if (!HasExited) throw new Win32Exception(error);
+    }
+
+    // Polls the exit code, so it works with the limited query right alone.
+    public bool WaitForExit(TimeSpan timeout)
+    {
+        var clock = Stopwatch.StartNew();
+        while (!HasExited)
+        {
+            if (clock.Elapsed >= timeout) return false;
+            Thread.Sleep(25);
+        }
+        return true;
+    }
+
     public void Dispose() => handle.Dispose();
+    [DllImport("kernel32.dll", SetLastError = true)] private static extern bool TerminateProcess(SafeProcessHandle process, uint exitCode);
     [DllImport("kernel32.dll", SetLastError = true)] private static extern SafeProcessHandle OpenProcess(uint access, bool inherit, int pid);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] private static extern bool QueryFullProcessImageName(SafeProcessHandle process, uint flags, StringBuilder path, ref int length);
     [DllImport("kernel32.dll", SetLastError = true)] private static extern bool GetProcessTimes(SafeProcessHandle process, out long creation, out long exit, out long kernel, out long user);

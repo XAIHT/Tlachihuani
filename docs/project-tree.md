@@ -1,9 +1,9 @@
-# Project files · 1.0.0
+# Project files · 1.0.1
 
 Active checkout: `C:\Development\XAIHT\repo\Tlachihuani`.
 
-Latest version: **[Tlachihuani 1.0.0](releases/v1.0.0.md)**, the first official release. Source inventory
-updated 25 November 2026. Includes tracked files and new files in this
+Latest version: **[Tlachihuani 1.0.1](releases/v1.0.1.md)**, a fix release for 1.0.0, the first official release. Source inventory
+updated 27 November 2026. Includes tracked files and new files in this
 working tree; ignored installers, local evidence and build intermediates are excluded.
 
 ~~~text
@@ -21,13 +21,19 @@ README.md
 Tlachihuani.slnx
 assets/branding/README.md
 assets/branding/XT.ico
+assets/branding/architecture.svg
 assets/branding/badge-dotnet.svg
 assets/branding/badge-package.svg
 assets/branding/badge-rest.svg
 assets/branding/badge-version.svg
 assets/branding/badge-windows.svg
+assets/branding/readme-architecture.svg
 assets/branding/readme-hero.svg
 assets/branding/xt-preview.png
+assets/handgi/README.md
+assets/handgi/models/gesture_recognizer.task
+assets/handgi/models/handpose_estimation_mediapipe_2023feb.onnx
+assets/handgi/models/palm_detection_mediapipe_2023feb.onnx
 config/README.md
 docs/architecture.md
 docs/control-protocol.md
@@ -35,6 +41,7 @@ docs/design/panel-concept.html
 docs/design/tlamatini-rc-internet-design.html
 docs/development-execution.md
 docs/flow-pills.md
+docs/handgi.md
 docs/hosted-development.es.md
 docs/hosted-development.md
 docs/implementation-plan.md
@@ -56,6 +63,7 @@ docs/releases/v0.36.0.md
 docs/releases/v0.37.0.md
 docs/releases/v0.38.0.md
 docs/releases/v1.0.0.md
+docs/releases/v1.0.1.md
 docs/remote-control-predeployment-checklist.md
 docs/remote-controller.md
 docs/remote-mobile-parity.md
@@ -83,6 +91,7 @@ docs/verification/2026-11-17-workspace-signin.md
 docs/verification/2026-11-19-xaiht-link.md
 docs/verification/2026-11-22-log-viewer.md
 docs/verification/2026-11-23-hosted-prompts.md
+docs/verification/2026-11-27-handgi.md
 docs/xaiht-link.md
 global.json
 integrations/tlamatini/README.md
@@ -159,6 +168,67 @@ src/Tlachihuani.FlowPills/Tlachihuani.FlowPills.csproj
 src/Tlachihuani.FlowPills/TlamatiniInstall.cs
 src/Tlachihuani.FlowPills/acp-palette.json
 src/Tlachihuani.FlowPills/packages.lock.json
+src/Tlachihuani.HandGI.Core/Audio/VolumeController.cs
+src/Tlachihuani.HandGI.Core/Capture/CameraCapture.cs
+src/Tlachihuani.HandGI.Core/Engine/AppSettings.cs
+src/Tlachihuani.HandGI.Core/Engine/EngineTypes.cs
+src/Tlachihuani.HandGI.Core/Engine/FrameSlot.cs
+src/Tlachihuani.HandGI.Core/Engine/GestureEngine.cs
+src/Tlachihuani.HandGI.Core/Engine/ModelCatalog.cs
+src/Tlachihuani.HandGI.Core/Gestures/GestureDecider.cs
+src/Tlachihuani.HandGI.Core/Gestures/GestureFusion.cs
+src/Tlachihuani.HandGI.Core/Gestures/GestureProfile.cs
+src/Tlachihuani.HandGI.Core/Gestures/MediaPipeGestures.cs
+src/Tlachihuani.HandGI.Core/Gpu/GpuCatalog.cs
+src/Tlachihuani.HandGI.Core/Gpu/OrtFactory.cs
+src/Tlachihuani.HandGI.Core/Onnx/OnnxGraph.cs
+src/Tlachihuani.HandGI.Core/Onnx/OnnxModel.cs
+src/Tlachihuani.HandGI.Core/Onnx/Proto.cs
+src/Tlachihuani.HandGI.Core/Onnx/TfLite.cs
+src/Tlachihuani.HandGI.Core/README.md
+src/Tlachihuani.HandGI.Core/SelfTest/SelfTests.cs
+src/Tlachihuani.HandGI.Core/SelfTest/gesture_vectors.json
+src/Tlachihuani.HandGI.Core/Tlachihuani.HandGI.Core.csproj
+src/Tlachihuani.HandGI.Core/Training/GpuTrainer.cs
+src/Tlachihuani.HandGI.Core/Training/SyntheticHands.cs
+src/Tlachihuani.HandGI.Core/Training/TrainingGraphs.cs
+src/Tlachihuani.HandGI.Core/Util/AppPaths.cs
+src/Tlachihuani.HandGI.Core/Util/Log.cs
+src/Tlachihuani.HandGI.Core/Util/Native.cs
+src/Tlachihuani.HandGI.Core/Util/QpcClock.cs
+src/Tlachihuani.HandGI.Core/Vision/FrameLayout.cs
+src/Tlachihuani.HandGI.Core/Vision/GestureGraphs.cs
+src/Tlachihuani.HandGI.Core/Vision/HandGeometry.cs
+src/Tlachihuani.HandGI.Core/Vision/HandGraphs.cs
+src/Tlachihuani.HandGI.Core/Vision/HandTracker.cs
+src/Tlachihuani.HandGI.Core/Vision/PalmAnchors.cs
+src/Tlachihuani.HandGI.Core/Vision/SamplerGraph.cs
+src/Tlachihuani.HandGI.Core/packages.lock.json
+src/Tlachihuani.HandGI/ConfirmForm.cs
+src/Tlachihuani.HandGI/ControlPipe.cs
+src/Tlachihuani.HandGI/Expert/AppController.cs
+src/Tlachihuani.HandGI/Expert/Controls/Charts.cs
+src/Tlachihuani.HandGI/Expert/Controls/PreviewView.cs
+src/Tlachihuani.HandGI/Expert/MainForm.cs
+src/Tlachihuani.HandGI/Expert/Stages/SetupStage.cs
+src/Tlachihuani.HandGI/Expert/Stages/StageBase.cs
+src/Tlachihuani.HandGI/Expert/Stages/TesterStage.cs
+src/Tlachihuani.HandGI/Expert/Stages/TrainerStage.cs
+src/Tlachihuani.HandGI/Expert/Theme.cs
+src/Tlachihuani.HandGI/Expert/VolumeOsd.cs
+src/Tlachihuani.HandGI/GlobalUsings.cs
+src/Tlachihuani.HandGI/HandGIService.cs
+src/Tlachihuani.HandGI/HotkeyWindow.cs
+src/Tlachihuani.HandGI/LegacyImport.cs
+src/Tlachihuani.HandGI/LogBridge.cs
+src/Tlachihuani.HandGI/Program.cs
+src/Tlachihuani.HandGI/README.md
+src/Tlachihuani.HandGI/SettingsForm.cs
+src/Tlachihuani.HandGI/SignLearning.cs
+src/Tlachihuani.HandGI/TeachForm.cs
+src/Tlachihuani.HandGI/Tlachihuani.HandGI.csproj
+src/Tlachihuani.HandGI/Tools.cs
+src/Tlachihuani.HandGI/packages.lock.json
 src/Tlachihuani.Jobs/JobsHost.cs
 src/Tlachihuani.Jobs/OwnedProcesses.cs
 src/Tlachihuani.Jobs/Program.cs
@@ -232,6 +302,7 @@ src/Tlachihuani.Tray/FlowCanvas.cs
 src/Tlachihuani.Tray/FlowPillsForm.cs
 src/Tlachihuani.Tray/FlowPillsHost.cs
 src/Tlachihuani.Tray/FlowPillsLauncher.cs
+src/Tlachihuani.Tray/HandGIControl.cs
 src/Tlachihuani.Tray/LogFileReader.cs
 src/Tlachihuani.Tray/LogHistorySearch.cs
 src/Tlachihuani.Tray/LogViewerForm.cs
@@ -246,6 +317,7 @@ src/Tlachihuani.Tray/ServiceErrorForm.cs
 src/Tlachihuani.Tray/ServiceLogCopier.cs
 src/Tlachihuani.Tray/ServiceProbes.cs
 src/Tlachihuani.Tray/ServiceReadiness.cs
+src/Tlachihuani.Tray/ServiceRows.cs
 src/Tlachihuani.Tray/ServicesForm.cs
 src/Tlachihuani.Tray/ServicesLayout.cs
 src/Tlachihuani.Tray/StatusForm.cs
@@ -263,6 +335,8 @@ src/Tlachihuani.Tray/XaihtCommands.cs
 src/Tlachihuani.Tray/XaihtLink.cs
 src/Tlachihuani.Tray/packages.lock.json
 src/Tlachihuani.Windows/DownloadDelivery.cs
+src/Tlachihuani.Windows/ForcedStop.cs
+src/Tlachihuani.Windows/HandGIEndpoint.cs
 src/Tlachihuani.Windows/Installation.cs
 src/Tlachihuani.Windows/JobsEndpoint.cs
 src/Tlachihuani.Windows/LifecycleGate.cs
@@ -274,8 +348,10 @@ src/Tlachihuani.Windows/RcEndpoint.cs
 src/Tlachihuani.Windows/RcLifecycle.cs
 src/Tlachihuani.Windows/ScmBackend.cs
 src/Tlachihuani.Windows/Tlachihuani.Windows.csproj
+src/Tlachihuani.Windows/UserProcess.cs
 src/Tlachihuani.Windows/packages.lock.json
 tests/README.md
+tests/Tlachihuani.Checks/DesktopChecks.cs
 tests/Tlachihuani.Checks/DownloadAccessChecks.cs
 tests/Tlachihuani.Checks/FlowPillsChecks.cs
 tests/Tlachihuani.Checks/LogViewerChecks.cs
@@ -284,12 +360,17 @@ tests/Tlachihuani.Checks/RcBrokerChecks.cs
 tests/Tlachihuani.Checks/RcLayoutChecks.cs
 tests/Tlachihuani.Checks/RcPermissionDialogChecks.cs
 tests/Tlachihuani.Checks/ServiceReadinessChecks.cs
+tests/Tlachihuani.Checks/ServiceStopChecks.cs
 tests/Tlachihuani.Checks/Tlachihuani.Checks.csproj
 tests/Tlachihuani.Checks/TrayLayoutChecks.cs
 tests/Tlachihuani.Checks/XaihtAccountsVisual.cs
 tests/Tlachihuani.Checks/XaihtCommandChecks.cs
 tests/Tlachihuani.Checks/XaihtRelayChecks.cs
 tests/Tlachihuani.Checks/packages.lock.json
+tests/Tlachihuani.HandGI.Checks/HandGILayoutChecks.cs
+tests/Tlachihuani.HandGI.Checks/Program.cs
+tests/Tlachihuani.HandGI.Checks/Tlachihuani.HandGI.Checks.csproj
+tests/Tlachihuani.HandGI.Checks/packages.lock.json
 tests/Tlachihuani.RC.Checks/AdapterChecks.cs
 tests/Tlachihuani.RC.Checks/MobileChecks.cs
 tests/Tlachihuani.RC.Checks/Program.cs
@@ -301,6 +382,7 @@ tests/Tlachihuani.RC.ContainerChecks/Tlachihuani.RC.ContainerChecks.csproj
 tests/Tlachihuani.RC.ContainerChecks/packages.lock.json
 tests/contracts/README.md
 tests/desktop/README.md
+tests/desktop/ServicesAndHandGI.ps1
 tests/desktop/SetupWizard.ps1
 tests/desktop/foreground_console.ps1
 tests/desktop/table_server.py
@@ -370,6 +452,7 @@ tests/unit/workspace_table.test.cjs
 tools/Tlachihuani.TraceWeaver/Program.cs
 tools/Tlachihuani.TraceWeaver/Tlachihuani.TraceWeaver.csproj
 tools/Tlachihuani.TraceWeaver/packages.lock.json
+tools/handgi/gesture_reference.py
 workers/flowpills/flowpills_compile.py
 workers/torrent/api.py
 workers/torrent/delivery.py

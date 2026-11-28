@@ -1,6 +1,6 @@
 # Service lifecycle
 
-Implementation update: Start/Stop/Restart and monitoring are implemented; force-stop/host consent and installed acceptance remain pending. See [current status](implementation-status.md).
+Implementation update: Start/Stop/Restart, monitoring and XT's forced **Stop Services** are implemented; host consent, the elevated helper and installed acceptance remain pending. See [current status](implementation-status.md).
 
 All values here are proposed defaults. SCM observations and worker health are separate facts.
 
@@ -66,6 +66,13 @@ A stop timeout offers retry/status/Force kill; it never silently escalates. A fa
 
 Use a session-scoped single-instance mutex and a stable icon identity. Initialize the message loop, register the original XT icon, and re-register it after Explorer's `TaskbarCreated` notification. Dispose the icon on normal exit. Windows may place it in the notification overflow; do not rewrite the user's notification preferences to force pinning.
 
-Remote-Controller is a third independent service with its own lifecycle. **Start Services** includes it only when its Network setting opts in; **Stop Services** stops it first. Stopping it disconnects its clients and suspends its scheduler; it never stops Tlamatini or Torrenter. See [Remote-Controller start and stop](remote-controller.md#start-and-stop).
+Remote-Controller is a third independent service with its own lifecycle. **Start Services** includes it only when its Network setting opts in; **Stop Services** stops it together with the other services. Stopping it disconnects its clients and suspends its scheduler; it never stops Tlamatini or Torrenter. See [Remote-Controller start and stop](remote-controller.md#start-and-stop).
+
+HandGI and Flow Pills are processes of the signed-in user, not services. Each publishes a
+record of its process (HandGI's `service.json`, Flow Pills' `process.json`), and XT ends it
+only through that record, after checking its creation time and executable. **Start Services**
+starts HandGI only when its Camera settings say **Start with the other services**, and never
+opens Flow Pills. **Stop Services** ends both at once; the programs they started end with
+them. See [HandGI](handgi.md) and [Flow Pills](flow-pills.md).
 
 The tray does not auto-start the service just because it starts or reconnects. Exiting it leaves the service untouched. The service does not need a tray to operate. Tray presence is reported per session; an absent heartbeat means unavailable, not proof that a user can or cannot see an icon.

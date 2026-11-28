@@ -17,7 +17,7 @@ never opened `.fpmt` files.
 
 ## Open it
 
-- **XT tray → Flow Pills…**, or **Show panel → Services… → Flow Pills…**.
+- **XT tray → Flow Pills…**, or **Show panel → Services… → Runtime → Flow Pills → Open**.
 - From a command line: `Tlachihuani.Tray.exe --flow-pills [file.flw] [file.fpmt] …`
 
 Flow Pills runs in your Windows session, not as a Session 0 service: Tlamatini's agents
@@ -26,6 +26,13 @@ second launch hands its files to the open window and brings it forward. **Openin
 never runs it.**
 
 It is a process of its own: exiting XT's tray does not stop your flows.
+
+While the window is open it records its process and how many flows run or wait in it, so
+XT's **Services… → Runtime → Flow Pills** section can show it. That section's **Stop** asks
+Flow Pills to stop every flow the way Tlamatini's **Stop** does, then close; if flows run
+or wait, XT asks you first. The window closes once they have ended and written their
+records, or after 30 seconds, and XT ends it if it is still open 10 seconds later.
+**Stop Services** does not ask: it ends Flow Pills at once, and every run ends with its job.
 
 ## The window
 
@@ -111,8 +118,8 @@ While flows run or wait, closing the window asks:
   closes once they have ended and written their records, or after 30 seconds.
 - **Cancel**: nothing changes.
 
-A close from outside the window (Task Manager, signing out, shutting down) ends every
-flow: their jobs end their processes.
+A close from outside the window (XT's **Stop Services**, Task Manager, signing out,
+shutting down) ends every flow: their jobs end their processes.
 
 ## Where things are kept
 
@@ -123,6 +130,9 @@ Under `%LOCALAPPDATA%\XAIHT\Tlachihuani\FlowPills\`:
 | `runs\{run}\` | The flow exactly as it ran, `events.log`, a pill's `transcript.log`, and `run.json` (how it ended) |
 | `pools\{run}\` | The compiled agents, in Tlamatini's own pool layout |
 | `inbox\` | Files a second launch asked the open window to load |
+
+While the window is open, `process.json` there names its process and how many flows run
+or wait in it, for XT. The window removes it when it closes.
 
 Flow Pills writes to `Tlachihuani.log` as `xt-flow-pills`.
 
@@ -137,10 +147,25 @@ Flow Pills writes to `Tlachihuani.log` as `xt-flow-pills`.
   Tlamatini installation found as described above.
 - End processes only through the run's job, by membership at that moment; never by image
   name or a stale PID.
+- The open window publishes `process.json` (a `UserProcessRecord`) and answers two named
+  events from `FlowPillsSignals`: **Show** brings it forward, **Stop** stops every flow and
+  closes it. XT's Runtime **Stop** sets that event, waits up to 40 seconds and then ends the
+  process; **Stop Services** ends it at once through `ForcedStop.UserProcessAsync`, which
+  first checks that the record still names that same process. A test folder
+  (`TLACHIHUANI_USER_DIR`) gets its own record and event names.
 - A run can be **Stopped** a moment before it has written `run.json`. Wait for
   `FlowRegistry.Idle` (every run finished and settled) before closing or exiting.
 - Code polled several times a second is `trace-off`, and the window keeps its footer, log
   and inspector out of UI tracing, so following runs does not flood `Tlachihuani.log`.
+
+## Verification · 27 November 2026
+
+Source checks of the work after 1.0.1, which is not committed yet. In a test folder of its
+own, the real window published its process with no flows; the Runtime **Stop** closed it and
+removed its record; **Stop Services** ended it in under 3 seconds, without asking; and
+`Tlachihuani.log` recorded both. These are the 4 Flow Pills checks of visible run
+`services-handgi-2026-11-27-h`; see the [27 November verification](verification/2026-11-27-handgi.md).
+The installed 1.0.1 package has not been checked for this.
 
 ## Verification · 25 November 2026
 

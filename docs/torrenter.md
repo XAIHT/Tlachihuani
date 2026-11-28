@@ -1,6 +1,6 @@
 # Operating Torrenter
 
-Latest version: **[1.0.0](releases/v1.0.0.md)**. See the
+Latest version: **[1.0.1](releases/v1.0.1.md)**. See the
 [dated recovery verification](verification/2026-11-10-torrenter-recovery.md) for
 source results and installed-audit limits.
 
@@ -9,7 +9,7 @@ Torrenter downloads selected files in the independent Windows service `Tlachihua
 ## Open the workspace
 
 1. Right-click **XT → Start Services**. When XT turns color, the Torrenter API is ready. **Show panel → Services…** shows Jobs, engine and web readiness, the active transfer count and the number of job records. Choose **XT → Stop Services** to stop the entire Tlachihuani stack and leave the gray tray icon running.
-2. Choose **Open workspace** in XT or **Panels → Torrenter Workspace** in Tlamatini. XT's **Open workspace** always opens the Tlamatini login page first, even if this browser is already signed in. Signing in there replaces the browser's Tlamatini session, so the queue shown belongs only to that account; another tab still showing the previous account reports the change instead of mixing queues. When both editions are available, XT lets you choose the edition, then sign in. Reloading keeps that session.
+2. In XT choose **Services… → Runtime → REST workspace → Open**, or **Panels → Torrenter Workspace** in Tlamatini. XT's **Open** always opens the Tlamatini login page first, even if this browser is already signed in. Signing in there replaces the browser's Tlamatini session, so the queue shown belongs only to that account; another tab still showing the previous account reports the change instead of mixing queues. When both editions are available, XT lets you choose the edition, then sign in. Reloading keeps that session.
 3. Choose **Add torrent**, upload a `.torrent` or enter a magnet, then **Inspect metadata**. Choose files, priorities, destination, resume and seeding policy. **Download selected files** creates the durable job.
 4. Search and filter the queue, then choose **Columns & view** to customize its display (see below). Use the transfer’s **Verified output** tab to see its output directory and per-file SHA-256. **Stop** retains partial files until you choose **Start**. **Pause** pairs with **Resume**. **Cancel** ends the transfer permanently. **Remove record** retains files. **Erase files…** requires a separate exact-file review and approval in XT.
 
@@ -21,7 +21,7 @@ Torrenter downloads selected files in the independent Windows service `Tlachihua
 - Choose 25, 50, 100, 250 or **All** rows. The workspace reads every API page before sorting and filtering, including transfers beyond the first 250. A failed later page preserves the previous complete view and reports the connection error.
 - The header checkbox selects only the current page. Selection remains when filtering, sorting or paging; the selection banner explicitly counts selected transfers outside the current page. **Clear selection** clears all checks. Row clicks or Enter open details even when Name is hidden. **Preferences** continues to control account transfer defaults, independently of table display.
 
-**Restart web** restarts the HTTP process independently of active peers. **Stop provider** drains Torrenter and persists the stop across Jobs restarts. **Stop Jobs** stops the entire provider host. Use **Start Jobs** and, if explicitly stopped, **Start provider** to bring it back.
+In XT's **Services… → Runtime**, the **REST workspace** section's **Restart** restarts the HTTP process independently of active peers. The **Torrent engine** section's **Stop** drains Torrenter and persists the stop across Jobs restarts, and its **Restart** restarts the engine. The **Jobs host** section's **Stop** stops the entire provider host. Use the Jobs host's **Start** and, if the engine was explicitly stopped, the Torrent engine's **Start** to bring it back; the engine's **Start** also starts the Jobs host.
 
 Open the [workspace](http://127.0.0.1:12064/) or [API discovery](http://127.0.0.1:12064/api/v1). This deployment binds the dashboard to IPv4 loopback. Torrent traffic uses a separate peer socket.
 
@@ -81,6 +81,23 @@ Use a unique `Idempotency-Key` for each durable mutation. Send `If-Match: "N"` f
 Trusted application enrollment uses native `{"op":"issue","gateway":true,"profile":"<application account>","scope":"read submit control"}`. Protect the returned signing key in the client’s credential store. Exchange an assertion at `POST /sessions/delegated` with `gateway_id`, `account`, `nonce`, `expires` (Unix seconds) and `signature`. Sign the UTF-8 bytes of Python-compatible compact JSON for `[gateway_id,account,"Tlachihuani.Torrenter",nonce,expires]` with HMAC-SHA256 using the UTF-8 signing key and lowercase hex output. The server checks the enrolled account, the single-use nonce and a maximum 90-second assertion window. The resulting token inherits the enrollment scopes. **Revoke access** in XT invalidates the operator’s sessions and enrollments. The Tlamatini wrapper belongs in a separately authorized Tlamatini change.
 
 ## Ownership and recovery
+
+### A busy engine
+
+Since [1.0.1](releases/v1.0.1.md), an engine that is slow to answer is treated as busy,
+not dead. When the engine does not answer a request within 15 seconds, Jobs keeps it
+running and discards its late reply; only an engine that has owed a reply for more
+than 3 minutes is restarted, and the startup check allows 60 seconds. A web request
+the engine does not answer gets **503** (*The Torrenter engine is busy or restarting.
+Try again shortly.*) while the web facade stays up, and Jobs' status reports
+`engine_busy`. The workspace page asks for one refresh at a time, waits up to 30
+seconds after a failure and asks nothing while it is hidden.
+
+Before 1.0.1, the engine traced every step of every generator expression, so its
+first answer after a start took about 18 seconds; Jobs ended the engine and its web
+facade after 15 seconds and the restarts repeated until XT's 40-second readiness
+check failed. The engine no longer traces generator expressions and storage checks
+once per item: inspecting 1,000 files went from 415,143 to 84,041 trace entries.
 
 ### Stalled queues and verification (source correction, 10 November 2026)
 

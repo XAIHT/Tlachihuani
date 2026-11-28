@@ -2,7 +2,7 @@
 
 The implemented synchronous subset and the required reply receipt byte are documented in [implementation status](implementation-status.md). Force-stop, consent IPC and persistent operation receipts below are future work.
 
-Jobs and Remote-Controller have their own native interfaces: XT manages Torrenter providers over the Jobs pipe ([Torrenter](torrenter.md)), and `Tlachihuani.RC.Server.exe --control` serves trusted native adapters and XT over an installation-specific, ACL-protected pipe ([Remote-Controller](remote-controller.md#storage-and-native-control)). Neither accepts browser-supplied commands.
+Jobs, Remote-Controller and HandGI have their own native interfaces: XT manages Torrenter providers over the Jobs pipe ([Torrenter](torrenter.md)), `Tlachihuani.RC.Server.exe --control` serves trusted native adapters and XT over an installation-specific, ACL-protected pipe ([Remote-Controller](remote-controller.md#storage-and-native-control)), and XT drives HandGI over a pipe of the signed-in user ([HandGI's pipe](#scm-and-pipe-roles)). None accepts browser-supplied commands.
 
 The browser API, transient controller CLI and service IPC have separate responsibilities. The protocol is local-only; no TCP listener or new inbound firewall rule is planned.
 
@@ -38,10 +38,13 @@ Proposed framing: 4-byte little-endian byte length followed by one UTF-8 JSON ob
 | Controller CLI | `status`, `start`, `stop`, `restart`, `events`, `operation-status`, `request-force-stop` |
 | Service pipe | `hello`, `status`, `events`; later workload methods require separate design |
 | Elevated helper | Fixed `Tlachihuani` service force-stop; no browser-selected PID, service, binary or shell |
+| HandGI pipe | `status`, `arm`, `disarm`, `show` with one page (`signs`, `camera`, `try` or `expert`), `stop`; XT refuses anything else before sending, and no caller names a program, path or PID |
 
 Start/Stop must not depend on a responsive pipe. Force-stop must work against an unresponsive service; the elevated helper independently queries SCM and process identity. The GUI's force-stop request is an operation request routed to host consent, not an instruction to terminate a JSON PID.
 
 For that consent handoff, the tray exposes a separate session pipe, proposed `\\.\pipe\XAIHT.Tlachihuani.Tray.v1.<session-id>`, with the interactive logon SID on its DACL and remote clients rejected. The controller locates the tray matching its authorized host Windows user/session, verifies its process identity, and submits a bounded pending request. The tray asks the person at that host to approve before starting UAC. This route does not pass through the hung service. If no matching tray exists, return the host-consent requirement; do not pick another user's session or launch elevation invisibly.
+
+**HandGI's pipe (implemented in the current source).** HandGI, the hand-sign volume control, is a program of the signed-in user that runs in that user's own session, not a service. Its pipe is `\\.\pipe\XAIHT.Tlachihuani.HandGI.v1.<user-SID>.<session-id>`; a test folder adds its own name. Only that user, SYSTEM and Administrators can open it, and Windows refuses remote clients. XT reads HandGI's `service.json` record, opens the process it names and trusts a reply only when the pipe's server is that process (same PID and executable). Each exchange is one request, one reply and XT's one-byte acknowledgement, like every Tlachihuani pipe; XT gives up after 5 s. A second HandGI start uses the same pipe to hand over, then leaves. No service in Session 0 talks to HandGI. See [HandGI](handgi.md#how-xt-and-handgi-work-together).
 
 ## Envelope
 
