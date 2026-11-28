@@ -51,6 +51,7 @@ function Step([string]$title, [string[]]$arguments, [string]$program = $checks) 
 }
 
 Step 'Unit checks' @()
+Step 'HandGI command cancellation (no camera)' @('--control-pipe') $handgiChecks
 Step 'HandGI lifecycle (test folder, camera off)' @('--handgi-lifecycle', $handgi)
 Step 'Flow Pills lifecycle (test folder)' @('--flow-pills-lifecycle', $tray)
 Step 'Services panel layout, desktop DPI' @('--tray-layout', (Join-Path $Output 'layout-desktop'), 'desktop')

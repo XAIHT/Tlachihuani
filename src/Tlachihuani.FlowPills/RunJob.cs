@@ -42,30 +42,71 @@ internal sealed class RunJob : IDisposable
     // (DETACHED_PROCESS, the way Tlamatini starts its agents) and returns its process id.
     internal int Launch(string executable, IReadOnlyList<string> arguments, string directory, IReadOnlyDictionary<string, string> environment)
     {
-        ObjectDisposedException.ThrowIf(disposed, this);
+        using var child = LaunchOwned(executable, arguments, directory, environment, null);
+        return child.Id;
+    }
+
+    // The caller owns the pipes and drains them concurrently. The compiler is suspended
+    // and assigned to this job before it executes, just like every other run process.
+    internal Child LaunchCaptured(string executable, IReadOnlyList<string> arguments, string directory,
+        IReadOnlyDictionary<string, string> environment, SafeHandle input, SafeHandle output, SafeHandle error)
+        => LaunchOwned(executable, arguments, directory, environment, new Capture(input, output, error));
+
+    private sealed record Capture(SafeHandle Input, SafeHandle Output, SafeHandle Error);
+
+    internal sealed class Child(SafeProcessHandle handle, int id) : IDisposable
+    {
+        internal int Id => id;
+        internal bool WaitForExit(int milliseconds)
+        {
+            uint result = WaitForSingleObject(handle, checked((uint)milliseconds));
+            return result switch { 0 => true, 258 => false, _ => throw new Win32Exception(Marshal.GetLastWin32Error()) };
+        }
+        public void Dispose() => handle.Dispose();
+    }
+
+    private static SafeFileHandle NullHandle()
+    {
         var inherit = new SecurityAttributes { Length = Marshal.SizeOf<SecurityAttributes>(), InheritHandle = 1 };
-        using var nul = CreateFileW("NUL", 0xC0000000, 3, ref inherit, 3, 0, IntPtr.Zero);
-        if (nul.IsInvalid) throw new Win32Exception(Marshal.GetLastWin32Error());
+        var handle = CreateFileW("NUL", 0xC0000000, 3, ref inherit, 3, 0, IntPtr.Zero);
+        if (!handle.IsInvalid) return handle;
+        int error = Marshal.GetLastWin32Error();
+        handle.Dispose();
+        throw new Win32Exception(error);
+    }
+
+    private Child LaunchOwned(string executable, IReadOnlyList<string> arguments, string directory,
+        IReadOnlyDictionary<string, string> environment, Capture? capture)
+    {
+        ObjectDisposedException.ThrowIf(disposed, this);
+        using var nul = capture is null ? NullHandle() : null;
+        SafeHandle input = capture?.Input ?? nul!, output = capture?.Output ?? nul!, errorOutput = capture?.Error ?? nul!;
+        int handleCount = capture is null ? 1 : 3;
         IntPtr size = IntPtr.Zero;
         InitializeProcThreadAttributeList(IntPtr.Zero, 1, 0, ref size);
         IntPtr attributes = Marshal.AllocHGlobal(size);
-        IntPtr handles = Marshal.AllocHGlobal(IntPtr.Size);
+        IntPtr handles = Marshal.AllocHGlobal(handleCount * IntPtr.Size);
         IntPtr block = Marshal.StringToHGlobalUni(EnvironmentBlock(environment));
         bool initialized = false;
         try
         {
             if (!InitializeProcThreadAttributeList(attributes, 1, 0, ref size)) throw new Win32Exception(Marshal.GetLastWin32Error());
             initialized = true;
-            // Only the NUL handle is inherited: nothing else of this process leaks into an agent.
-            Marshal.WriteIntPtr(handles, nul.DangerousGetHandle());
-            if (!UpdateProcThreadAttribute(attributes, 0, HandleListAttribute, handles, IntPtr.Size, IntPtr.Zero, IntPtr.Zero))
+            // Only standard handles are inherited; no service/job handles leak.
+            Marshal.WriteIntPtr(handles, input.DangerousGetHandle());
+            if (capture is not null)
+            {
+                Marshal.WriteIntPtr(handles, IntPtr.Size, output.DangerousGetHandle());
+                Marshal.WriteIntPtr(handles, 2 * IntPtr.Size, errorOutput.DangerousGetHandle());
+            }
+            if (!UpdateProcThreadAttribute(attributes, 0, HandleListAttribute, handles, handleCount * IntPtr.Size, IntPtr.Zero, IntPtr.Zero))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             var startup = new StartupInfoEx();
             startup.StartupInfo.cb = Marshal.SizeOf<StartupInfoEx>();
             startup.StartupInfo.dwFlags = UseStdHandles;
-            startup.StartupInfo.hStdInput = nul.DangerousGetHandle();
-            startup.StartupInfo.hStdOutput = nul.DangerousGetHandle();
-            startup.StartupInfo.hStdError = nul.DangerousGetHandle();
+            startup.StartupInfo.hStdInput = input.DangerousGetHandle();
+            startup.StartupInfo.hStdOutput = output.DangerousGetHandle();
+            startup.StartupInfo.hStdError = errorOutput.DangerousGetHandle();
             startup.lpAttributeList = attributes;
             var command = new StringBuilder(CommandLine(executable, arguments));
             if (!CreateProcessW(executable, command, IntPtr.Zero, IntPtr.Zero, true,
@@ -76,16 +117,17 @@ internal sealed class RunJob : IDisposable
             {
                 if (!AssignProcessToJobObject(job, process.hProcess) || ResumeThread(process.hThread) == uint.MaxValue)
                 {
-                    int error = Marshal.GetLastWin32Error();
-                    TerminateProcess(process.hProcess, 1);
-                    throw new Win32Exception(error);
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
                 }
-                return process.dwProcessId;
+                var child = new Child(new SafeProcessHandle(process.hProcess, ownsHandle: true), process.dwProcessId);
+                process.hProcess = IntPtr.Zero; // transferred to the retained child handle
+                return child;
             }
+            catch { TerminateProcess(process.hProcess, 1); throw; }
             finally
             {
                 CloseHandle(process.hThread);
-                CloseHandle(process.hProcess);
+                if (process.hProcess != IntPtr.Zero) CloseHandle(process.hProcess);
             }
         }
         finally
@@ -252,6 +294,8 @@ internal sealed class RunJob : IDisposable
     private static extern uint ResumeThread(IntPtr thread);
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool CloseHandle(IntPtr handle);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint WaitForSingleObject(SafeProcessHandle handle, uint milliseconds);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)]
     private static extern SafeFileHandle CreateFileW(string name, uint access, uint share, ref SecurityAttributes security, uint creation, uint flags, IntPtr template);
     [DllImport("kernel32.dll", SetLastError = true)]

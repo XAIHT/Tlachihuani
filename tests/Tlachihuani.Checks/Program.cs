@@ -8,6 +8,14 @@ using Tlachihuani.Core;
 using Tlachihuani.Windows;
 
 if (args is ["--flow-pills-sleeper"]) return FlowPillsChecks.Sleeper();
+if (args is ["-I", "-B", var compilerScript] && Path.GetFileName(compilerScript) == "flowpills_compile.py") return CompilerLifetimeChecks.Compiler();
+if (args is ["--compiler-descendant", var compilerMarker]) return CompilerLifetimeChecks.Descendant(compilerMarker);
+if (args is ["--compiler-parent", var compilerFolder]) return CompilerLifetimeChecks.Parent(compilerFolder);
+if (args is ["--compiler-lifetime-checks", var compilerRoot]) { await CompilerLifetimeChecks.Run(compilerRoot); return 0; }
+if (args is ["--compiler-real-python", var realCompilerRoot, var compilerPython]) { CompilerLifetimeChecks.RealPython(realCompilerRoot, compilerPython); return 0; }
+if (args is ["--worker-channel-echo"]) return WorkerChannelChecks.Echo();
+if (args is ["--worker-channel-checks"]) { await WorkerChannelChecks.Run(); return 0; }
+if (args is ["--worker-channel-real-idle"]) { await WorkerChannelChecks.Run(realIdle: true); return 0; }
 if (args is ["--rc-permissions-dialog", var permissionDirectory]) return RcPermissionDialogChecks.Run(permissionDirectory);
 if (args is ["--tray-layout", var directory, var mode]) return TrayLayoutChecks.Run(directory, mode);
 if (args is ["--rc-layout", var rcDirectory, var captureScript, var python]) return RcLayoutChecks.Run(rcDirectory, captureScript, python);
@@ -29,6 +37,8 @@ Request RequestFor(string operation) => new(1, 0, Guid.NewGuid(), operation);
 
 try
 {
+    await Check("Worker reply ownership and genuine hung detection", () => WorkerChannelChecks.Run());
+    await Check("Compiler cancellation, output and parent-exit containment", () => CompilerLifetimeChecks.Run(Path.Combine(AppContext.BaseDirectory, "compiler-lifetime-checks")));
     await Check("Website command relay: real envelopes, lease snapshots and bounded transport", XaihtCommandChecks.Run);
     await Check("Flow Pills: Tlamatini's flow rules, independent log tails, owned agent processes and machine limits", FlowPillsChecks.Run);
     await Check("XT exit label follows service state and keeps the exit action", () =>

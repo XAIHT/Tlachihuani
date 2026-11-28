@@ -93,7 +93,9 @@ internal sealed class WorkerChannel : IDisposable
             var proc = process;
             var lines = replies;
             if (proc is null || lines is null || proc.HasExited) throw new IOException("Torrent engine unavailable.");
-            if (owed > 0 && Stopwatch.GetElapsedTime(owedSince) > HungAfter)
+            // The reader may already have received this reply while no caller was waiting.
+            // Age alone describes an unconsumed reply, not an unresponsive engine.
+            if (owed > 0 && !lines.Reader.TryPeek(out _) && Stopwatch.GetElapsedTime(owedSince) > HungAfter)
             {
                 Tlachihuani.Contracts.TraceLog.W($"engine has not answered for {Stopwatch.GetElapsedTime(owedSince).TotalSeconds:0} seconds; closing it");
                 CloseProcess();

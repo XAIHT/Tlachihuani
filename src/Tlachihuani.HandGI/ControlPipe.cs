@@ -59,9 +59,16 @@ internal sealed class ControlPipe : IDisposable
     private async Task<JsonObject> OnWindowThreadAsync(JsonObject request, CancellationToken token)
     {
         var done = new TaskCompletionSource<JsonObject>(TaskCreationOptions.RunContinuationsAsynchronously);
-        using var registration = token.Register(() => done.TrySetCanceled(token));
+        // Cancellation and dispatch compete to claim queued work. Once execution begins,
+        // return its actual result; cancellation cannot undo a command already executing.
+        int state = 0; // 0 queued, 1 executing, 2 canceled before execution
+        using var registration = token.Register(() =>
+        {
+            if (Interlocked.CompareExchange(ref state, 2, 0) == 0) done.TrySetCanceled(token);
+        });
         ui.Post(_ =>
         {
+            if (Interlocked.CompareExchange(ref state, 1, 0) != 0) return;
             try { done.TrySetResult(answer(request)); }
             catch (Exception ex) when (ex is not OutOfMemoryException)
             {

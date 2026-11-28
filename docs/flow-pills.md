@@ -64,8 +64,11 @@ agents start one another exactly as they do under Tlamatini.
   `HKCU\Software\XAIHT\Tlamatini`, run under that Tlamatini's Python, and read its
   `config.json`. Drives are never scanned.
 
-Every run owns its processes: each agent starts inside the run's own Windows job, so
+Every run owns its processes: the compiler and each agent start inside the run's own Windows job, so
 whatever it starts stays there too. Stopping a run ends exactly that run's processes.
+Stopping during compilation ends the compiler and its children and records the run
+as **Stopped**. Compiler input/output stays in pipes; its temporary-directory environment
+uses Tlamatini's own `Temp` folder.
 After a run completes, anything the flow started on purpose (an application, a server)
 keeps running, as it would under Tlamatini.
 

@@ -2,6 +2,7 @@
 // tlachihuani:trace-off (one supervising thread per run, ticking twice a second; every start, end and change is written explicitly)
 using System.Diagnostics;
 using System.Globalization;
+using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -67,7 +68,13 @@ public sealed class AgentFlowRun : FlowRun
 
     public override void Pause() => Ask(Command.Pause);
     public override void Resume() => Ask(Command.Resume);
-    protected override void OnStop(bool force) => Ask(force ? Command.ForceStop : Command.Stop);
+    protected override void OnStop(bool force)
+    {
+        Ask(force ? Command.ForceStop : Command.Stop);
+        // Preparation has no Ender to run. Ending its owned compiler also releases a
+        // blocked pipe write; forced stopping applies to every phase of this run.
+        if (force || State == RunState.Preparing) job.TerminateAll();
+    }
 
     private void Ask(Command command)
     {
@@ -137,34 +144,46 @@ public sealed class AgentFlowRun : FlowRun
             if (StopRequested) throw new OperationCanceledException();
         try
         {
-            var start = new ProcessStartInfo(Install.Python)
+            if (StopRequested) throw new OperationCanceledException();
+            using var inputPipe = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+            using var outputPipe = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            using var errorPipe = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            using var outputReader = new StreamReader(outputPipe, Utf8);
+            using var errorReader = new StreamReader(errorPipe, Utf8);
+            Directory.CreateDirectory(Install.TempFolder);
+            using var process = job.LaunchCaptured(Install.Python, ["-I", "-B", worker], FlowPillsPaths.Root,
+                new Dictionary<string, string> { ["TEMP"] = Install.TempFolder, ["TMP"] = Install.TempFolder, ["TLAMATINI_TEMP"] = Install.TempFolder },
+                inputPipe.ClientSafePipeHandle, outputPipe.ClientSafePipeHandle, errorPipe.ClientSafePipeHandle);
+            try
             {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                StandardInputEncoding = Utf8,
-                StandardOutputEncoding = Utf8,
-                StandardErrorEncoding = Utf8,
-                WorkingDirectory = FlowPillsPaths.Root,
-            };
-            start.ArgumentList.Add("-I");
-            start.ArgumentList.Add("-B");
-            start.ArgumentList.Add(worker);
-            using var process = Process.Start(start) ?? throw new FlowPillsException("compile_failed", "Python could not be started to compile the flow.");
-            var output = process.StandardOutput.ReadToEndAsync();
-            var errors = process.StandardError.ReadToEndAsync();
-            process.StandardInput.Write(new JsonObject { ["flw"] = flow, ["agents_root"] = Install.AgentsRoot, ["pool"] = pool }.ToJsonString());
-            process.StandardInput.Close();
-            if (!process.WaitForExit(120_000))
-            {
-                try { process.Kill(entireProcessTree: true); }
-                catch (InvalidOperationException) { }
-                throw new FlowPillsException("compile_timeout", "Compiling the flow took more than two minutes; nothing was started.");
+                inputPipe.DisposeLocalCopyOfClientHandle();
+                outputPipe.DisposeLocalCopyOfClientHandle();
+                errorPipe.DisposeLocalCopyOfClientHandle();
+                var output = outputReader.ReadToEndAsync();
+                var errors = errorReader.ReadToEndAsync();
+                if (StopRequested) throw new OperationCanceledException();
+                using (var writer = new StreamWriter(inputPipe, Utf8))
+                    writer.Write(new JsonObject { ["flw"] = flow, ["agents_root"] = Install.AgentsRoot, ["pool"] = pool }.ToJsonString());
+                var wait = Stopwatch.StartNew();
+                while (!process.WaitForExit(100))
+                {
+                    if (StopRequested) throw new OperationCanceledException();
+                    if (wait.Elapsed >= TimeSpan.FromMinutes(2))
+                        throw new FlowPillsException("compile_timeout", "Compiling the flow took more than two minutes; nothing was started.");
+                }
+                // A compiler must not leave children holding its output pipes open.
+                job.TerminateAll();
+                if (StopRequested) throw new OperationCanceledException();
+                return ParseCompiled(output.GetAwaiter().GetResult(), errors.GetAwaiter().GetResult());
             }
-            return ParseCompiled(output.GetAwaiter().GetResult(), errors.GetAwaiter().GetResult());
+            finally
+            {
+                job.TerminateAll();
+                process.WaitForExit(3000);
+            }
         }
+        catch (Exception ex) when (StopRequested && ex is IOException or ObjectDisposedException or System.ComponentModel.Win32Exception)
+        { throw new OperationCanceledException("Compilation stopped", ex); }
         finally { Compiles.Release(); }
     }
 
@@ -441,7 +460,7 @@ public sealed class AgentFlowRun : FlowRun
     protected override void Dispose(bool disposing)
     {
         if (!disposing) return;
-        Ask(Command.ForceStop);
+        Stop(force: true);
         job.Dispose();
     }
 }

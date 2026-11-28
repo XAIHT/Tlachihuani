@@ -86,8 +86,10 @@ Trusted application enrollment uses native `{"op":"issue","gateway":true,"profil
 
 Since [1.0.1](releases/v1.0.1.md), an engine that is slow to answer is treated as busy,
 not dead. When the engine does not answer a request within 15 seconds, Jobs keeps it
-running and discards its late reply; only an engine that has owed a reply for more
-than 3 minutes is restarted, and the startup check allows 60 seconds. A web request
+running and discards its late reply. Before enforcing the 3-minute hung threshold,
+Jobs checks whether that reply has already arrived in its queue; a queued late reply
+does not restart a healthy engine, even after a long idle interval. An overdue reply
+that has not arrived still triggers recovery. The startup check allows 60 seconds. A web request
 the engine does not answer gets **503** (*The Torrenter engine is busy or restarting.
 Try again shortly.*) while the web facade stays up, and Jobs' status reports
 `engine_busy`. The workspace page asks for one refresh at a time, waits up to 30

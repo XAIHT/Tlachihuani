@@ -173,10 +173,12 @@ in application storage outside Windows user profiles.
 
 ## Durable operations and schedules
 
-The closed operation set is `application.status`, `application.start`,
+The closed operation set is `application.status`, `application.start`, `application.stop`,
 `conversation.history`, `conversation.submit`, `conversation.cancel`,
 `conversation.permission` and `audio.transcribe`; capability availability
 additionally depends on the connected application adapter.
+`application.stop` requires the `stop` scope. This is the local RC operation set;
+the hosted website prompt route does not expose application start/stop controls.
 Authorization binds installation, edition, immutable account, device and scope.
 An accepted receipt is not completion. Repeating the same idempotency key and
 payload returns the same receipt; changing its meaning returns a conflict.

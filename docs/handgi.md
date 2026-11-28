@@ -49,6 +49,8 @@ when installed). **Stop Services** ends HandGI at once, together with every othe
 - **Pipe:** one per user and session, which only that user can open. XT sends `status`, `arm`,
   `disarm`, `show signs|camera|try|expert` or `stop`; any other request is refused before it is
   sent. A reply counts only when the pipe's server is the process `service.json` names.
+  A command canceled while waiting for the window thread is discarded. Once its handler
+  has begun, cancellation cannot undo it; dispatch retains the handler's actual result.
 - **Stop Services** ends the recorded process after checking its start time and executable, so a
   recycled PID or another program is never touched.
 - **Command line:** `Tlachihuani.HandGI.exe [--service] [--camera-off] [--show signs|camera|try|expert]`.

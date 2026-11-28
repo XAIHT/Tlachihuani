@@ -35,14 +35,14 @@
       "tlachihuani.core": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[1.0.1, )"
+          "Tlachihuani.Contracts": "[1.1.0, )"
         }
       },
       "tlachihuani.handgi": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.HandGI.Core": "[1.0.1, )",
-          "Tlachihuani.Windows": "[1.0.1, )"
+          "Tlachihuani.HandGI.Core": "[1.1.0, )",
+          "Tlachihuani.Windows": "[1.1.0, )"
         }
       },
       "tlachihuani.handgi.core": {
@@ -54,14 +54,14 @@
       "tlachihuani.rc": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Contracts": "[1.0.1, )"
+          "Tlachihuani.Contracts": "[1.1.0, )"
         }
       },
       "tlachihuani.windows": {
         "type": "Project",
         "dependencies": {
-          "Tlachihuani.Core": "[1.0.1, )",
-          "Tlachihuani.RC": "[1.0.1, )"
+          "Tlachihuani.Core": "[1.1.0, )",
+          "Tlachihuani.RC": "[1.1.0, )"
         }
       }
     },
